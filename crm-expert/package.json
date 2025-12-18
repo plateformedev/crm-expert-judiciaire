@@ -1,0 +1,81 @@
+{
+  "name": "crm-expert-judiciaire",
+  "version": "3.0.0",
+  "description": "CRM pour Expert Judiciaire BTP - Architecture modulaire complète",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
+    "db:migrate": "supabase db push",
+    "db:reset": "supabase db reset",
+    "db:seed": "supabase db seed"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "lucide-react": "^0.303.0",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.1",
+    "recharts": "^2.10.3",
+    "framer-motion": "^10.17.0",
+    "date-fns": "^3.0.6",
+    "date-fns-tz": "^2.0.0",
+    "zustand": "^4.4.7",
+    "react-hook-form": "^7.49.2",
+    "@hookform/resolvers": "^3.3.2",
+    "zod": "^3.22.4",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.2.0",
+    "react-hot-toast": "^2.4.1",
+    "idb": "^8.0.0",
+    "@tanstack/react-query": "^5.17.0",
+    "axios": "^1.6.2",
+    "pdfmake": "^0.2.9"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.10",
+    "vite-plugin-pwa": "^0.17.4",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "postcss-import": "^15.1.0",
+    "cssnano": "^6.0.2",
+    "tailwindcss": "^3.4.0",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "vitest": "^1.1.1",
+    "@vitest/ui": "^1.1.1",
+    "@vitest/coverage-v8": "^1.1.1",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/user-event": "^14.5.2",
+    "jsdom": "^23.1.0",
+    "msw": "^2.0.11",
+    "supabase": "^1.123.0",
+    "web-vitals": "^3.5.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

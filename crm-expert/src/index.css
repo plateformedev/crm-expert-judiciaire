@@ -1,0 +1,378 @@
+/* ============================================================================
+   CRM EXPERT JUDICIAIRE - Styles principaux
+   ============================================================================ */
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* ============================================================================
+   Fonts
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ============================================================================
+   Base Styles
+   ============================================================================ */
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply font-sans text-neutral-900 bg-neutral-50 antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Titres */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans tracking-tight;
+  }
+
+  h1 {
+    @apply text-3xl font-light;
+  }
+
+  h2 {
+    @apply text-2xl font-light;
+  }
+
+  h3 {
+    @apply text-xl font-medium;
+  }
+
+  h4 {
+    @apply text-lg font-medium;
+  }
+
+  /* Focus visible */
+  :focus-visible {
+    @apply outline-none ring-2 ring-gold-500 ring-offset-2;
+  }
+
+  /* Sélection */
+  ::selection {
+    @apply bg-gold-200 text-gold-900;
+  }
+
+  /* Placeholder */
+  ::placeholder {
+    @apply text-neutral-400;
+  }
+}
+
+/* ============================================================================
+   Components
+   ============================================================================ */
+
+@layer components {
+  /* Carte avec effet glassmorphism */
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-sm border border-white/20 shadow-soft;
+  }
+
+  /* Loader spinner */
+  .spinner {
+    @apply w-6 h-6 border-2 border-gold-500 border-t-transparent rounded-full animate-spin;
+  }
+
+  /* Badge de statut */
+  .status-badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full;
+  }
+
+  .status-nouveau {
+    @apply bg-blue-100 text-blue-700;
+  }
+
+  .status-en-cours {
+    @apply bg-gold-100 text-gold-700;
+  }
+
+  .status-pre-rapport {
+    @apply bg-amber-100 text-amber-700;
+  }
+
+  .status-termine {
+    @apply bg-green-100 text-green-700;
+  }
+
+  /* Tooltip */
+  .tooltip {
+    @apply absolute z-50 px-2 py-1 text-xs font-medium text-white bg-neutral-900 rounded-lg shadow-lg;
+    @apply opacity-0 invisible transition-all duration-200;
+    @apply -translate-x-1/2 left-1/2 bottom-full mb-2;
+  }
+
+  .tooltip-trigger:hover .tooltip {
+    @apply opacity-100 visible;
+  }
+
+  /* Dropdown menu */
+  .dropdown-menu {
+    @apply absolute z-50 min-w-48 p-1 bg-white border border-neutral-200 rounded-xl shadow-lg;
+    @apply origin-top-right scale-95 opacity-0 invisible;
+    @apply transition-all duration-200 ease-out;
+  }
+
+  .dropdown-menu.open {
+    @apply scale-100 opacity-100 visible;
+  }
+
+  .dropdown-item {
+    @apply flex items-center gap-3 px-3 py-2 text-sm text-neutral-700 rounded-lg;
+    @apply hover:bg-neutral-100 cursor-pointer transition-colors;
+  }
+
+  /* Modal overlay */
+  .modal-overlay {
+    @apply fixed inset-0 z-50 bg-black/50 backdrop-blur-sm;
+    @apply flex items-center justify-center p-4;
+  }
+
+  .modal-content {
+    @apply bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-hidden;
+    @apply animate-scale-in;
+  }
+
+  /* Sidebar navigation */
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 text-neutral-600 rounded-xl;
+    @apply hover:bg-neutral-100 hover:text-neutral-900;
+    @apply transition-all duration-200;
+  }
+
+  .nav-item.active {
+    @apply bg-gold-100 text-gold-700 font-medium;
+  }
+
+  /* Form field */
+  .form-field {
+    @apply space-y-2;
+  }
+
+  .form-label {
+    @apply block text-xs font-medium uppercase tracking-wider text-neutral-500;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-3 border border-neutral-200 rounded-xl;
+    @apply focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-100;
+    @apply transition-all duration-200;
+  }
+
+  .form-error {
+    @apply text-xs text-red-600 mt-1;
+  }
+
+  /* Data table */
+  .data-table {
+    @apply w-full border-collapse;
+  }
+
+  .data-table thead {
+    @apply bg-neutral-50 sticky top-0;
+  }
+
+  .data-table th {
+    @apply px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500;
+    @apply border-b border-neutral-200;
+  }
+
+  .data-table td {
+    @apply px-4 py-4 text-sm text-neutral-700 border-b border-neutral-100;
+  }
+
+  .data-table tbody tr:hover {
+    @apply bg-neutral-50;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    @apply h-2 bg-neutral-200 rounded-full overflow-hidden;
+  }
+
+  .progress-bar-fill {
+    @apply h-full bg-gold-500 rounded-full transition-all duration-500 ease-out;
+  }
+
+  /* Alertes par criticité */
+  .alert-critique {
+    @apply border-l-4 border-l-red-500 bg-red-50;
+  }
+
+  .alert-haute {
+    @apply border-l-4 border-l-orange-500 bg-orange-50;
+  }
+
+  .alert-moyenne {
+    @apply border-l-4 border-l-amber-500 bg-amber-50;
+  }
+
+  .alert-basse {
+    @apply border-l-4 border-l-blue-500 bg-blue-50;
+  }
+
+  /* Timeline */
+  .timeline-item {
+    @apply relative pl-8 pb-8 border-l-2 border-neutral-200 last:pb-0;
+  }
+
+  .timeline-dot {
+    @apply absolute left-0 -translate-x-1/2 w-4 h-4 rounded-full bg-gold-500 border-4 border-white;
+  }
+}
+
+/* ============================================================================
+   Utilities
+   ============================================================================ */
+
+@layer utilities {
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-gradient-to-r from-gold-600 to-gold-400 bg-clip-text text-transparent;
+  }
+
+  /* Masquer scrollbar mais garder scroll */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Scrollbar fine */
+  .thin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.neutral.300') theme('colors.neutral.100');
+  }
+
+  .thin-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-track {
+    @apply bg-neutral-100 rounded;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-neutral-300 rounded hover:bg-neutral-400;
+  }
+
+  /* Transition group pour listes */
+  .list-enter {
+    @apply opacity-0 translate-y-2;
+  }
+
+  .list-enter-active {
+    @apply opacity-100 translate-y-0 transition-all duration-300;
+  }
+
+  /* Safe area pour mobile */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* ============================================================================
+   Print Styles
+   ============================================================================ */
+
+@media print {
+  body {
+    @apply text-black bg-white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-break-before {
+    page-break-before: always;
+  }
+
+  .print-break-after {
+    page-break-after: always;
+  }
+
+  .print-avoid-break {
+    page-break-inside: avoid;
+  }
+}
+
+/* ============================================================================
+   Dark Mode (optionnel, préparé pour le futur)
+   ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  /* Désactivé par défaut, activer si besoin */
+  /* 
+  :root.dark-mode {
+    --bg-primary: theme('colors.neutral.900');
+    --bg-secondary: theme('colors.neutral.800');
+    --text-primary: theme('colors.neutral.100');
+    --text-secondary: theme('colors.neutral.400');
+  }
+  */
+}
+
+/* ============================================================================
+   Animations additionnelles
+   ============================================================================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    theme('colors.neutral.200') 0%,
+    theme('colors.neutral.100') 50%,
+    theme('colors.neutral.200') 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Skeleton loader */
+.skeleton {
+  @apply bg-neutral-200 rounded animate-pulse;
+}
+
+/* Ripple effect pour boutons */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.3s;
+}
+
+.ripple:active::after {
+  transform: scale(2);
+  opacity: 1;
+  transition: 0s;
+}
