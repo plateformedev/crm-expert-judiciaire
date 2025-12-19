@@ -158,7 +158,8 @@ export const saveAffaires = (affaires) => {
 };
 
 // Vérifier si on est en mode démo (pas de Supabase configuré)
-export const isDemoMode = () => {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  return !supabaseUrl || supabaseUrl === 'https://placeholder.supabase.co';
-};
+// Calculé une seule fois au chargement du module
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+export const DEMO_MODE = !supabaseUrl || supabaseUrl === 'https://placeholder.supabase.co';
+
+export const isDemoMode = () => DEMO_MODE;

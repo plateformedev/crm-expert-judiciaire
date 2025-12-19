@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase, realtime } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { isDemoMode, getStoredAffaires, saveAffaires, DEMO_USER } from '../lib/demoData';
+import { DEMO_MODE, getStoredAffaires, saveAffaires, DEMO_USER } from '../lib/demoData';
 
 // ============================================================================
 // HOOK GÉNÉRIQUE: useSupabaseQuery
@@ -108,14 +108,13 @@ export const useAffaires = (options = {}) => {
   const [affaires, setAffaires] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const demoMode = isDemoMode();
 
   const { statut = null, limit = null } = options;
 
   // Charger les affaires
   const fetchAffaires = useCallback(async () => {
     // Mode démo : charger depuis localStorage
-    if (demoMode) {
+    if (DEMO_MODE) {
       setLoading(true);
       try {
         let data = getStoredAffaires();
@@ -174,7 +173,7 @@ export const useAffaires = (options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [user, statut, limit, demoMode]);
+  }, [user, statut, limit]);
 
   useEffect(() => {
     fetchAffaires();
@@ -183,7 +182,7 @@ export const useAffaires = (options = {}) => {
   // Créer une affaire
   const createAffaire = useCallback(async (affaireData) => {
     // Mode démo
-    if (demoMode) {
+    if (DEMO_MODE) {
       const currentAffaires = getStoredAffaires();
       const annee = new Date().getFullYear();
       const reference = `EXP-${annee}-${String(currentAffaires.length + 1).padStart(4, '0')}`;
@@ -241,7 +240,7 @@ export const useAffaires = (options = {}) => {
       console.error('Erreur création affaire:', err);
       return { success: false, error: err.message };
     }
-  }, [user, demoMode]);
+  }, [user]);
 
   // Mettre à jour une affaire
   const updateAffaire = useCallback(async (id, updates) => {

@@ -4,7 +4,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, auth } from '../lib/supabase';
-import { isDemoMode, DEMO_USER } from '../lib/demoData';
+import { DEMO_MODE, DEMO_USER } from '../lib/demoData';
 
 // ============================================================================
 // CRÉATION DU CONTEXTE
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       // Mode démo : utiliser l'utilisateur démo directement
-      if (isDemoMode()) {
+      if (DEMO_MODE) {
         console.log('Mode démo activé - Supabase non configuré');
         setUser(DEMO_USER);
         setExpert({
@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }) => {
     initAuth();
 
     // Ne pas écouter les changements en mode démo
-    if (isDemoMode()) {
+    if (DEMO_MODE) {
       return;
     }
 
