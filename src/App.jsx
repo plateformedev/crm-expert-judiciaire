@@ -299,6 +299,66 @@ const MatriceImputabiliteWrapper = () => {
 };
 
 // ============================================================================
+// DASHBOARD WRAPPER - Avec navigation fonctionnelle
+// ============================================================================
+
+const DashboardWrapper = () => {
+  const navigate = useNavigate();
+  const { affaires } = useAffaires();
+  const { expert } = useAuth();
+
+  const handleNavigate = (action) => {
+    switch (action) {
+      case 'nouvelle-affaire':
+        navigate('/affaires/nouveau');
+        break;
+      case 'nouvelle-reunion':
+        // Si des affaires existent, aller vers la première pour planifier
+        if (affaires.length > 0) {
+          navigate(`/affaires/${affaires[0].id}`);
+        } else {
+          navigate('/affaires');
+        }
+        break;
+      case 'document':
+        // Aller vers la liste des affaires pour choisir
+        navigate('/affaires');
+        break;
+      case 'lrar':
+        // Pour l'instant, notification que cette fonctionnalité arrive
+        alert('Fonctionnalité LRAR bientôt disponible');
+        break;
+      case 'alertes':
+        navigate('/alertes');
+        break;
+      case 'dires':
+        if (affaires.length > 0) {
+          navigate(`/affaires/${affaires[0].id}/dires`);
+        }
+        break;
+      case 'finances':
+        navigate('/affaires');
+        break;
+      default:
+        console.log('Action non gérée:', action);
+    }
+  };
+
+  const handleSelectAffaire = (affaire) => {
+    navigate(`/affaires/${affaire.id}`);
+  };
+
+  return (
+    <DashboardExpert
+      expert={expert}
+      affaires={affaires}
+      onNavigate={handleNavigate}
+      onSelectAffaire={handleSelectAffaire}
+    />
+  );
+};
+
+// ============================================================================
 // LAYOUT PRINCIPAL
 // ============================================================================
 
@@ -417,7 +477,7 @@ const App = () => {
         <Suspense fallback={<LoadingSpinner size="lg" />}>
           <Routes>
           {/* Dashboard */}
-          <Route path="/" element={<DashboardExpert />} />
+          <Route path="/" element={<DashboardWrapper />} />
           
           {/* Affaires */}
           <Route path="/affaires" element={<ListeAffaires />} />

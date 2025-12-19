@@ -623,7 +623,16 @@ export const OpalexeModule = ({ affaire }) => {
         </div>
       </Card>
 
-      <Button variant="gold" className="w-full" disabled={score < 100}>
+      <Button
+        variant="gold"
+        className="w-full"
+        disabled={score < 100}
+        onClick={() => {
+          if (score >= 100) {
+            alert('Préparation du dépôt Opalexe - Fonctionnalité en cours de développement');
+          }
+        }}
+      >
         <Upload className="w-4 h-4 mr-2" />
         Préparer le dépôt
       </Button>

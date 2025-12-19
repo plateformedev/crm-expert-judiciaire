@@ -541,7 +541,7 @@ export const InterventionsSapiteurs = ({ affaireId, interventions = [] }) => {
                   </div>
                   <div className="flex gap-2">
                     {intervention.rapport_path && (
-                      <Button variant="ghost" size="sm" icon={FileText}>
+                      <Button variant="ghost" size="sm" icon={FileText} onClick={() => window.open(intervention.rapport_path, '_blank')}>
                         Rapport
                       </Button>
                     )}

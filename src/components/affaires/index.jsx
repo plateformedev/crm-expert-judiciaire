@@ -432,6 +432,23 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
   const { affaire, loading, error, update } = useAffaireDetail(affaireId);
   const [activeTab, setActiveTab] = useState('general');
   const [editing, setEditing] = useState(false);
+  const [showAddPartie, setShowAddPartie] = useState(false);
+  const [showAddReunion, setShowAddReunion] = useState(false);
+  const [showAddDesordre, setShowAddDesordre] = useState(false);
+
+  // Gestionnaire pour générer un document
+  const handleGenerateDocument = () => {
+    alert('Générateur de document - Fonctionnalité en cours de développement');
+  };
+
+  // Gestionnaire pour télécharger un document
+  const handleDownloadDocument = (doc) => {
+    if (doc.url) {
+      window.open(doc.url, '_blank');
+    } else {
+      alert(`Téléchargement de "${doc.titre}" - URL non disponible en mode démo`);
+    }
+  };
 
   if (loading) {
     return (
@@ -486,7 +503,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
           <Button variant="secondary" icon={Edit} onClick={() => setEditing(true)}>
             Modifier
           </Button>
-          <Button variant="primary" icon={FileText}>
+          <Button variant="primary" icon={FileText} onClick={handleGenerateDocument}>
             Générer document
           </Button>
         </div>
@@ -520,13 +537,44 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
       {/* Contenu des tabs */}
       <div className="min-h-[400px]">
         {activeTab === 'general' && <TabGeneral affaire={affaire} />}
-        {activeTab === 'parties' && <TabParties affaire={affaire} />}
-        {activeTab === 'reunions' && <TabReunions affaire={affaire} />}
-        {activeTab === 'desordres' && <TabDesordres affaire={affaire} />}
-        {activeTab === 'documents' && <TabDocuments affaire={affaire} />}
+        {activeTab === 'parties' && <TabParties affaire={affaire} onAddPartie={() => setShowAddPartie(true)} />}
+        {activeTab === 'reunions' && <TabReunions affaire={affaire} onAddReunion={() => setShowAddReunion(true)} />}
+        {activeTab === 'desordres' && <TabDesordres affaire={affaire} onAddDesordre={() => setShowAddDesordre(true)} />}
+        {activeTab === 'documents' && <TabDocuments affaire={affaire} onDownload={handleDownloadDocument} />}
         {activeTab === 'financier' && <TabFinancier affaire={affaire} />}
         {activeTab === 'outils' && <TabOutils affaire={affaire} />}
       </div>
+
+      {/* Modals pour ajout (placeholders pour l'instant) */}
+      {showAddPartie && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-lg p-6">
+            <h3 className="text-lg font-medium mb-4">Ajouter une partie</h3>
+            <p className="text-[#737373] mb-4">Fonctionnalité en cours de développement</p>
+            <Button variant="secondary" onClick={() => setShowAddPartie(false)}>Fermer</Button>
+          </Card>
+        </div>
+      )}
+
+      {showAddReunion && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-lg p-6">
+            <h3 className="text-lg font-medium mb-4">Planifier une réunion</h3>
+            <p className="text-[#737373] mb-4">Fonctionnalité en cours de développement</p>
+            <Button variant="secondary" onClick={() => setShowAddReunion(false)}>Fermer</Button>
+          </Card>
+        </div>
+      )}
+
+      {showAddDesordre && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-lg p-6">
+            <h3 className="text-lg font-medium mb-4">Ajouter un désordre</h3>
+            <p className="text-[#737373] mb-4">Fonctionnalité en cours de développement</p>
+            <Button variant="secondary" onClick={() => setShowAddDesordre(false)}>Fermer</Button>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
@@ -597,7 +645,7 @@ const TabGeneral = ({ affaire }) => (
   </div>
 );
 
-const TabParties = ({ affaire }) => {
+const TabParties = ({ affaire, onAddPartie }) => {
   const parties = affaire.parties || [];
 
   const partiesByType = {
@@ -652,14 +700,14 @@ const TabParties = ({ affaire }) => {
         )
       ))}
       
-      <Button variant="secondary" icon={Plus} className="w-full">
+      <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddPartie}>
         Ajouter une partie
       </Button>
     </div>
   );
 };
 
-const TabReunions = ({ affaire }) => (
+const TabReunions = ({ affaire, onAddReunion }) => (
   <div className="space-y-4">
     {(affaire.reunions || []).length === 0 ? (
       <EmptyState
@@ -692,13 +740,13 @@ const TabReunions = ({ affaire }) => (
         </Card>
       ))
     )}
-    <Button variant="secondary" icon={Plus} className="w-full">
+    <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddReunion}>
       Planifier une réunion
     </Button>
   </div>
 );
 
-const TabDesordres = ({ affaire }) => (
+const TabDesordres = ({ affaire, onAddDesordre }) => (
   <div className="space-y-4">
     {(affaire.pathologies || []).length === 0 ? (
       <EmptyState
@@ -731,13 +779,13 @@ const TabDesordres = ({ affaire }) => (
         </Card>
       ))
     )}
-    <Button variant="secondary" icon={Plus} className="w-full">
+    <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddDesordre}>
       Ajouter un désordre
     </Button>
   </div>
 );
 
-const TabDocuments = ({ affaire }) => (
+const TabDocuments = ({ affaire, onDownload }) => (
   <div className="space-y-4">
     {(affaire.documents || []).length === 0 ? (
       <EmptyState
@@ -758,7 +806,7 @@ const TabDocuments = ({ affaire }) => (
                 </p>
               </div>
             </div>
-            <Button variant="ghost" size="sm" icon={Download}>
+            <Button variant="ghost" size="sm" icon={Download} onClick={() => onDownload && onDownload(doc)}>
               Télécharger
             </Button>
           </div>
