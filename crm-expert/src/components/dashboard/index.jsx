@@ -14,7 +14,7 @@ import {
 import { Card, Badge, Button, ProgressBar } from '../ui';
 import { AlertesWidget } from '../alertes';
 import { DiresWidget } from '../dires';
-import { formatDateFr, joursEntre, formatMontant } from '../../utils/helpers';
+import { formatDateFr, joursEntre, formatMontant, calculerAvancementTunnel } from '../../utils/helpers';
 import { useAlertes, AlertEngine } from '../alertes';
 
 // ============================================================================
@@ -128,7 +128,7 @@ export const DashboardExpert = ({
               {expert?.prenom || 'Expert'} {expert?.nom || ''}
             </h1>
             <p className="text-white/60 mt-1">
-              {formatDateFr(new Date(), true)} — Voici votre tableau de bord
+              {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} — Voici votre tableau de bord
             </p>
           </div>
           
@@ -422,35 +422,38 @@ const AffairesRecentes = ({ affaires, onSelect }) => {
       </div>
 
       <div className="space-y-3">
-        {affaires.map(affaire => (
-          <div
-            key={affaire.id}
-            className="p-3 rounded-xl bg-[#fafafa] cursor-pointer hover:shadow-sm transition-shadow"
-            onClick={() => onSelect && onSelect(affaire)}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-sm text-[#1a1a1a]">{affaire.reference}</p>
-                <p className="text-xs text-[#737373]">{affaire.bien_ville || affaire.tribunal}</p>
+        {affaires.map(affaire => {
+          const avancement = calculerAvancementTunnel(affaire).pourcentage;
+          return (
+            <div
+              key={affaire.id}
+              className="p-3 rounded-xl bg-[#fafafa] cursor-pointer hover:shadow-sm transition-shadow"
+              onClick={() => onSelect && onSelect(affaire)}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-sm text-[#1a1a1a]">{affaire.reference}</p>
+                  <p className="text-xs text-[#737373]">{affaire.bien_ville || affaire.tribunal}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {affaire.urgent && <Badge variant="error">Urgent</Badge>}
+                  <Badge variant={
+                    affaire.statut === 'termine' ? 'success' :
+                    affaire.statut === 'pre-rapport' ? 'warning' : 'info'
+                  }>
+                    {affaire.statut || 'En cours'}
+                  </Badge>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                {affaire.urgent && <Badge variant="error">Urgent</Badge>}
-                <Badge variant={
-                  affaire.statut === 'termine' ? 'success' :
-                  affaire.statut === 'pre-rapport' ? 'warning' : 'info'
-                }>
-                  {affaire.statut || 'En cours'}
-                </Badge>
-              </div>
+              <ProgressBar
+                value={avancement}
+                size="sm"
+                showLabel={false}
+                className="mt-2"
+              />
             </div>
-            <ProgressBar 
-              value={affaire.avancement || 0} 
-              size="sm" 
-              showLabel={false}
-              className="mt-2"
-            />
-          </div>
-        ))}
+          );
+        })}
       </div>
     </Card>
   );

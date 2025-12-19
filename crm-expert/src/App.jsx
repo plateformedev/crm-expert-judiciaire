@@ -386,6 +386,66 @@ const AppLayout = ({ children }) => {
 // APPLICATION PRINCIPALE
 // ============================================================================
 
+// Wrapper Dashboard avec données
+const DashboardWrapper = () => {
+  const navigate = useNavigate();
+  const { affaires } = useAffaires();
+  const { expert } = useAuth();
+
+  const handleNavigate = (action) => {
+    switch (action) {
+      case 'affaires':
+        navigate('/affaires');
+        break;
+      case 'nouvelle-affaire':
+        navigate('/affaires/nouveau');
+        break;
+      case 'alertes':
+        navigate('/alertes');
+        break;
+      case 'calendrier':
+        navigate('/calendrier');
+        break;
+      case 'finances':
+        navigate('/facturation');
+        break;
+      case 'dires':
+        navigate('/affaires'); // Pour l'instant
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleSelectAffaire = (affaire) => {
+    if (affaire?.id) {
+      navigate(`/affaires/${affaire.id}`);
+    }
+  };
+
+  return (
+    <DashboardExpert
+      expert={expert}
+      affaires={affaires}
+      onNavigate={handleNavigate}
+      onSelectAffaire={handleSelectAffaire}
+    />
+  );
+};
+
+// Wrapper Alertes avec données
+const AlertesWrapper = () => {
+  const navigate = useNavigate();
+  const { affaires } = useAffaires();
+
+  return (
+    <CentreAlertes
+      affaires={affaires}
+      onAlertClick={(alerte) => navigate(`/affaires/${alerte.affaireId}`)}
+    />
+  );
+};
+
 const App = () => {
   const { user, loading: authLoading } = useAuth();
 
@@ -406,7 +466,7 @@ const App = () => {
       <Suspense fallback={<LoadingSpinner size="lg" />}>
         <Routes>
           {/* Dashboard */}
-          <Route path="/" element={<DashboardExpert />} />
+          <Route path="/" element={<DashboardWrapper />} />
           
           {/* Affaires */}
           <Route path="/affaires" element={<ListeAffaires />} />
@@ -419,7 +479,7 @@ const App = () => {
           <Route path="/affaires/:id/imputabilite" element={<MatriceImputabiliteWrapper />} />
           
           {/* Alertes */}
-          <Route path="/alertes" element={<CentreAlertes />} />
+          <Route path="/alertes" element={<AlertesWrapper />} />
           
           {/* Pages principales */}
           <Route path="/calendrier" element={<PageCalendrier />} />

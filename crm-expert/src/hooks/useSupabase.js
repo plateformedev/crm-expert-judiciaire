@@ -456,13 +456,53 @@ export const useAffaireDetail = (affaireId) => {
 // ============================================================================
 
 export const useParties = (affaireId) => {
-  const { data, loading, error, refetch } = useSupabaseQuery('parties', {
-    filter: { affaire_id: affaireId },
-    orderBy: { column: 'type', ascending: true }
-  });
+  const [parties, setParties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const isDemoMode = !isSupabaseConfigured();
+
+  const fetchParties = useCallback(async () => {
+    if (!affaireId) {
+      setParties([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (isDemoMode) {
+        const data = localParties.getByAffaire(affaireId);
+        setParties(data);
+      } else {
+        const { data, error } = await supabase
+          .from('parties')
+          .select('*')
+          .eq('affaire_id', affaireId)
+          .order('type', { ascending: true });
+
+        if (error) throw error;
+        setParties(data || []);
+      }
+    } catch (err) {
+      console.error('Erreur fetch parties:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [affaireId, isDemoMode]);
+
+  useEffect(() => {
+    fetchParties();
+  }, [fetchParties]);
 
   const addPartie = useCallback(async (partieData) => {
     try {
+      if (isDemoMode) {
+        const newPartie = localParties.create({ affaire_id: affaireId, ...partieData });
+        setParties(prev => [...prev, newPartie]);
+        return { success: true, partie: newPartie };
+      }
+
       const { data: newPartie, error } = await supabase
         .from('parties')
         .insert({ affaire_id: affaireId, ...partieData })
@@ -470,48 +510,63 @@ export const useParties = (affaireId) => {
         .single();
 
       if (error) throw error;
-      await refetch();
+      await fetchParties();
       return { success: true, partie: newPartie };
     } catch (err) {
       return { success: false, error: err.message };
     }
-  }, [affaireId, refetch]);
+  }, [affaireId, isDemoMode, fetchParties]);
 
   const updatePartie = useCallback(async (id, updates) => {
     try {
+      if (isDemoMode) {
+        const updated = localParties.update(id, updates);
+        if (updated) {
+          setParties(prev => prev.map(p => p.id === id ? updated : p));
+          return { success: true };
+        }
+        return { success: false, error: 'Partie non trouvée' };
+      }
+
       const { error } = await supabase
         .from('parties')
         .update(updates)
         .eq('id', id);
 
       if (error) throw error;
-      await refetch();
+      await fetchParties();
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
     }
-  }, [refetch]);
+  }, [isDemoMode, fetchParties]);
 
   const deletePartie = useCallback(async (id) => {
     try {
+      if (isDemoMode) {
+        localParties.delete(id);
+        setParties(prev => prev.filter(p => p.id !== id));
+        return { success: true };
+      }
+
       const { error } = await supabase
         .from('parties')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
-      await refetch();
+      await fetchParties();
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
     }
-  }, [refetch]);
+  }, [isDemoMode, fetchParties]);
 
   return {
-    parties: data,
+    parties,
     loading,
     error,
-    refetch,
+    refetch: fetchParties,
     addPartie,
     updatePartie,
     deletePartie
@@ -523,15 +578,54 @@ export const useParties = (affaireId) => {
 // ============================================================================
 
 export const useReunions = (affaireId) => {
-  const { data, loading, error, refetch } = useSupabaseQuery('reunions', {
-    filter: { affaire_id: affaireId },
-    orderBy: { column: 'date_reunion', ascending: true }
-  });
+  const [reunions, setReunions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const isDemoMode = !isSupabaseConfigured();
+
+  const fetchReunions = useCallback(async () => {
+    if (!affaireId) {
+      setReunions([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (isDemoMode) {
+        const data = localReunions.getByAffaire(affaireId);
+        setReunions(data);
+      } else {
+        const { data, error } = await supabase
+          .from('reunions')
+          .select('*')
+          .eq('affaire_id', affaireId)
+          .order('date_reunion', { ascending: true });
+
+        if (error) throw error;
+        setReunions(data || []);
+      }
+    } catch (err) {
+      console.error('Erreur fetch reunions:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [affaireId, isDemoMode]);
+
+  useEffect(() => {
+    fetchReunions();
+  }, [fetchReunions]);
 
   const addReunion = useCallback(async (reunionData) => {
     try {
-      // Calculer le numéro de réunion
-      const numero = (data?.length || 0) + 1;
+      const numero = reunions.length + 1;
+
+      if (isDemoMode) {
+        const newReunion = localReunions.create({ affaire_id: affaireId, numero, ...reunionData });
+        setReunions(prev => [...prev, newReunion]);
+        return { success: true, reunion: newReunion };
+      }
 
       const { data: newReunion, error } = await supabase
         .from('reunions')
@@ -540,33 +634,42 @@ export const useReunions = (affaireId) => {
         .single();
 
       if (error) throw error;
-      await refetch();
+      await fetchReunions();
       return { success: true, reunion: newReunion };
     } catch (err) {
       return { success: false, error: err.message };
     }
-  }, [affaireId, data, refetch]);
+  }, [affaireId, reunions.length, isDemoMode, fetchReunions]);
 
   const updateReunion = useCallback(async (id, updates) => {
     try {
+      if (isDemoMode) {
+        const updated = localReunions.update(id, updates);
+        if (updated) {
+          setReunions(prev => prev.map(r => r.id === id ? updated : r));
+          return { success: true };
+        }
+        return { success: false, error: 'Réunion non trouvée' };
+      }
+
       const { error } = await supabase
         .from('reunions')
         .update(updates)
         .eq('id', id);
 
       if (error) throw error;
-      await refetch();
+      await fetchReunions();
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
     }
-  }, [refetch]);
+  }, [isDemoMode, fetchReunions]);
 
   return {
-    reunions: data,
+    reunions,
     loading,
     error,
-    refetch,
+    refetch: fetchReunions,
     addReunion,
     updateReunion
   };
@@ -577,14 +680,54 @@ export const useReunions = (affaireId) => {
 // ============================================================================
 
 export const usePathologies = (affaireId) => {
-  const { data, loading, error, refetch } = useSupabaseQuery('pathologies', {
-    filter: { affaire_id: affaireId },
-    orderBy: { column: 'numero', ascending: true }
-  });
+  const [pathologies, setPathologies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const isDemoMode = !isSupabaseConfigured();
+
+  const fetchPathologies = useCallback(async () => {
+    if (!affaireId) {
+      setPathologies([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (isDemoMode) {
+        const data = localPathologies.getByAffaire(affaireId);
+        setPathologies(data);
+      } else {
+        const { data, error } = await supabase
+          .from('pathologies')
+          .select('*')
+          .eq('affaire_id', affaireId)
+          .order('numero', { ascending: true });
+
+        if (error) throw error;
+        setPathologies(data || []);
+      }
+    } catch (err) {
+      console.error('Erreur fetch pathologies:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [affaireId, isDemoMode]);
+
+  useEffect(() => {
+    fetchPathologies();
+  }, [fetchPathologies]);
 
   const addPathologie = useCallback(async (pathologieData) => {
     try {
-      const numero = (data?.length || 0) + 1;
+      const numero = pathologies.length + 1;
+
+      if (isDemoMode) {
+        const newPathologie = localPathologies.create({ affaire_id: affaireId, numero, ...pathologieData });
+        setPathologies(prev => [...prev, newPathologie]);
+        return { success: true, pathologie: newPathologie };
+      }
 
       const { data: newPathologie, error } = await supabase
         .from('pathologies')
@@ -593,35 +736,66 @@ export const usePathologies = (affaireId) => {
         .single();
 
       if (error) throw error;
-      await refetch();
+      await fetchPathologies();
       return { success: true, pathologie: newPathologie };
     } catch (err) {
       return { success: false, error: err.message };
     }
-  }, [affaireId, data, refetch]);
+  }, [affaireId, pathologies.length, isDemoMode, fetchPathologies]);
 
   const updatePathologie = useCallback(async (id, updates) => {
     try {
+      if (isDemoMode) {
+        const updated = localPathologies.update(id, updates);
+        if (updated) {
+          setPathologies(prev => prev.map(p => p.id === id ? updated : p));
+          return { success: true };
+        }
+        return { success: false, error: 'Pathologie non trouvée' };
+      }
+
       const { error } = await supabase
         .from('pathologies')
         .update(updates)
         .eq('id', id);
 
       if (error) throw error;
-      await refetch();
+      await fetchPathologies();
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
     }
-  }, [refetch]);
+  }, [isDemoMode, fetchPathologies]);
+
+  const deletePathologie = useCallback(async (id) => {
+    try {
+      if (isDemoMode) {
+        localPathologies.delete(id);
+        setPathologies(prev => prev.filter(p => p.id !== id));
+        return { success: true };
+      }
+
+      const { error } = await supabase
+        .from('pathologies')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      await fetchPathologies();
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }, [isDemoMode, fetchPathologies]);
 
   return {
-    pathologies: data,
+    pathologies,
     loading,
     error,
-    refetch,
+    refetch: fetchPathologies,
     addPathologie,
-    updatePathologie
+    updatePathologie,
+    deletePathologie
   };
 };
 

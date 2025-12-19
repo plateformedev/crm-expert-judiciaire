@@ -11,7 +11,7 @@ import {
   Building, Gavel, Phone, Mail, Save, X, Upload, Download
 } from 'lucide-react';
 import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase } from '../ui';
-import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
+import { useAffaires, useAffaireDetail, useParties, useReunions, usePathologies } from '../../hooks/useSupabase';
 import { ETAPES_TUNNEL, GARANTIES } from '../../data';
 import { formatDateFr, calculerDelaiRestant, calculerAvancementTunnel } from '../../utils/helpers';
 
@@ -160,10 +160,10 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
       ) : (
         <div className="grid gap-4">
           {affairesFiltrees.map(affaire => (
-            <AffaireCard 
-              key={affaire.id} 
-              affaire={affaire} 
-              onClick={() => onSelectAffaire && onSelectAffaire(affaire)}
+            <AffaireCard
+              key={affaire.id}
+              affaire={affaire}
+              onClick={() => navigate(`/affaires/${affaire.id}`)}
             />
           ))}
         </div>
@@ -191,11 +191,12 @@ const AffaireCard = ({ affaire, onClick }) => {
   
   const getStatutBadge = () => {
     switch (affaire.statut) {
+      case 'nouveau': return { variant: 'gold', label: 'Nouveau' };
       case 'en-cours': return { variant: 'info', label: 'En cours' };
       case 'pre-rapport': return { variant: 'warning', label: 'Pré-rapport' };
       case 'termine': return { variant: 'success', label: 'Terminé' };
       case 'archive': return { variant: 'default', label: 'Archivé' };
-      default: return { variant: 'default', label: affaire.statut };
+      default: return { variant: 'info', label: affaire.statut || 'En cours' };
     }
   };
 
@@ -610,6 +611,17 @@ const TabGeneral = ({ affaire }) => (
 
 const TabParties = ({ affaireId }) => {
   const { parties, loading, addPartie } = useParties(affaireId);
+  const [showModal, setShowModal] = useState(false);
+  const [newPartie, setNewPartie] = useState({ type: 'demandeur', nom: '', prenom: '', email: '', telephone: '' });
+
+  const handleAddPartie = async () => {
+    if (!newPartie.nom) return;
+    const result = await addPartie(newPartie);
+    if (result.success) {
+      setShowModal(false);
+      setNewPartie({ type: 'demandeur', nom: '', prenom: '', email: '', telephone: '' });
+    }
+  };
 
   if (loading) return <div className="text-center py-8">Chargement...</div>;
 
@@ -664,91 +676,237 @@ const TabParties = ({ affaireId }) => {
           </div>
         )
       ))}
-      
-      <Button variant="secondary" icon={Plus} className="w-full">
+
+      <Button variant="secondary" icon={Plus} className="w-full" onClick={() => setShowModal(true)}>
         Ajouter une partie
       </Button>
+
+      {showModal && (
+        <ModalBase isOpen={true} onClose={() => setShowModal(false)} title="Ajouter une partie" size="md">
+          <div className="space-y-4">
+            <Select
+              label="Type"
+              value={newPartie.type}
+              onChange={(e) => setNewPartie(prev => ({ ...prev, type: e.target.value }))}
+              options={[
+                { value: 'demandeur', label: 'Demandeur' },
+                { value: 'defenseur', label: 'Défendeur' },
+                { value: 'intervenant', label: 'Intervenant' },
+                { value: 'assureur', label: 'Assureur' }
+              ]}
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Nom" value={newPartie.nom} onChange={(e) => setNewPartie(prev => ({ ...prev, nom: e.target.value }))} required />
+              <Input label="Prénom" value={newPartie.prenom} onChange={(e) => setNewPartie(prev => ({ ...prev, prenom: e.target.value }))} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Email" type="email" value={newPartie.email} onChange={(e) => setNewPartie(prev => ({ ...prev, email: e.target.value }))} />
+              <Input label="Téléphone" value={newPartie.telephone} onChange={(e) => setNewPartie(prev => ({ ...prev, telephone: e.target.value }))} />
+            </div>
+            <div className="flex gap-3 pt-4">
+              <Button variant="secondary" onClick={() => setShowModal(false)} className="flex-1">Annuler</Button>
+              <Button variant="gold" onClick={handleAddPartie} className="flex-1">Ajouter</Button>
+            </div>
+          </div>
+        </ModalBase>
+      )}
     </div>
   );
 };
 
-const TabReunions = ({ affaire }) => (
-  <div className="space-y-4">
-    {(affaire.reunions || []).length === 0 ? (
-      <EmptyState
-        icon={Calendar}
-        title="Aucune réunion"
-        description="Planifiez la première réunion d'expertise"
-        actionLabel="Planifier"
-      />
-    ) : (
-      affaire.reunions.map(reunion => (
-        <Card key={reunion.id} className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
-                <span className="font-medium text-[#c9a227]">{reunion.numero}</span>
-              </div>
-              <div>
-                <p className="font-medium text-[#1a1a1a]">
-                  Réunion n°{reunion.numero}
-                </p>
-                <p className="text-sm text-[#737373]">
-                  {reunion.date_reunion ? formatDateFr(reunion.date_reunion) : 'Date à définir'}
-                </p>
-              </div>
-            </div>
-            <Badge variant={reunion.statut === 'terminee' ? 'success' : 'info'}>
-              {reunion.statut || 'Planifiée'}
-            </Badge>
-          </div>
-        </Card>
-      ))
-    )}
-    <Button variant="secondary" icon={Plus} className="w-full">
-      Planifier une réunion
-    </Button>
-  </div>
-);
+const TabReunions = ({ affaire }) => {
+  const { reunions, addReunion } = useReunions(affaire.id);
+  const [showModal, setShowModal] = useState(false);
+  const [newReunion, setNewReunion] = useState({ date_reunion: '', lieu: '', type: 'expertise' });
 
-const TabDesordres = ({ affaire }) => (
-  <div className="space-y-4">
-    {(affaire.pathologies || []).length === 0 ? (
-      <EmptyState
-        icon={AlertTriangle}
-        title="Aucun désordre"
-        description="Ajoutez les désordres constatés"
-        actionLabel="Ajouter"
-      />
-    ) : (
-      affaire.pathologies.map(pathologie => (
-        <Card key={pathologie.id} className="p-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs px-2 py-0.5 bg-[#1a1a1a] text-white rounded">
-                  D{pathologie.numero}
-                </span>
-                <span className="font-medium text-[#1a1a1a]">{pathologie.intitule}</span>
+  const handleAddReunion = async () => {
+    if (!newReunion.date_reunion) return;
+    const result = await addReunion(newReunion);
+    if (result.success) {
+      setShowModal(false);
+      setNewReunion({ date_reunion: '', lieu: '', type: 'expertise' });
+    }
+  };
+
+  const displayReunions = reunions.length > 0 ? reunions : (affaire.reunions || []);
+
+  return (
+    <div className="space-y-4">
+      {displayReunions.length === 0 ? (
+        <EmptyState
+          icon={Calendar}
+          title="Aucune réunion"
+          description="Planifiez la première réunion d'expertise"
+          action={() => setShowModal(true)}
+          actionLabel="Planifier"
+        />
+      ) : (
+        displayReunions.map(reunion => (
+          <Card key={reunion.id} className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
+                  <span className="font-medium text-[#c9a227]">{reunion.numero}</span>
+                </div>
+                <div>
+                  <p className="font-medium text-[#1a1a1a]">
+                    Réunion n°{reunion.numero}
+                  </p>
+                  <p className="text-sm text-[#737373]">
+                    {reunion.date_reunion ? formatDateFr(reunion.date_reunion) : 'Date à définir'}
+                  </p>
+                </div>
               </div>
-              <p className="text-sm text-[#737373]">{pathologie.localisation}</p>
+              <Badge variant={reunion.statut === 'terminee' ? 'success' : 'info'}>
+                {reunion.statut || 'Planifiée'}
+              </Badge>
             </div>
-            <Badge variant={
-              pathologie.garantie === 'decennale' ? 'error' :
-              pathologie.garantie === 'biennale' ? 'warning' :
-              pathologie.garantie === 'gpa' ? 'info' : 'default'
-            }>
-              {pathologie.garantie || 'À qualifier'}
-            </Badge>
+          </Card>
+        ))
+      )}
+      <Button variant="secondary" icon={Plus} className="w-full" onClick={() => setShowModal(true)}>
+        Planifier une réunion
+      </Button>
+
+      {showModal && (
+        <ModalBase isOpen={true} onClose={() => setShowModal(false)} title="Planifier une réunion" size="md">
+          <div className="space-y-4">
+            <Input
+              label="Date et heure"
+              type="datetime-local"
+              value={newReunion.date_reunion}
+              onChange={(e) => setNewReunion(prev => ({ ...prev, date_reunion: e.target.value }))}
+              required
+            />
+            <Input
+              label="Lieu"
+              value={newReunion.lieu}
+              onChange={(e) => setNewReunion(prev => ({ ...prev, lieu: e.target.value }))}
+              placeholder="Sur site / Adresse"
+            />
+            <Select
+              label="Type de réunion"
+              value={newReunion.type}
+              onChange={(e) => setNewReunion(prev => ({ ...prev, type: e.target.value }))}
+              options={[
+                { value: 'expertise', label: "Réunion d'expertise" },
+                { value: 'accedit', label: 'Accédit' },
+                { value: 'contradictoire', label: 'Réunion contradictoire' }
+              ]}
+            />
+            <div className="flex gap-3 pt-4">
+              <Button variant="secondary" onClick={() => setShowModal(false)} className="flex-1">Annuler</Button>
+              <Button variant="gold" onClick={handleAddReunion} className="flex-1">Planifier</Button>
+            </div>
           </div>
-        </Card>
-      ))
-    )}
-    <Button variant="secondary" icon={Plus} className="w-full">
-      Ajouter un désordre
-    </Button>
-  </div>
-);
+        </ModalBase>
+      )}
+    </div>
+  );
+};
+
+const TabDesordres = ({ affaire }) => {
+  const { pathologies, addPathologie } = usePathologies(affaire.id);
+  const [showModal, setShowModal] = useState(false);
+  const [newDesordre, setNewDesordre] = useState({ intitule: '', localisation: '', description: '', garantie: '' });
+
+  const handleAddDesordre = async () => {
+    if (!newDesordre.intitule) return;
+    const result = await addPathologie(newDesordre);
+    if (result.success) {
+      setShowModal(false);
+      setNewDesordre({ intitule: '', localisation: '', description: '', garantie: '' });
+    }
+  };
+
+  const displayPathologies = pathologies.length > 0 ? pathologies : (affaire.pathologies || []);
+
+  return (
+    <div className="space-y-4">
+      {displayPathologies.length === 0 ? (
+        <EmptyState
+          icon={AlertTriangle}
+          title="Aucun désordre"
+          description="Ajoutez les désordres constatés"
+          action={() => setShowModal(true)}
+          actionLabel="Ajouter"
+        />
+      ) : (
+        displayPathologies.map(pathologie => (
+          <Card key={pathologie.id} className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs px-2 py-0.5 bg-[#1a1a1a] text-white rounded">
+                    D{pathologie.numero}
+                  </span>
+                  <span className="font-medium text-[#1a1a1a]">{pathologie.intitule}</span>
+                </div>
+                <p className="text-sm text-[#737373]">{pathologie.localisation}</p>
+              </div>
+              <Badge variant={
+                pathologie.garantie === 'decennale' ? 'error' :
+                pathologie.garantie === 'biennale' ? 'warning' :
+                pathologie.garantie === 'gpa' ? 'info' : 'default'
+              }>
+                {pathologie.garantie || 'À qualifier'}
+              </Badge>
+            </div>
+          </Card>
+        ))
+      )}
+      <Button variant="secondary" icon={Plus} className="w-full" onClick={() => setShowModal(true)}>
+        Ajouter un désordre
+      </Button>
+
+      {showModal && (
+        <ModalBase isOpen={true} onClose={() => setShowModal(false)} title="Ajouter un désordre" size="md">
+          <div className="space-y-4">
+            <Input
+              label="Intitulé"
+              value={newDesordre.intitule}
+              onChange={(e) => setNewDesordre(prev => ({ ...prev, intitule: e.target.value }))}
+              placeholder="Ex: Fissures en façade"
+              required
+            />
+            <Input
+              label="Localisation"
+              value={newDesordre.localisation}
+              onChange={(e) => setNewDesordre(prev => ({ ...prev, localisation: e.target.value }))}
+              placeholder="Ex: Façade Sud, RDC"
+            />
+            <div>
+              <label className="block text-sm font-medium text-[#525252] mb-1">Description</label>
+              <textarea
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                rows={3}
+                value={newDesordre.description}
+                onChange={(e) => setNewDesordre(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Décrivez le désordre..."
+              />
+            </div>
+            <Select
+              label="Garantie applicable"
+              value={newDesordre.garantie}
+              onChange={(e) => setNewDesordre(prev => ({ ...prev, garantie: e.target.value }))}
+              options={[
+                { value: '', label: 'À qualifier' },
+                { value: 'decennale', label: 'Garantie décennale' },
+                { value: 'biennale', label: 'Garantie biennale' },
+                { value: 'gpa', label: 'GPA / Parfait achèvement' },
+                { value: 'aucune', label: 'Aucune garantie' }
+              ]}
+            />
+            <div className="flex gap-3 pt-4">
+              <Button variant="secondary" onClick={() => setShowModal(false)} className="flex-1">Annuler</Button>
+              <Button variant="gold" onClick={handleAddDesordre} className="flex-1">Ajouter</Button>
+            </div>
+          </div>
+        </ModalBase>
+      )}
+    </div>
+  );
+};
 
 const TabDocuments = ({ affaire }) => (
   <div className="space-y-4">
