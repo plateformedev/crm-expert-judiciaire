@@ -182,43 +182,48 @@ export const calculerTVA = (montantHT, taux = 20) => {
 // ============================================================================
 
 export const calculerAvancementTunnel = (affaire) => {
-  if (!affaire) return { etapesValidees: 0, totalEtapes: ETAPES_TUNNEL.length, pourcentage: 0 };
-  
+  if (!affaire) return 0;
+
   let etapesValidees = 0;
-  
-  // Assignation
-  if (affaire.mission?.questionsJuge?.length > 0) etapesValidees++;
-  
-  // Parties
-  const parties = affaire.assignation;
-  if (parties && (parties.demandeurs?.length > 0 || parties.defenseurs?.length > 0)) etapesValidees++;
-  
-  // 1ère réunion
-  if (affaire.reunions?.some(r => r.type === 'accedif' || r.numero === 1)) etapesValidees++;
-  
-  // Constatations
-  if (affaire.pathologies?.length > 0) etapesValidees++;
-  
-  // Dires
-  if (affaire.dires?.length > 0) etapesValidees++;
-  
-  // Analyses
-  if (affaire.analyses?.length > 0 || affaire.excellence?.analyses) etapesValidees++;
-  
-  // Chiffrage
-  if (affaire.chiffrage?.scenarios?.length > 0) etapesValidees++;
-  
-  // Pré-rapport
-  if (affaire.noteSynthese) etapesValidees++;
-  
-  // Rapport final
-  if (affaire.rapportFinal) etapesValidees++;
-  
-  return { 
-    etapesValidees, 
-    totalEtapes: ETAPES_TUNNEL.length, 
-    pourcentage: Math.round((etapesValidees / ETAPES_TUNNEL.length) * 100) 
-  };
+  const totalEtapes = ETAPES_TUNNEL.length;
+
+  // 1. Assignation - mission renseignée ou questions du juge
+  if (affaire.mission || affaire.questions_juge?.length > 0) etapesValidees++;
+
+  // 2. Parties - au moins une partie identifiée
+  const parties = affaire.parties || [];
+  if (parties.length > 0) etapesValidees++;
+
+  // 3. 1ère réunion - au moins une réunion planifiée ou effectuée
+  const reunions = affaire.reunions || [];
+  if (reunions.length > 0) etapesValidees++;
+
+  // 4. Constatations - au moins un désordre/pathologie documenté
+  const pathologies = affaire.pathologies || [];
+  if (pathologies.length > 0) etapesValidees++;
+
+  // 5. Dires - au moins un dire reçu
+  const dires = affaire.dires || [];
+  if (dires.length > 0) etapesValidees++;
+
+  // 6. Analyses - chiffrages ou analyses techniques effectués
+  const chiffrages = affaire.chiffrages || [];
+  if (chiffrages.length > 0) etapesValidees++;
+
+  // 7. Chiffrage - vacations enregistrées
+  const vacations = affaire.vacations || [];
+  if (vacations.length > 0) etapesValidees++;
+
+  // 8. Pré-rapport - statut pré-rapport ou document généré
+  const documents = affaire.documents || [];
+  const hasPreRapport = documents.some(d => d.type === 'pre-rapport' || d.type === 'note-synthese');
+  if (affaire.statut === 'pre-rapport' || hasPreRapport) etapesValidees++;
+
+  // 9. Rapport final - statut terminé ou document rapport final
+  const hasRapportFinal = documents.some(d => d.type === 'rapport-final');
+  if (affaire.statut === 'termine' || hasRapportFinal) etapesValidees++;
+
+  return Math.round((etapesValidees / totalEtapes) * 100);
 };
 
 export const calculerScoreConformite = (verifications) => {

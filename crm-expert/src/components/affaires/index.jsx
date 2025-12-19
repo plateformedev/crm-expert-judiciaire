@@ -3,6 +3,7 @@
 // ============================================================================
 
 import React, { useState, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Folder, Plus, Search, Filter, ChevronRight, Clock, MapPin,
   Scale, Users, Calendar, FileText, AlertCircle, Euro, Edit,
@@ -19,11 +20,21 @@ import { formatDateFr, calculerDelaiRestant, calculerAvancementTunnel } from '..
 // ============================================================================
 
 export const ListeAffaires = ({ onSelectAffaire }) => {
+  const navigate = useNavigate();
   const { affaires, loading, error, createAffaire, deleteAffaire } = useAffaires();
   const [search, setSearch] = useState('');
   const [filterStatut, setFilterStatut] = useState('all');
   const [filterUrgent, setFilterUrgent] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Fonction de navigation vers une affaire
+  const handleSelectAffaire = useCallback((affaire) => {
+    if (onSelectAffaire) {
+      onSelectAffaire(affaire);
+    } else {
+      navigate(`/affaires/${affaire.id}`);
+    }
+  }, [onSelectAffaire, navigate]);
 
   // Filtrage
   const affairesFiltrees = useMemo(() => {
@@ -51,7 +62,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
     const result = await createAffaire(data);
     if (result.success) {
       setShowCreateModal(false);
-      if (onSelectAffaire) onSelectAffaire(result.affaire);
+      handleSelectAffaire(result.affaire);
     }
     return result;
   };
@@ -136,10 +147,10 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
       ) : (
         <div className="grid gap-4">
           {affairesFiltrees.map(affaire => (
-            <AffaireCard 
-              key={affaire.id} 
-              affaire={affaire} 
-              onClick={() => onSelectAffaire && onSelectAffaire(affaire)}
+            <AffaireCard
+              key={affaire.id}
+              affaire={affaire}
+              onClick={() => handleSelectAffaire(affaire)}
             />
           ))}
         </div>
