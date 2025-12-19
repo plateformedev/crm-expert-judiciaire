@@ -185,7 +185,8 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
 // ============================================================================
 
 const AffaireCard = ({ affaire, onClick }) => {
-  const avancement = calculerAvancementTunnel(affaire);
+  const avancementData = calculerAvancementTunnel(affaire);
+  const avancement = avancementData.pourcentage;
   const delaiRestant = affaire.date_echeance ? calculerDelaiRestant(affaire.date_echeance) : null;
   
   const getStatutBadge = () => {
@@ -508,11 +509,11 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium text-[#1a1a1a]">Progression de l'expertise</h3>
           <span className="text-2xl font-light text-[#c9a227]">
-            {calculerAvancementTunnel(affaire)}%
+            {calculerAvancementTunnel(affaire).pourcentage}%
           </span>
         </div>
-        <ProgressBar 
-          value={calculerAvancementTunnel(affaire)} 
+        <ProgressBar
+          value={calculerAvancementTunnel(affaire).pourcentage}
           color="gold"
           size="md"
         />
