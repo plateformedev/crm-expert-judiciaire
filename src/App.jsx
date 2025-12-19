@@ -65,36 +65,6 @@ const MODULES = [
   { id: 'calendrier', path: '/calendrier', label: 'Calendrier', icon: Calendar },
   { id: 'contacts', path: '/contacts', label: 'Contacts', icon: Users },
   { id: 'documents', path: '/documents', label: 'Documents', icon: FileText },
-  { id: 'facturation', path: '/facturation', label: 'Facturation', icon: Euro },
-  { 
-    id: 'excellence', 
-    path: '/excellence',
-    label: 'Excellence', 
-    icon: Award, 
-    color: 'gold',
-    sousModules: [
-      { id: 'garanties', path: '/excellence/garanties', label: 'Garanties', icon: Scale },
-      { id: 'conformite', path: '/excellence/conformite', label: 'Conformité CPC', icon: CheckCircle },
-      { id: 'protection', path: '/excellence/protection', label: 'Protection Expert', icon: Shield },
-      { id: 'dtu', path: '/excellence/dtu', label: 'Base DTU', icon: BookOpen },
-      { id: 'jurisprudence', path: '/excellence/jurisprudence', label: 'Jurisprudence', icon: Gavel },
-      { id: 'qualification', path: '/excellence/qualification', label: 'Qualification', icon: Target },
-      { id: 'imputabilite', path: '/excellence/imputabilite', label: 'Imputabilité', icon: Users },
-      { id: 'opalexe', path: '/excellence/opalexe', label: 'OPALEXE', icon: Upload }
-    ]
-  },
-  { 
-    id: 'outils', 
-    path: '/outils',
-    label: 'Outils', 
-    icon: Wand2,
-    sousModules: [
-      { id: 'chronometre', path: '/outils/chronometre', label: 'Chronomètre', icon: Clock },
-      { id: 'calculatrice', path: '/outils/calculatrice', label: 'Calculatrice', icon: Calculator },
-      { id: 'dictee', path: '/outils/dictee', label: 'Dictée vocale', icon: Mic }
-    ]
-  },
-  { id: 'statistiques', path: '/statistiques', label: 'Statistiques', icon: BarChart3 },
   { id: 'parametres', path: '/parametres', label: 'Paramètres', icon: Settings }
 ];
 

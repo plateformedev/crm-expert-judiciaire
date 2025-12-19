@@ -8,7 +8,8 @@ import {
   Folder, Plus, Search, Filter, ChevronRight, Clock, MapPin,
   Scale, Users, Calendar, FileText, AlertCircle, Euro, Edit,
   Trash2, MoreVertical, CheckCircle, AlertTriangle, Eye,
-  Building, Gavel, Phone, Mail, Save, X, Upload, Download
+  Building, Gavel, Phone, Mail, Save, X, Upload, Download,
+  Wand2, Calculator, BookOpen, Shield, Target
 } from 'lucide-react';
 import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase } from '../ui';
 import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
@@ -458,7 +459,8 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
     { id: 'reunions', label: `Réunions (${affaire.reunions?.length || 0})`, icon: Calendar },
     { id: 'desordres', label: `Désordres (${affaire.pathologies?.length || 0})`, icon: AlertTriangle },
     { id: 'documents', label: `Documents (${affaire.documents?.length || 0})`, icon: Folder },
-    { id: 'financier', label: 'Financier', icon: Euro }
+    { id: 'financier', label: 'Financier', icon: Euro },
+    { id: 'outils', label: 'Outils', icon: Wand2 }
   ];
 
   return (
@@ -523,6 +525,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
         {activeTab === 'desordres' && <TabDesordres affaire={affaire} />}
         {activeTab === 'documents' && <TabDocuments affaire={affaire} />}
         {activeTab === 'financier' && <TabFinancier affaire={affaire} />}
+        {activeTab === 'outils' && <TabOutils affaire={affaire} />}
       </div>
     </div>
   );
@@ -793,6 +796,259 @@ const TabFinancier = ({ affaire }) => {
           Vacations: {totalVacations.toLocaleString('fr-FR')} € • Frais: {totalFrais.toLocaleString('fr-FR')} €
         </p>
       </Card>
+    </div>
+  );
+};
+
+// ============================================================================
+// TAB OUTILS - Outils contextuels liés à l'affaire
+// ============================================================================
+
+const TabOutils = ({ affaire }) => {
+  const [activeTool, setActiveTool] = useState(null);
+  const navigate = useNavigate();
+
+  // Calcul de garantie basé sur la date de réception
+  const calculerGaranties = useCallback(() => {
+    if (!affaire.date_reception_ouvrage) return null;
+    const dateReception = new Date(affaire.date_reception_ouvrage);
+    const now = new Date();
+    const joursEcoules = Math.floor((now - dateReception) / (1000 * 60 * 60 * 24));
+
+    return {
+      gpa: {
+        active: joursEcoules <= 365,
+        restant: Math.max(0, 365 - joursEcoules),
+        pourcentage: Math.min(100, (joursEcoules / 365) * 100)
+      },
+      biennale: {
+        active: joursEcoules <= 730,
+        restant: Math.max(0, 730 - joursEcoules),
+        pourcentage: Math.min(100, (joursEcoules / 730) * 100)
+      },
+      decennale: {
+        active: joursEcoules <= 3652,
+        restant: Math.max(0, 3652 - joursEcoules),
+        pourcentage: Math.min(100, (joursEcoules / 3652) * 100)
+      }
+    };
+  }, [affaire.date_reception_ouvrage]);
+
+  const garanties = calculerGaranties();
+
+  const outils = [
+    {
+      id: 'garanties',
+      label: 'Calculateur Garanties',
+      icon: Scale,
+      description: 'Calculer les garanties applicables selon la date de réception',
+      disabled: !affaire.date_reception_ouvrage,
+      color: 'bg-blue-500'
+    },
+    {
+      id: 'imputabilite',
+      label: 'Matrice Imputabilité',
+      icon: Target,
+      description: `Attribuer les responsabilités (${affaire.pathologies?.length || 0} désordres)`,
+      disabled: !affaire.pathologies?.length,
+      color: 'bg-purple-500',
+      action: () => navigate(`/affaires/${affaire.id}/imputabilite`)
+    },
+    {
+      id: 'chiffrage',
+      label: 'Chiffrage Travaux',
+      icon: Calculator,
+      description: 'Estimer le coût des travaux de reprise',
+      disabled: !affaire.pathologies?.length,
+      color: 'bg-green-500',
+      action: () => navigate(`/affaires/${affaire.id}/chiffrage`)
+    },
+    {
+      id: 'rapport',
+      label: 'Générateur Rapport',
+      icon: FileText,
+      description: 'Générer le rapport d\'expertise',
+      disabled: false,
+      color: 'bg-amber-500',
+      action: () => navigate(`/affaires/${affaire.id}/rapport`)
+    },
+    {
+      id: 'dtu',
+      label: 'Références DTU',
+      icon: BookOpen,
+      description: 'Consulter les normes applicables',
+      disabled: false,
+      color: 'bg-cyan-500'
+    },
+    {
+      id: 'conformite',
+      label: 'Check-list CPC',
+      icon: CheckCircle,
+      description: 'Vérifier la conformité au Code de procédure',
+      disabled: false,
+      color: 'bg-emerald-500'
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Grille d'outils */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        {outils.map(outil => (
+          <Card
+            key={outil.id}
+            onClick={() => outil.action ? outil.action() : setActiveTool(outil.id)}
+            className={`p-5 cursor-pointer transition-all hover:shadow-lg hover:border-[#c9a227] ${
+              outil.disabled ? 'opacity-50 cursor-not-allowed' : ''
+            } ${activeTool === outil.id ? 'border-[#c9a227] bg-[#faf8f3]' : ''}`}
+          >
+            <div className="flex items-start gap-4">
+              <div className={`w-12 h-12 ${outil.color} bg-opacity-10 rounded-xl flex items-center justify-center`}>
+                <outil.icon className={`w-6 h-6 ${outil.color.replace('bg-', 'text-')}`} />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium text-[#1a1a1a]">{outil.label}</h4>
+                <p className="text-xs text-[#737373] mt-1">{outil.description}</p>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Panneau détail outil - Garanties */}
+      {activeTool === 'garanties' && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-medium text-[#1a1a1a] flex items-center gap-2">
+              <Scale className="w-5 h-5 text-[#c9a227]" />
+              Calculateur de Garanties
+            </h3>
+            <button onClick={() => setActiveTool(null)} className="text-[#737373] hover:text-[#1a1a1a]">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {!affaire.date_reception_ouvrage ? (
+            <div className="text-center py-8 text-[#737373]">
+              <AlertCircle className="w-12 h-12 mx-auto mb-3 text-amber-500" />
+              <p>Date de réception de l'ouvrage non renseignée</p>
+              <p className="text-sm mt-1">Ajoutez cette date dans l'onglet Général pour calculer les garanties</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-[#737373] mb-4">
+                Réception de l'ouvrage : <strong>{formatDateFr(affaire.date_reception_ouvrage)}</strong>
+              </p>
+
+              {/* GPA */}
+              <div className="p-4 bg-[#fafafa] rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium">Garantie de Parfait Achèvement (1 an)</span>
+                  <Badge variant={garanties?.gpa.active ? 'success' : 'default'}>
+                    {garanties?.gpa.active ? `${garanties.gpa.restant} jours restants` : 'Expirée'}
+                  </Badge>
+                </div>
+                <ProgressBar value={garanties?.gpa.pourcentage || 0} color={garanties?.gpa.active ? 'blue' : 'gray'} />
+              </div>
+
+              {/* Biennale */}
+              <div className="p-4 bg-[#fafafa] rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium">Garantie Biennale (2 ans)</span>
+                  <Badge variant={garanties?.biennale.active ? 'warning' : 'default'}>
+                    {garanties?.biennale.active ? `${garanties.biennale.restant} jours restants` : 'Expirée'}
+                  </Badge>
+                </div>
+                <ProgressBar value={garanties?.biennale.pourcentage || 0} color={garanties?.biennale.active ? 'yellow' : 'gray'} />
+              </div>
+
+              {/* Décennale */}
+              <div className="p-4 bg-[#fafafa] rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium">Garantie Décennale (10 ans)</span>
+                  <Badge variant={garanties?.decennale.active ? 'error' : 'default'}>
+                    {garanties?.decennale.active ? `${garanties.decennale.restant} jours restants` : 'Expirée'}
+                  </Badge>
+                </div>
+                <ProgressBar value={garanties?.decennale.pourcentage || 0} color={garanties?.decennale.active ? 'red' : 'gray'} />
+              </div>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Panneau DTU */}
+      {activeTool === 'dtu' && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-medium text-[#1a1a1a] flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-[#c9a227]" />
+              Références DTU applicables
+            </h3>
+            <button onClick={() => setActiveTool(null)} className="text-[#737373] hover:text-[#1a1a1a]">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              { code: 'DTU 20.1', titre: 'Ouvrages en maçonnerie de petits éléments', applicable: affaire.bien_type === 'Maison' },
+              { code: 'DTU 31.2', titre: 'Construction de maisons et bâtiments à ossature bois', applicable: false },
+              { code: 'DTU 43.1', titre: 'Étanchéité des toitures-terrasses', applicable: true },
+              { code: 'DTU 45.2', titre: 'Isolation thermique des circuits', applicable: true },
+              { code: 'DTU 60.11', titre: 'Règles de calcul des installations de plomberie', applicable: true },
+              { code: 'DTU 65.14', titre: 'Exécution de planchers chauffants', applicable: false }
+            ].map(dtu => (
+              <div key={dtu.code} className={`p-3 rounded-lg border ${dtu.applicable ? 'border-[#c9a227] bg-[#faf8f3]' : 'border-[#e5e5e5]'}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium text-[#1a1a1a]">{dtu.code}</span>
+                    <p className="text-sm text-[#737373]">{dtu.titre}</p>
+                  </div>
+                  {dtu.applicable && (
+                    <Badge variant="success">Pertinent</Badge>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Panneau Conformité CPC */}
+      {activeTool === 'conformite' && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-medium text-[#1a1a1a] flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-[#c9a227]" />
+              Check-list Conformité CPC
+            </h3>
+            <button onClick={() => setActiveTool(null)} className="text-[#737373] hover:text-[#1a1a1a]">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              { label: 'Parties convoquées dans les délais (8 jours)', check: affaire.parties?.length > 0 },
+              { label: 'Première réunion tenue', check: affaire.reunions?.some(r => r.statut === 'terminee') },
+              { label: 'Dires recueillis', check: affaire.dires?.length > 0 },
+              { label: 'Note de synthèse envoyée', check: affaire.documents?.some(d => d.type === 'note-synthese') },
+              { label: 'Délai réponse aux dires respecté (21 jours)', check: true },
+              { label: 'Rapport déposé dans les délais', check: affaire.statut === 'termine' }
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 bg-[#fafafa] rounded-lg">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                  item.check ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+                }`}>
+                  {item.check ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                </div>
+                <span className={item.check ? 'text-[#1a1a1a]' : 'text-[#737373]'}>{item.label}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   );
 };
