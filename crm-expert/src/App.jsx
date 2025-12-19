@@ -66,11 +66,11 @@ const MODULES = [
   { id: 'contacts', path: '/contacts', label: 'Contacts', icon: Users },
   { id: 'documents', path: '/documents', label: 'Documents', icon: FileText },
   { id: 'facturation', path: '/facturation', label: 'Facturation', icon: Euro },
-  { 
-    id: 'excellence', 
+  {
+    id: 'excellence',
     path: '/excellence',
-    label: 'Excellence', 
-    icon: Award, 
+    label: 'Boîte à outils',
+    icon: Award,
     color: 'gold',
     sousModules: [
       { id: 'garanties', path: '/excellence/garanties', label: 'Garanties', icon: Scale },
@@ -204,7 +204,7 @@ const PageExcellence = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-[#1a1a1a]">Module Excellence</h1>
+      <h1 className="text-2xl font-semibold text-[#1a1a1a]">Boîte à outils</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {sousModules.map(sub => (
           <Card 
