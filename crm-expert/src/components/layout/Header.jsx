@@ -3,22 +3,23 @@
 // ============================================================================
 
 import React, { useState } from 'react';
-import { 
-  Search, Bell, Plus, User, ChevronDown, 
+import { useNavigate } from 'react-router-dom';
+import {
+  Search, Bell, Plus, User, ChevronDown,
   Download, Upload, Settings, LogOut
 } from 'lucide-react';
 import { Button } from '../ui';
 
-const Header = ({ 
-  searchQuery, 
-  setSearchQuery, 
-  setShowModal,
+const Header = ({
+  searchQuery,
+  setSearchQuery,
   notifications = [],
   user = { nom: 'Expert', email: 'expert@example.com' }
 }) => {
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  
+
   const unreadNotifications = notifications.filter(n => !n.lu).length;
 
   return (
@@ -40,10 +41,10 @@ const Header = ({
       {/* Actions */}
       <div className="flex items-center gap-4">
         {/* Bouton nouvelle affaire */}
-        <Button 
+        <Button
           variant="primary"
           icon={Plus}
-          onClick={() => setShowModal('nouvelle-affaire')}
+          onClick={() => navigate('/affaires/nouveau')}
         >
           Nouvelle affaire
         </Button>

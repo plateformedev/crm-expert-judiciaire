@@ -2,7 +2,8 @@
 // CRM EXPERT JUDICIAIRE - COMPOSANTS AFFAIRES
 // ============================================================================
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Folder, Plus, Search, Filter, ChevronRight, Clock, MapPin,
   Scale, Users, Calendar, FileText, AlertCircle, Euro, Edit,
@@ -19,11 +20,20 @@ import { formatDateFr, calculerDelaiRestant, calculerAvancementTunnel } from '..
 // ============================================================================
 
 export const ListeAffaires = ({ onSelectAffaire }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { affaires, loading, error, createAffaire, deleteAffaire } = useAffaires();
   const [search, setSearch] = useState('');
   const [filterStatut, setFilterStatut] = useState('all');
   const [filterUrgent, setFilterUrgent] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Auto-open modal when navigating to /affaires/nouveau
+  useEffect(() => {
+    if (location.pathname === '/affaires/nouveau') {
+      setShowCreateModal(true);
+    }
+  }, [location.pathname]);
 
   // Filtrage
   const affairesFiltrees = useMemo(() => {
@@ -51,9 +61,23 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
     const result = await createAffaire(data);
     if (result.success) {
       setShowCreateModal(false);
+      // Navigate to the new case
+      if (result.affaire?.id) {
+        navigate(`/affaires/${result.affaire.id}`);
+      } else {
+        navigate('/affaires');
+      }
       if (onSelectAffaire) onSelectAffaire(result.affaire);
     }
     return result;
+  };
+
+  const handleCloseModal = () => {
+    setShowCreateModal(false);
+    // Navigate back to affaires list if we were on /affaires/nouveau
+    if (location.pathname === '/affaires/nouveau') {
+      navigate('/affaires');
+    }
   };
 
   if (loading) {
@@ -148,7 +172,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
       {/* Modal création */}
       {showCreateModal && (
         <ModalNouvelleAffaire
-          onClose={() => setShowCreateModal(false)}
+          onClose={handleCloseModal}
           onCreate={handleCreate}
         />
       )}
