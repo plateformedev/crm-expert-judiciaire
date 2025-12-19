@@ -5,6 +5,7 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/crm-expert-judiciaire/',
   plugins: [
     react(),
     VitePWA({
@@ -18,7 +19,7 @@ export default defineConfig({
         background_color: '#1a1a1a',
         display: 'standalone',
         orientation: 'any',
-        start_url: '/',
+        start_url: '/crm-expert-judiciaire/',
         icons: [
           {
             src: 'icons/icon-72.png',
