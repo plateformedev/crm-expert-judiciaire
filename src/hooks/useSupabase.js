@@ -5,6 +5,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase, realtime } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { isDemoMode, getStoredAffaires, saveAffaires, DEMO_USER } from '../lib/demoData';
 
 // ============================================================================
 // HOOK GÉNÉRIQUE: useSupabaseQuery
@@ -107,12 +108,37 @@ export const useAffaires = (options = {}) => {
   const [affaires, setAffaires] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const demoMode = isDemoMode();
 
   const { statut = null, limit = null } = options;
 
   // Charger les affaires
   const fetchAffaires = useCallback(async () => {
-    if (!user) return;
+    // Mode démo : charger depuis localStorage
+    if (demoMode) {
+      setLoading(true);
+      try {
+        let data = getStoredAffaires();
+        if (statut) {
+          data = data.filter(a => a.statut === statut);
+        }
+        if (limit) {
+          data = data.slice(0, limit);
+        }
+        setAffaires(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Mode Supabase
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -148,7 +174,7 @@ export const useAffaires = (options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [user, statut, limit]);
+  }, [user, statut, limit, demoMode]);
 
   useEffect(() => {
     fetchAffaires();
@@ -156,6 +182,35 @@ export const useAffaires = (options = {}) => {
 
   // Créer une affaire
   const createAffaire = useCallback(async (affaireData) => {
+    // Mode démo
+    if (demoMode) {
+      const currentAffaires = getStoredAffaires();
+      const annee = new Date().getFullYear();
+      const reference = `EXP-${annee}-${String(currentAffaires.length + 1).padStart(4, '0')}`;
+
+      const newAffaire = {
+        id: `demo-${Date.now()}`,
+        reference,
+        ...affaireData,
+        statut: affaireData.statut || 'en-cours',
+        created_at: new Date().toISOString(),
+        parties: [],
+        reunions: [],
+        pathologies: [],
+        documents: [],
+        dires: [],
+        chiffrages: [],
+        vacations: [],
+        frais: []
+      };
+
+      const updated = [newAffaire, ...currentAffaires];
+      saveAffaires(updated);
+      setAffaires(updated);
+      return { success: true, affaire: newAffaire };
+    }
+
+    // Mode Supabase
     if (!user) return { success: false, error: 'Non authentifié' };
 
     try {
@@ -186,7 +241,7 @@ export const useAffaires = (options = {}) => {
       console.error('Erreur création affaire:', err);
       return { success: false, error: err.message };
     }
-  }, [user]);
+  }, [user, demoMode]);
 
   // Mettre à jour une affaire
   const updateAffaire = useCallback(async (id, updates) => {

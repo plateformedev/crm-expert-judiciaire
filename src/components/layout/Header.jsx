@@ -9,13 +9,21 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui';
 
-const Header = ({ 
-  searchQuery, 
-  setSearchQuery, 
-  setShowModal,
+const Header = ({
+  searchQuery = '',
+  setSearchQuery = () => {},
+  setShowModal = null,
+  onNewAffaire = null,
   notifications = [],
   user = { nom: 'Expert', email: 'expert@example.com' }
 }) => {
+  const handleNewAffaire = () => {
+    if (onNewAffaire) {
+      onNewAffaire();
+    } else if (setShowModal) {
+      setShowModal('nouvelle-affaire');
+    }
+  };
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   
@@ -40,10 +48,10 @@ const Header = ({
       {/* Actions */}
       <div className="flex items-center gap-4">
         {/* Bouton nouvelle affaire */}
-        <Button 
+        <Button
           variant="primary"
           icon={Plus}
-          onClick={() => setShowModal('nouvelle-affaire')}
+          onClick={handleNewAffaire}
         >
           Nouvelle affaire
         </Button>
