@@ -5,7 +5,7 @@
 import React, { useState, useMemo } from 'react';
 import { 
   Shield, Scale, FileCheck, BookOpen, Gavel, Calculator,
-  Target, ShieldCheck, Users, Handshake, AlertTriangle,
+  Target, ShieldCheck, Users, UserCheck, AlertTriangle,
   TrendingUp, FlaskConical, Upload, CheckCircle, XCircle,
   AlertCircle, ChevronRight, Info
 } from 'lucide-react';
