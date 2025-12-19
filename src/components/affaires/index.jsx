@@ -520,7 +520,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
       {/* Contenu des tabs */}
       <div className="min-h-[400px]">
         {activeTab === 'general' && <TabGeneral affaire={affaire} />}
-        {activeTab === 'parties' && <TabParties affaireId={affaire.id} />}
+        {activeTab === 'parties' && <TabParties affaire={affaire} />}
         {activeTab === 'reunions' && <TabReunions affaire={affaire} />}
         {activeTab === 'desordres' && <TabDesordres affaire={affaire} />}
         {activeTab === 'documents' && <TabDocuments affaire={affaire} />}
@@ -597,10 +597,8 @@ const TabGeneral = ({ affaire }) => (
   </div>
 );
 
-const TabParties = ({ affaireId }) => {
-  const { parties, loading, addPartie } = useParties(affaireId);
-
-  if (loading) return <div className="text-center py-8">Chargement...</div>;
+const TabParties = ({ affaire }) => {
+  const parties = affaire.parties || [];
 
   const partiesByType = {
     demandeur: parties.filter(p => p.type === 'demandeur'),

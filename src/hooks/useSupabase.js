@@ -339,6 +339,25 @@ export const useAffaireDetail = (affaireId) => {
     setLoading(true);
     setError(null);
 
+    // Mode démo : charger depuis localStorage
+    if (DEMO_MODE) {
+      try {
+        const affaires = getStoredAffaires();
+        const found = affaires.find(a => a.id === affaireId);
+        if (found) {
+          setAffaire(found);
+        } else {
+          setError('Affaire non trouvée');
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Mode Supabase
     try {
       const { data, error } = await supabase
         .from('affaires')
@@ -376,6 +395,22 @@ export const useAffaireDetail = (affaireId) => {
   const update = useCallback(async (updates) => {
     if (!affaireId) return { success: false };
 
+    // Mode démo
+    if (DEMO_MODE) {
+      try {
+        const affaires = getStoredAffaires();
+        const updatedAffaires = affaires.map(a =>
+          a.id === affaireId ? { ...a, ...updates } : a
+        );
+        saveAffaires(updatedAffaires);
+        setAffaire(prev => ({ ...prev, ...updates }));
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    }
+
+    // Mode Supabase
     try {
       const { data, error } = await supabase
         .from('affaires')
