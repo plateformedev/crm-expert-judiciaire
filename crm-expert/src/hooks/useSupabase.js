@@ -5,6 +5,14 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase, realtime } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  isSupabaseConfigured,
+  localAffaires,
+  localParties,
+  localReunions,
+  localPathologies,
+  localContacts
+} from '../lib/localStore';
 
 // ============================================================================
 // HOOK GÉNÉRIQUE: useSupabaseQuery
@@ -107,8 +115,9 @@ export const useAffaires = (options = {}) => {
   const [affaires, setAffaires] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isDemoMode = !isSupabaseConfigured();
 
-  const { statut = null, limit = null } = options;
+  const { statut = null, limit: queryLimit = null } = options;
 
   // Charger les affaires
   const fetchAffaires = useCallback(async () => {
@@ -118,6 +127,34 @@ export const useAffaires = (options = {}) => {
     setError(null);
 
     try {
+      // MODE DEMO : Utiliser le stockage local
+      if (isDemoMode) {
+        let data = localAffaires.getAll();
+
+        // Ajouter les relations
+        data = data.map(affaire => ({
+          ...affaire,
+          parties: localParties.getByAffaire(affaire.id),
+          reunions: localReunions.getByAffaire(affaire.id),
+          pathologies: localPathologies.getByAffaire(affaire.id)
+        }));
+
+        // Filtrer par statut si nécessaire
+        if (statut) {
+          data = data.filter(a => a.statut === statut);
+        }
+
+        // Limiter si nécessaire
+        if (queryLimit) {
+          data = data.slice(0, queryLimit);
+        }
+
+        setAffaires(data);
+        setLoading(false);
+        return;
+      }
+
+      // MODE SUPABASE
       let query = supabase
         .from('affaires')
         .select(`
@@ -134,8 +171,8 @@ export const useAffaires = (options = {}) => {
         query = query.eq('statut', statut);
       }
 
-      if (limit) {
-        query = query.limit(limit);
+      if (queryLimit) {
+        query = query.limit(queryLimit);
       }
 
       const { data, error } = await query;
@@ -148,7 +185,7 @@ export const useAffaires = (options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [user, statut, limit]);
+  }, [user, statut, queryLimit, isDemoMode]);
 
   useEffect(() => {
     fetchAffaires();
@@ -159,7 +196,14 @@ export const useAffaires = (options = {}) => {
     if (!user) return { success: false, error: 'Non authentifié' };
 
     try {
-      // Générer la référence
+      // MODE DEMO : Utiliser le stockage local
+      if (isDemoMode) {
+        const newAffaire = localAffaires.create(affaireData);
+        setAffaires(prev => [newAffaire, ...prev]);
+        return { success: true, affaire: newAffaire };
+      }
+
+      // MODE SUPABASE
       const annee = new Date().getFullYear();
       const { count } = await supabase
         .from('affaires')
@@ -186,11 +230,22 @@ export const useAffaires = (options = {}) => {
       console.error('Erreur création affaire:', err);
       return { success: false, error: err.message };
     }
-  }, [user]);
+  }, [user, isDemoMode]);
 
   // Mettre à jour une affaire
   const updateAffaire = useCallback(async (id, updates) => {
     try {
+      // MODE DEMO
+      if (isDemoMode) {
+        const updated = localAffaires.update(id, updates);
+        if (updated) {
+          setAffaires(prev => prev.map(a => a.id === id ? { ...a, ...updated } : a));
+          return { success: true, affaire: updated };
+        }
+        return { success: false, error: 'Affaire non trouvée' };
+      }
+
+      // MODE SUPABASE
       const { data, error } = await supabase
         .from('affaires')
         .update(updates)
@@ -206,11 +261,19 @@ export const useAffaires = (options = {}) => {
       console.error('Erreur mise à jour affaire:', err);
       return { success: false, error: err.message };
     }
-  }, []);
+  }, [isDemoMode]);
 
   // Supprimer une affaire
   const deleteAffaire = useCallback(async (id) => {
     try {
+      // MODE DEMO
+      if (isDemoMode) {
+        localAffaires.delete(id);
+        setAffaires(prev => prev.filter(a => a.id !== id));
+        return { success: true };
+      }
+
+      // MODE SUPABASE
       const { error } = await supabase
         .from('affaires')
         .delete()
@@ -224,11 +287,21 @@ export const useAffaires = (options = {}) => {
       console.error('Erreur suppression affaire:', err);
       return { success: false, error: err.message };
     }
-  }, []);
+  }, [isDemoMode]);
 
   // Obtenir une affaire par ID
   const getAffaire = useCallback(async (id) => {
     try {
+      // MODE DEMO
+      if (isDemoMode) {
+        const affaire = localAffaires.getById(id);
+        if (affaire) {
+          return { success: true, affaire };
+        }
+        return { success: false, error: 'Affaire non trouvée' };
+      }
+
+      // MODE SUPABASE
       const { data, error } = await supabase
         .from('affaires')
         .select(`
@@ -252,7 +325,7 @@ export const useAffaires = (options = {}) => {
       console.error('Erreur récupération affaire:', err);
       return { success: false, error: err.message };
     }
-  }, []);
+  }, [isDemoMode]);
 
   return {
     affaires,
@@ -274,6 +347,7 @@ export const useAffaireDetail = (affaireId) => {
   const [affaire, setAffaire] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isDemoMode = !isSupabaseConfigured();
 
   const fetchAffaire = useCallback(async () => {
     if (!affaireId) {
@@ -286,6 +360,31 @@ export const useAffaireDetail = (affaireId) => {
     setError(null);
 
     try {
+      // MODE DEMO
+      if (isDemoMode) {
+        const data = localAffaires.getById(affaireId);
+        if (data) {
+          setAffaire({
+            ...data,
+            parties: localParties.getByAffaire(affaireId),
+            reunions: localReunions.getByAffaire(affaireId),
+            pathologies: localPathologies.getByAffaire(affaireId),
+            dires: [],
+            chiffrages: [],
+            vacations: [],
+            frais: [],
+            documents: [],
+            photos: [],
+            evenements: []
+          });
+        } else {
+          setError('Affaire non trouvée');
+        }
+        setLoading(false);
+        return;
+      }
+
+      // MODE SUPABASE
       const { data, error } = await supabase
         .from('affaires')
         .select(`
@@ -312,7 +411,7 @@ export const useAffaireDetail = (affaireId) => {
     } finally {
       setLoading(false);
     }
-  }, [affaireId]);
+  }, [affaireId, isDemoMode]);
 
   useEffect(() => {
     fetchAffaire();
@@ -323,6 +422,17 @@ export const useAffaireDetail = (affaireId) => {
     if (!affaireId) return { success: false };
 
     try {
+      // MODE DEMO
+      if (isDemoMode) {
+        const updated = localAffaires.update(affaireId, updates);
+        if (updated) {
+          setAffaire(prev => ({ ...prev, ...updated }));
+          return { success: true };
+        }
+        return { success: false, error: 'Affaire non trouvée' };
+      }
+
+      // MODE SUPABASE
       const { data, error } = await supabase
         .from('affaires')
         .update(updates)
@@ -336,7 +446,7 @@ export const useAffaireDetail = (affaireId) => {
     } catch (err) {
       return { success: false, error: err.message };
     }
-  }, [affaireId]);
+  }, [affaireId, isDemoMode]);
 
   return { affaire, loading, error, refetch: fetchAffaire, update };
 };

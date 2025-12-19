@@ -4,6 +4,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, auth } from '../lib/supabase';
+import { isSupabaseConfigured, demoUser, demoExpert } from '../lib/localStore';
 
 // ============================================================================
 // CRÉATION DU CONTEXTE
@@ -61,9 +62,18 @@ export const AuthProvider = ({ children }) => {
   // Initialisation - Vérifier la session au montage
   useEffect(() => {
     const initAuth = async () => {
+      // MODE DEMO : Si Supabase n'est pas configuré
+      if (!isSupabaseConfigured()) {
+        console.log('🎮 Mode DEMO activé - Supabase non configuré');
+        setUser(demoUser);
+        setExpert(demoExpert);
+        setLoading(false);
+        return;
+      }
+
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (session?.user) {
           setUser(session.user);
           await loadExpertProfile(session.user.id);
@@ -78,11 +88,16 @@ export const AuthProvider = ({ children }) => {
 
     initAuth();
 
+    // Ne pas écouter les changements si mode démo
+    if (!isSupabaseConfigured()) {
+      return;
+    }
+
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth event:', event);
-        
+
         if (session?.user) {
           setUser(session.user);
           await loadExpertProfile(session.user.id);
@@ -90,7 +105,7 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
           setExpert(null);
         }
-        
+
         setLoading(false);
       }
     );
