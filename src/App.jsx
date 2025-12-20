@@ -62,14 +62,9 @@ import { ETAPES_TUNNEL, DS } from './data';
 // CONFIGURATION MODULES (Navigation)
 // ============================================================================
 
+// Navigation simplifiée - Module par module
 const MODULES = [
-  { id: 'dashboard', path: '/', label: 'Tableau de bord', icon: Home },
-  { id: 'affaires', path: '/affaires', label: 'Affaires', icon: Folder },
-  { id: 'alertes', path: '/alertes', label: 'Alertes', icon: AlertCircle },
-  { id: 'calendrier', path: '/calendrier', label: 'Calendrier', icon: Calendar },
-  { id: 'contacts', path: '/contacts', label: 'Contacts', icon: Users },
-  { id: 'documents', path: '/documents', label: 'Documents', icon: FileText },
-  { id: 'parametres', path: '/parametres', label: 'Paramètres', icon: Settings }
+  { id: 'affaires', path: '/', label: 'Affaires', icon: Folder }
 ];
 
 // ============================================================================
@@ -477,10 +472,8 @@ const App = () => {
       <AppLayout>
         <Suspense fallback={<LoadingSpinner size="lg" />}>
           <Routes>
-          {/* Dashboard */}
-          <Route path="/" element={<DashboardWrapper />} />
-          
-          {/* Affaires */}
+          {/* Affaires - Page principale */}
+          <Route path="/" element={<ListeAffaires />} />
           <Route path="/affaires" element={<ListeAffaires />} />
           <Route path="/affaires/nouveau" element={<ListeAffaires />} />
           <Route path="/affaires/:id" element={<AffaireDetailWrapper />} />

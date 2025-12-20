@@ -137,7 +137,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
         </Button>
       </div>
 
-      {/* Liste */}
+      {/* Tableau des affaires */}
       {affairesFiltrees.length === 0 ? (
         <EmptyState
           icon={Folder}
@@ -147,15 +147,153 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
           actionLabel="Créer une affaire"
         />
       ) : (
-        <div className="grid gap-4">
-          {affairesFiltrees.map(affaire => (
-            <AffaireCard
-              key={affaire.id}
-              affaire={affaire}
-              onClick={() => handleSelectAffaire(affaire)}
-            />
-          ))}
-        </div>
+        <Card className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-[#1a1a1a] text-white">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Référence</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">N° RG</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Tribunal</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Ville</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Statut</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Échéance</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Progress.</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Parties</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Réunions</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Désordres</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider">Provision</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e5e5e5]">
+                {affairesFiltrees.map(affaire => {
+                  const avancement = calculerAvancementTunnel(affaire);
+                  const delaiRestant = affaire.date_echeance ? calculerDelaiRestant(affaire.date_echeance) : null;
+
+                  return (
+                    <tr
+                      key={affaire.id}
+                      className={`hover:bg-[#faf8f3] cursor-pointer transition-colors ${affaire.urgent ? 'bg-red-50' : ''}`}
+                      onClick={() => handleSelectAffaire(affaire)}
+                    >
+                      {/* Référence */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          {affaire.urgent && <AlertTriangle className="w-4 h-4 text-red-500" />}
+                          <span className="font-medium text-[#1a1a1a]">{affaire.reference}</span>
+                        </div>
+                      </td>
+
+                      {/* N° RG */}
+                      <td className="px-4 py-3 text-sm text-[#525252]">
+                        {affaire.rg || '-'}
+                      </td>
+
+                      {/* Tribunal */}
+                      <td className="px-4 py-3 text-sm text-[#525252]">
+                        {affaire.tribunal || '-'}
+                      </td>
+
+                      {/* Ville */}
+                      <td className="px-4 py-3 text-sm text-[#525252]">
+                        {affaire.bien_ville || '-'}
+                      </td>
+
+                      {/* Statut */}
+                      <td className="px-4 py-3 text-center">
+                        <Badge variant={
+                          affaire.statut === 'en-cours' ? 'info' :
+                          affaire.statut === 'pre-rapport' ? 'warning' :
+                          affaire.statut === 'termine' ? 'success' : 'default'
+                        }>
+                          {affaire.statut === 'en-cours' ? 'En cours' :
+                           affaire.statut === 'pre-rapport' ? 'Pré-rapport' :
+                           affaire.statut === 'termine' ? 'Terminé' :
+                           affaire.statut || 'Nouveau'}
+                        </Badge>
+                      </td>
+
+                      {/* Échéance */}
+                      <td className="px-4 py-3 text-center">
+                        {delaiRestant !== null ? (
+                          <span className={`text-xs font-medium px-2 py-1 rounded ${
+                            delaiRestant <= 7 ? 'bg-red-100 text-red-600' :
+                            delaiRestant <= 30 ? 'bg-amber-100 text-amber-600' :
+                            'bg-[#f5f5f5] text-[#737373]'
+                          }`}>
+                            {delaiRestant > 0 ? `J-${delaiRestant}` : 'Dépassée'}
+                          </span>
+                        ) : (
+                          <span className="text-[#a3a3a3]">-</span>
+                        )}
+                      </td>
+
+                      {/* Progression */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-2 bg-[#e5e5e5] rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${
+                                avancement >= 80 ? 'bg-green-500' :
+                                avancement >= 40 ? 'bg-amber-500' : 'bg-blue-500'
+                              }`}
+                              style={{ width: `${avancement}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-[#737373] w-8">{avancement}%</span>
+                        </div>
+                      </td>
+
+                      {/* Parties */}
+                      <td className="px-4 py-3 text-center">
+                        <span className={`text-sm ${(affaire.parties?.length || 0) > 0 ? 'text-[#1a1a1a]' : 'text-[#a3a3a3]'}`}>
+                          {affaire.parties?.length || 0}
+                        </span>
+                      </td>
+
+                      {/* Réunions */}
+                      <td className="px-4 py-3 text-center">
+                        <span className={`text-sm ${(affaire.reunions?.length || 0) > 0 ? 'text-[#1a1a1a]' : 'text-[#a3a3a3]'}`}>
+                          {affaire.reunions?.length || 0}
+                        </span>
+                      </td>
+
+                      {/* Désordres */}
+                      <td className="px-4 py-3 text-center">
+                        <span className={`text-sm ${(affaire.pathologies?.length || 0) > 0 ? 'text-[#1a1a1a]' : 'text-[#a3a3a3]'}`}>
+                          {affaire.pathologies?.length || 0}
+                        </span>
+                      </td>
+
+                      {/* Provision */}
+                      <td className="px-4 py-3 text-right">
+                        <span className="text-sm font-medium text-[#1a1a1a]">
+                          {affaire.provision_montant
+                            ? `${parseFloat(affaire.provision_montant).toLocaleString('fr-FR')} €`
+                            : '-'}
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          className="p-2 hover:bg-[#e5e5e5] rounded-lg transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectAffaire(affaire);
+                          }}
+                        >
+                          <Eye className="w-4 h-4 text-[#737373]" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
 
       {/* Modal création */}
