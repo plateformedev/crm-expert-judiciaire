@@ -9,10 +9,12 @@ import {
   Scale, Users, Calendar, FileText, AlertCircle, Euro, Edit,
   Trash2, MoreVertical, CheckCircle, AlertTriangle, Eye,
   Building, Gavel, Phone, Mail, Save, X, Upload, Download,
-  Wand2, Calculator, BookOpen, Shield, Target, ChevronDown, RotateCcw
+  Wand2, Calculator, BookOpen, Shield, Target, ChevronDown, RotateCcw,
+  Timer, Play, Square, Banknote, CircleDot, ArrowRight
 } from 'lucide-react';
 import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase } from '../ui';
 import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
+import { useAutoTimer } from '../../hooks';
 import { ETAPES_TUNNEL, GARANTIES } from '../../data';
 import { getStoredAffaires, saveAffaires } from '../../lib/demoData';
 import { formatDateFr, calculerDelaiRestant, calculerAvancementTunnel } from '../../utils/helpers';
@@ -925,6 +927,21 @@ const ModalNouvelleAffaire = ({ onClose, onCreate }) => {
 };
 
 // ============================================================================
+// COMPOSANT: ChecklistItem pour l'avancement
+// ============================================================================
+
+const ChecklistItem = ({ done, label }) => (
+  <div className="flex items-center gap-2">
+    {done ? (
+      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+    ) : (
+      <div className="w-4 h-4 border-2 border-[#d4d4d4] rounded-full flex-shrink-0" />
+    )}
+    <span className={`text-sm ${done ? 'text-[#525252]' : 'text-[#a3a3a3]'}`}>{label}</span>
+  </div>
+);
+
+// ============================================================================
 // FICHE AFFAIRE DÉTAILLÉE
 // ============================================================================
 
@@ -936,10 +953,28 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
   const [showAddReunion, setShowAddReunion] = useState(false);
   const [showAddDesordre, setShowAddDesordre] = useState(false);
 
+  // ⏱️ Chronomètre automatique - démarre à l'entrée, sauvegarde à la sortie
+  const timer = useAutoTimer(affaireId, 90); // 90€/h par défaut
+
   // Gestionnaire pour générer un document
   const handleGenerateDocument = () => {
     alert('Générateur de document - Fonctionnalité en cours de développement');
   };
+
+  // Calculer la prochaine action recommandée
+  const getNextAction = () => {
+    if (!affaire) return null;
+    if (!affaire.parties?.length) return { label: 'Ajouter les parties au dossier', action: () => setShowAddPartie(true), tab: 'parties' };
+    if (!affaire.reunions?.length) return { label: 'Planifier la première réunion', action: () => setShowAddReunion(true), tab: 'reunions' };
+    if (!affaire.pathologies?.length) return { label: 'Constater les désordres', action: () => setShowAddDesordre(true), tab: 'desordres' };
+    if (!affaire.documents?.some(d => d.type === 'note-synthese' || d.type === 'pre-rapport')) {
+      return { label: 'Rédiger la note de synthèse', action: () => navigate(`/affaires/${affaireId}/rapport`), tab: 'outils' };
+    }
+    return null;
+  };
+
+  const nextAction = getNextAction();
+  const navigate = useNavigate();
 
   // Gestionnaire pour télécharger un document
   const handleDownloadDocument = (doc) => {
@@ -1009,27 +1044,131 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
         </div>
       </div>
 
-      {/* Progression */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-medium text-[#1a1a1a]">Progression de l'expertise</h3>
-          <span className="text-2xl font-light text-[#c9a227]">
-            {calculerAvancementTunnel(affaire)}%
-          </span>
-        </div>
-        <ProgressBar 
-          value={calculerAvancementTunnel(affaire)} 
-          color="gold"
-          size="md"
-        />
-        <div className="flex justify-between mt-4 text-xs text-[#a3a3a3]">
-          {ETAPES_TUNNEL.slice(0, 5).map((etape, i) => (
-            <span key={i} className={affaire.etape_actuelle >= i ? 'text-[#c9a227]' : ''}>
-              {etape.label}
-            </span>
-          ))}
-        </div>
-      </Card>
+      {/* ═══════════════════════════════════════════════════════════════════════
+          TABLEAU DE BORD SIMPLIFIÉ
+          ═══════════════════════════════════════════════════════════════════════ */}
+
+      {/* Prochaine action recommandée */}
+      {nextAction && (
+        <Card className="p-4 bg-gradient-to-r from-[#faf8f3] to-white border-l-4 border-[#c9a227]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#c9a227] rounded-full flex items-center justify-center">
+                <ArrowRight className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wider text-[#c9a227] font-medium">Prochaine étape</p>
+                <p className="text-lg font-medium text-[#1a1a1a]">{nextAction.label}</p>
+              </div>
+            </div>
+            <Button variant="primary" onClick={nextAction.action}>
+              Faire maintenant
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* Panneaux Timer + Provision + Progression */}
+      <div className="grid grid-cols-3 gap-4">
+        {/* ⏱️ Chronomètre automatique */}
+        <Card className="p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <div className={`w-3 h-3 rounded-full ${timer.isRunning ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
+            <h3 className="text-sm font-medium uppercase tracking-wider text-[#737373]">Temps passé</h3>
+          </div>
+
+          {/* Session actuelle */}
+          <div className="mb-4">
+            <p className="text-xs text-[#a3a3a3]">Cette session</p>
+            <p className="text-2xl font-light text-[#1a1a1a] font-mono">{timer.sessionFormatted}</p>
+          </div>
+
+          {/* Total affaire */}
+          <div className="pt-4 border-t border-[#e5e5e5]">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-xs text-[#a3a3a3]">Total dossier</p>
+                <p className="text-lg font-medium text-[#1a1a1a]">{timer.totalFormatted}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-[#a3a3a3]">Honoraires estimés</p>
+                <p className="text-lg font-medium text-[#c9a227]">{timer.totalMontant.toFixed(2)} €</p>
+              </div>
+            </div>
+            <p className="text-xs text-[#a3a3a3] mt-2">Taux: {timer.tauxHoraire}€/h</p>
+          </div>
+        </Card>
+
+        {/* 💰 Provision */}
+        <Card className="p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Banknote className="w-4 h-4 text-[#737373]" />
+            <h3 className="text-sm font-medium uppercase tracking-wider text-[#737373]">Provision</h3>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <p className="text-xs text-[#a3a3a3]">Montant consigné</p>
+              <p className="text-2xl font-light text-[#1a1a1a]">
+                {affaire.provision_montant ? `${parseFloat(affaire.provision_montant).toLocaleString('fr-FR')} €` : '— €'}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {affaire.provision_recue ? (
+                <>
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-green-600 font-medium">Reçue</span>
+                </>
+              ) : (
+                <>
+                  <Clock className="w-5 h-5 text-amber-500" />
+                  <span className="text-amber-600 font-medium">En attente</span>
+                </>
+              )}
+            </div>
+
+            {affaire.provision_montant && timer.totalMontant > 0 && (
+              <div className="pt-4 border-t border-[#e5e5e5]">
+                <div className="flex justify-between">
+                  <span className="text-xs text-[#a3a3a3]">Reste disponible</span>
+                  <span className={`text-sm font-medium ${
+                    (affaire.provision_montant - timer.totalMontant) < 0 ? 'text-red-600' : 'text-green-600'
+                  }`}>
+                    {(affaire.provision_montant - timer.totalMontant).toFixed(2)} €
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* 📋 Checklist */}
+        <Card className="p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <CheckCircle className="w-4 h-4 text-[#737373]" />
+            <h3 className="text-sm font-medium uppercase tracking-wider text-[#737373]">Avancement</h3>
+          </div>
+
+          <div className="space-y-2">
+            <ChecklistItem done={!!affaire.mission} label="Assignation reçue" />
+            <ChecklistItem done={affaire.provision_recue} label="Provision encaissée" />
+            <ChecklistItem done={(affaire.parties?.length || 0) > 0} label={`Parties (${affaire.parties?.length || 0})`} />
+            <ChecklistItem done={(affaire.reunions?.length || 0) > 0} label={`Réunion planifiée (${affaire.reunions?.length || 0})`} />
+            <ChecklistItem done={(affaire.pathologies?.length || 0) > 0} label={`Désordres (${affaire.pathologies?.length || 0})`} />
+            <ChecklistItem done={affaire.documents?.some(d => d.type === 'note-synthese')} label="Note de synthèse" />
+            <ChecklistItem done={affaire.statut === 'termine'} label="Rapport déposé" />
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-[#e5e5e5]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[#a3a3a3]">Progression</span>
+              <span className="text-lg font-medium text-[#c9a227]">{calculerAvancementTunnel(affaire)}%</span>
+            </div>
+            <ProgressBar value={calculerAvancementTunnel(affaire)} color="gold" size="sm" className="mt-2" />
+          </div>
+        </Card>
+      </div>
 
       {/* Tabs */}
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />

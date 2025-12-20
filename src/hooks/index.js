@@ -142,6 +142,135 @@ export const useTimer = (initialSeconds = 0) => {
 };
 
 // ============================================================================
+// HOOK: useAutoTimer - Chronomètre automatique pour suivi du temps
+// Démarre automatiquement à l'entrée, sauvegarde à la sortie
+// ============================================================================
+
+export const useAutoTimer = (affaireId, tauxHoraire = 90) => {
+  const [seconds, setSeconds] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const [totalSecondsAffaire, setTotalSecondsAffaire] = useState(0);
+  const intervalRef = useRef(null);
+  const startTimeRef = useRef(null);
+  const affaireIdRef = useRef(affaireId);
+
+  // Charger le temps total de l'affaire au montage
+  useEffect(() => {
+    if (!affaireId) return;
+
+    try {
+      const stored = localStorage.getItem('crm_demo_affaires');
+      if (stored) {
+        const affaires = JSON.parse(stored);
+        const affaire = affaires.find(a => a.id === affaireId);
+        if (affaire && affaire.vacations) {
+          const total = affaire.vacations.reduce((acc, v) => acc + (v.duree_secondes || 0), 0);
+          setTotalSecondsAffaire(total);
+        }
+      }
+    } catch (e) {
+      console.error('Erreur chargement temps:', e);
+    }
+  }, [affaireId]);
+
+  // Démarrer automatiquement le timer
+  useEffect(() => {
+    if (!affaireId) return;
+
+    startTimeRef.current = Date.now();
+    setIsRunning(true);
+
+    intervalRef.current = setInterval(() => {
+      setSeconds(s => s + 1);
+    }, 1000);
+
+    // Cleanup : sauvegarder le temps à la sortie
+    return () => {
+      clearInterval(intervalRef.current);
+
+      if (startTimeRef.current && affaireIdRef.current) {
+        const dureeSecondes = Math.floor((Date.now() - startTimeRef.current) / 1000);
+
+        // Ne sauvegarder que si plus de 10 secondes (éviter les micro-sessions)
+        if (dureeSecondes >= 10) {
+          try {
+            const stored = localStorage.getItem('crm_demo_affaires');
+            if (stored) {
+              const affaires = JSON.parse(stored);
+              const index = affaires.findIndex(a => a.id === affaireIdRef.current);
+
+              if (index !== -1) {
+                if (!affaires[index].vacations) {
+                  affaires[index].vacations = [];
+                }
+
+                // Ajouter la vacation automatique
+                affaires[index].vacations.push({
+                  id: `auto-${Date.now()}`,
+                  type: 'consultation',
+                  description: 'Temps de consultation automatique',
+                  date_vacation: new Date().toISOString().split('T')[0],
+                  duree_secondes: dureeSecondes,
+                  duree_heures: Math.round(dureeSecondes / 36) / 100, // Arrondi à 2 décimales
+                  taux_horaire: tauxHoraire,
+                  montant: Math.round((dureeSecondes / 3600) * tauxHoraire * 100) / 100,
+                  auto: true
+                });
+
+                localStorage.setItem('crm_demo_affaires', JSON.stringify(affaires));
+                console.log(`⏱️ Temps sauvegardé: ${formatDuree(dureeSecondes)} pour affaire ${affaireIdRef.current}`);
+              }
+            }
+          } catch (e) {
+            console.error('Erreur sauvegarde temps:', e);
+          }
+        }
+      }
+    };
+  }, [affaireId, tauxHoraire]);
+
+  // Mettre à jour la ref quand affaireId change
+  useEffect(() => {
+    affaireIdRef.current = affaireId;
+  }, [affaireId]);
+
+  // Formater la durée en HH:MM:SS
+  const formatDuree = (secs) => {
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    if (h > 0) {
+      return `${h}h ${m.toString().padStart(2, '0')}min ${s.toString().padStart(2, '0')}s`;
+    }
+    return `${m}min ${s.toString().padStart(2, '0')}s`;
+  };
+
+  // Calculer les montants
+  const sessionHeures = seconds / 3600;
+  const totalHeures = (totalSecondsAffaire + seconds) / 3600;
+  const sessionMontant = sessionHeures * tauxHoraire;
+  const totalMontant = totalHeures * tauxHoraire;
+
+  return {
+    // Session actuelle
+    seconds,
+    sessionFormatted: formatDuree(seconds),
+    sessionHeures: Math.round(sessionHeures * 100) / 100,
+    sessionMontant: Math.round(sessionMontant * 100) / 100,
+
+    // Total affaire
+    totalSeconds: totalSecondsAffaire + seconds,
+    totalFormatted: formatDuree(totalSecondsAffaire + seconds),
+    totalHeures: Math.round(totalHeures * 100) / 100,
+    totalMontant: Math.round(totalMontant * 100) / 100,
+
+    // État
+    isRunning,
+    tauxHoraire
+  };
+};
+
+// ============================================================================
 // HOOK: useNotifications
 // ============================================================================
 
