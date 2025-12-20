@@ -73,9 +73,18 @@ import { ETAPES_TUNNEL, DS } from './data';
 // CONFIGURATION MODULES (Navigation)
 // ============================================================================
 
-// Navigation simplifiée - Module par module
+// Navigation complète - Tous les modules accessibles
 const MODULES = [
-  { id: 'affaires', path: '/', label: 'Affaires', icon: Folder }
+  { id: 'affaires', path: '/', label: 'Affaires', icon: Folder },
+  { id: 'alertes', path: '/alertes', label: 'Alertes', icon: AlertCircle },
+  { id: 'calendrier', path: '/calendrier', label: 'Calendrier', icon: Calendar },
+  { id: 'documents', path: '/documents', label: 'Documents', icon: FileText },
+  { id: 'contacts', path: '/contacts', label: 'Contacts', icon: Users },
+  { id: 'facturation', path: '/facturation', label: 'Facturation', icon: Euro },
+  { id: 'statistiques', path: '/statistiques', label: 'Statistiques', icon: BarChart3 },
+  { id: 'excellence', path: '/excellence', label: 'Excellence', icon: Award },
+  { id: 'outils', path: '/outils', label: 'Outils', icon: Wand2 },
+  { id: 'parametres', path: '/parametres', label: 'Paramètres', icon: Settings }
 ];
 
 // ============================================================================
@@ -93,26 +102,43 @@ const PageContacts = () => (
 // PAGE: Excellence (Menu)
 // ============================================================================
 
+const EXCELLENCE_MODULES = [
+  { id: 'garanties', path: '/excellence/garanties', label: 'Garanties', icon: Shield, description: 'GPA, Biennale, Décennale' },
+  { id: 'conformite', path: '/excellence/conformite', label: 'Conformité', icon: CheckCircle, description: 'Checklists règlementaires' },
+  { id: 'dtu', path: '/excellence/dtu', label: 'Base DTU', icon: BookOpen, description: 'Documents Techniques Unifiés' },
+  { id: 'jurisprudence', path: '/excellence/jurisprudence', label: 'Jurisprudence', icon: Scale, description: 'Décisions de référence' },
+  { id: 'qualification', path: '/excellence/qualification', label: 'Qualification', icon: Target, description: 'Qualification des désordres' },
+  { id: 'imputabilite', path: '/excellence/imputabilite', label: 'Imputabilité', icon: Users, description: 'Matrice d\'imputabilité' },
+  { id: 'opalexe', path: '/excellence/opalexe', label: 'OPALEXE', icon: Upload, description: 'Dépôt dématérialisé' },
+  { id: 'protection', path: '/excellence/protection', label: 'Protection', icon: Shield, description: 'Sécurité et conformité' }
+];
+
 const PageExcellence = () => {
   const navigate = useNavigate();
-  const sousModules = MODULES.find(m => m.id === 'excellence')?.sousModules || [];
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-[#1a1a1a]">Module Excellence</h1>
+      <div>
+        <h1 className="text-2xl font-semibold text-[#1a1a1a]">Module Excellence</h1>
+        <p className="text-[#737373] mt-1">Outils professionnels pour l'expertise judiciaire</p>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {sousModules.map(sub => (
-          <Card 
-            key={sub.id}
-            onClick={() => navigate(sub.path)}
-            className="p-6 cursor-pointer hover:border-[#c9a227] transition-all hover:shadow-lg group"
-          >
-            <div className="w-12 h-12 bg-[#f5e6c8] rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#c9a227] transition-colors">
-              <sub.icon className="w-6 h-6 text-[#c9a227] group-hover:text-white transition-colors" />
-            </div>
-            <h3 className="font-medium text-[#1a1a1a]">{sub.label}</h3>
-          </Card>
-        ))}
+        {EXCELLENCE_MODULES.map(sub => {
+          const Icon = sub.icon;
+          return (
+            <Card
+              key={sub.id}
+              onClick={() => navigate(sub.path)}
+              className="p-6 cursor-pointer hover:border-[#c9a227] transition-all hover:shadow-lg group"
+            >
+              <div className="w-12 h-12 bg-[#f5e6c8] rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#c9a227] transition-colors">
+                <Icon className="w-6 h-6 text-[#c9a227] group-hover:text-white transition-colors" />
+              </div>
+              <h3 className="font-medium text-[#1a1a1a]">{sub.label}</h3>
+              <p className="text-sm text-[#737373] mt-1">{sub.description}</p>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
@@ -122,26 +148,38 @@ const PageExcellence = () => {
 // PAGE: Outils (Menu)
 // ============================================================================
 
+const OUTILS_MODULES = [
+  { id: 'chronometre', path: '/outils/chronometre', label: 'Chronomètre', icon: Clock, description: 'Suivi du temps passé' },
+  { id: 'calculatrice', path: '/outils/calculatrice', label: 'Calculatrice', icon: Calculator, description: 'Calculs techniques' },
+  { id: 'dictee', path: '/outils/dictee', label: 'Dictée vocale', icon: Mic, description: 'Transcription vocale' }
+];
+
 const PageOutils = () => {
   const navigate = useNavigate();
-  const sousModules = MODULES.find(m => m.id === 'outils')?.sousModules || [];
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-[#1a1a1a]">Outils</h1>
+      <div>
+        <h1 className="text-2xl font-semibold text-[#1a1a1a]">Outils</h1>
+        <p className="text-[#737373] mt-1">Utilitaires pour faciliter votre travail quotidien</p>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {sousModules.map(sub => (
-          <Card 
-            key={sub.id}
-            onClick={() => navigate(sub.path)}
-            className="p-6 cursor-pointer hover:border-[#c9a227] transition-all hover:shadow-lg group"
-          >
-            <div className="w-12 h-12 bg-[#f5e6c8] rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#c9a227] transition-colors">
-              <sub.icon className="w-6 h-6 text-[#c9a227] group-hover:text-white transition-colors" />
-            </div>
-            <h3 className="font-medium text-[#1a1a1a]">{sub.label}</h3>
-          </Card>
-        ))}
+        {OUTILS_MODULES.map(sub => {
+          const Icon = sub.icon;
+          return (
+            <Card
+              key={sub.id}
+              onClick={() => navigate(sub.path)}
+              className="p-6 cursor-pointer hover:border-[#c9a227] transition-all hover:shadow-lg group"
+            >
+              <div className="w-12 h-12 bg-[#f5e6c8] rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#c9a227] transition-colors">
+                <Icon className="w-6 h-6 text-[#c9a227] group-hover:text-white transition-colors" />
+              </div>
+              <h3 className="font-medium text-[#1a1a1a]">{sub.label}</h3>
+              <p className="text-sm text-[#737373] mt-1">{sub.description}</p>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
@@ -272,10 +310,10 @@ const DashboardWrapper = () => {
         }
         break;
       case 'finances':
-        navigate('/affaires');
+        navigate('/facturation');
         break;
       default:
-        console.log('Action non gérée:', action);
+        toast.info('Action', `Navigation vers "${action}" en cours de développement`);
     }
   };
 
