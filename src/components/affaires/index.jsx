@@ -10,7 +10,8 @@ import {
   Trash2, MoreVertical, CheckCircle, AlertTriangle, Eye,
   Building, Gavel, Phone, Mail, Save, X, Upload, Download,
   Wand2, Calculator, BookOpen, Shield, Target, ChevronDown, RotateCcw,
-  Timer, Play, Square, Banknote, CircleDot, ArrowRight
+  Timer, Play, Square, Banknote, CircleDot, ArrowRight,
+  Archive, PauseCircle, MoreHorizontal
 } from 'lucide-react';
 import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase } from '../ui';
 import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
@@ -25,10 +26,12 @@ import { formatDateFr, calculerDelaiRestant, calculerAvancementTunnel } from '..
 
 export const ListeAffaires = ({ onSelectAffaire }) => {
   const navigate = useNavigate();
-  const { affaires, loading, error, createAffaire, deleteAffaire } = useAffaires();
+  const { affaires, loading, error, createAffaire, deleteAffaire, updateAffaire } = useAffaires();
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [actionMenuId, setActionMenuId] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null); // { type: 'delete'|'archive'|'suspend', affaire: {} }
 
   // État des filtres
   const [filters, setFilters] = useState({
@@ -175,6 +178,39 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
     return result;
   };
 
+  // Gestionnaire d'actions (archiver, suspendre, supprimer)
+  const handleAction = async (type, affaire) => {
+    setActionMenuId(null);
+
+    if (type === 'delete') {
+      setConfirmAction({ type: 'delete', affaire });
+    } else if (type === 'archive') {
+      setConfirmAction({ type: 'archive', affaire });
+    } else if (type === 'suspend') {
+      setConfirmAction({ type: 'suspend', affaire });
+    } else if (type === 'reactivate') {
+      // Réactiver directement sans confirmation
+      await updateAffaire(affaire.id, { statut: 'en-cours' });
+    }
+  };
+
+  // Confirmer l'action
+  const confirmActionHandler = async () => {
+    if (!confirmAction) return;
+
+    const { type, affaire } = confirmAction;
+
+    if (type === 'delete') {
+      await deleteAffaire(affaire.id);
+    } else if (type === 'archive') {
+      await updateAffaire(affaire.id, { statut: 'archive' });
+    } else if (type === 'suspend') {
+      await updateAffaire(affaire.id, { statut: 'suspendu' });
+    }
+
+    setConfirmAction(null);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -274,6 +310,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
                   <option value="en-cours">En cours</option>
                   <option value="pre-rapport">Pré-rapport</option>
                   <option value="termine">Terminé</option>
+                  <option value="suspendu">Suspendu</option>
                   <option value="archive">Archivé</option>
                 </select>
               </div>
@@ -551,11 +588,15 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
                         <Badge variant={
                           affaire.statut === 'en-cours' ? 'info' :
                           affaire.statut === 'pre-rapport' ? 'warning' :
-                          affaire.statut === 'termine' ? 'success' : 'default'
+                          affaire.statut === 'termine' ? 'success' :
+                          affaire.statut === 'archive' ? 'default' :
+                          affaire.statut === 'suspendu' ? 'warning' : 'default'
                         }>
                           {affaire.statut === 'en-cours' ? 'En cours' :
                            affaire.statut === 'pre-rapport' ? 'Pré-rapport' :
                            affaire.statut === 'termine' ? 'Terminé' :
+                           affaire.statut === 'archive' ? 'Archivé' :
+                           affaire.statut === 'suspendu' ? 'Suspendu' :
                            affaire.statut || 'Nouveau'}
                         </Badge>
                       </td>
@@ -623,15 +664,89 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
 
                       {/* Actions */}
                       <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          className="p-2 hover:bg-[#e5e5e5] rounded-lg transition-colors"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectAffaire(affaire);
-                          }}
-                        >
-                          <Eye className="w-4 h-4 text-[#737373]" />
-                        </button>
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            className="p-2 hover:bg-[#e5e5e5] rounded-lg transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectAffaire(affaire);
+                            }}
+                            title="Voir le dossier"
+                          >
+                            <Eye className="w-4 h-4 text-[#737373]" />
+                          </button>
+                          <div className="relative">
+                            <button
+                              className="p-2 hover:bg-[#e5e5e5] rounded-lg transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActionMenuId(actionMenuId === affaire.id ? null : affaire.id);
+                              }}
+                              title="Plus d'actions"
+                            >
+                              <MoreHorizontal className="w-4 h-4 text-[#737373]" />
+                            </button>
+
+                            {/* Menu déroulant */}
+                            {actionMenuId === affaire.id && (
+                              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-lg border border-[#e5e5e5] py-1 z-50">
+                                {/* Archiver */}
+                                {affaire.statut !== 'archive' && (
+                                  <button
+                                    className="w-full px-4 py-2 text-left text-sm text-[#525252] hover:bg-[#f5f5f5] flex items-center gap-2"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAction('archive', affaire);
+                                    }}
+                                  >
+                                    <Archive className="w-4 h-4 text-[#737373]" />
+                                    Archiver
+                                  </button>
+                                )}
+
+                                {/* Suspendre */}
+                                {affaire.statut !== 'suspendu' && affaire.statut !== 'archive' && (
+                                  <button
+                                    className="w-full px-4 py-2 text-left text-sm text-[#525252] hover:bg-[#f5f5f5] flex items-center gap-2"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAction('suspend', affaire);
+                                    }}
+                                  >
+                                    <PauseCircle className="w-4 h-4 text-amber-500" />
+                                    Suspendre
+                                  </button>
+                                )}
+
+                                {/* Réactiver */}
+                                {(affaire.statut === 'suspendu' || affaire.statut === 'archive') && (
+                                  <button
+                                    className="w-full px-4 py-2 text-left text-sm text-green-600 hover:bg-[#f5f5f5] flex items-center gap-2"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAction('reactivate', affaire);
+                                    }}
+                                  >
+                                    <Play className="w-4 h-4" />
+                                    Réactiver
+                                  </button>
+                                )}
+
+                                {/* Supprimer */}
+                                <button
+                                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-[#e5e5e5] mt-1 pt-2"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAction('delete', affaire);
+                                  }}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                  Supprimer
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -648,6 +763,90 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
           onClose={() => setShowCreateModal(false)}
           onCreate={handleCreate}
         />
+      )}
+
+      {/* Modal confirmation action */}
+      {confirmAction && (
+        <ModalBase
+          isOpen={true}
+          onClose={() => setConfirmAction(null)}
+          title={
+            confirmAction.type === 'delete' ? 'Supprimer l\'affaire' :
+            confirmAction.type === 'archive' ? 'Archiver l\'affaire' :
+            'Suspendre l\'affaire'
+          }
+          size="sm"
+        >
+          <div className="space-y-4">
+            <div className={`p-4 rounded-xl ${
+              confirmAction.type === 'delete' ? 'bg-red-50' :
+              confirmAction.type === 'archive' ? 'bg-gray-50' :
+              'bg-amber-50'
+            }`}>
+              {confirmAction.type === 'delete' ? (
+                <div className="flex items-start gap-3">
+                  <Trash2 className="w-5 h-5 text-red-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-red-800">Attention, cette action est irréversible !</p>
+                    <p className="text-sm text-red-600 mt-1">
+                      Toutes les données liées à cette affaire seront définitivement supprimées :
+                      parties, réunions, désordres, documents, vacations...
+                    </p>
+                  </div>
+                </div>
+              ) : confirmAction.type === 'archive' ? (
+                <div className="flex items-start gap-3">
+                  <Archive className="w-5 h-5 text-gray-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-gray-800">Archiver cette affaire ?</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      L'affaire sera déplacée dans les archives. Vous pourrez la réactiver ultérieurement.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start gap-3">
+                  <PauseCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-amber-800">Suspendre cette affaire ?</p>
+                    <p className="text-sm text-amber-600 mt-1">
+                      L'affaire sera mise en pause. Vous pourrez la réactiver quand vous le souhaitez.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-3 bg-[#faf8f3] rounded-xl">
+              <p className="text-xs text-[#737373] uppercase tracking-wider mb-1">Affaire concernée</p>
+              <p className="font-medium text-[#1a1a1a]">{confirmAction.affaire.reference}</p>
+              {confirmAction.affaire.tribunal && (
+                <p className="text-sm text-[#737373]">{confirmAction.affaire.tribunal}</p>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="secondary"
+                className="flex-1"
+                onClick={() => setConfirmAction(null)}
+              >
+                Annuler
+              </Button>
+              <Button
+                variant={confirmAction.type === 'delete' ? 'danger' : confirmAction.type === 'archive' ? 'secondary' : 'warning'}
+                className={`flex-1 ${
+                  confirmAction.type === 'delete' ? 'bg-red-600 hover:bg-red-700 text-white' :
+                  confirmAction.type === 'suspend' ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''
+                }`}
+                onClick={confirmActionHandler}
+              >
+                {confirmAction.type === 'delete' ? 'Supprimer' :
+                 confirmAction.type === 'archive' ? 'Archiver' : 'Suspendre'}
+              </Button>
+            </div>
+          </div>
+        </ModalBase>
       )}
     </div>
   );
@@ -947,11 +1146,14 @@ const ChecklistItem = ({ done, label }) => (
 
 export const FicheAffaire = ({ affaireId, onBack }) => {
   const { affaire, loading, error, update } = useAffaireDetail(affaireId);
+  const { deleteAffaire } = useAffaires();
   const [activeTab, setActiveTab] = useState('general');
   const [editing, setEditing] = useState(false);
   const [showAddPartie, setShowAddPartie] = useState(false);
   const [showAddReunion, setShowAddReunion] = useState(false);
   const [showAddDesordre, setShowAddDesordre] = useState(false);
+  const [showActionMenu, setShowActionMenu] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null); // { type: 'delete'|'archive'|'suspend' }
 
   // ⏱️ Chronomètre automatique - démarre à l'entrée, sauvegarde à la sortie
   const timer = useAutoTimer(affaireId, 90); // 90€/h par défaut
@@ -959,6 +1161,34 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
   // Gestionnaire pour générer un document
   const handleGenerateDocument = () => {
     alert('Générateur de document - Fonctionnalité en cours de développement');
+  };
+
+  // Gestionnaire d'actions (archiver, suspendre, supprimer)
+  const handleAction = (type) => {
+    setShowActionMenu(false);
+    if (type === 'reactivate') {
+      update({ statut: 'en-cours' });
+    } else {
+      setConfirmAction({ type });
+    }
+  };
+
+  // Confirmer l'action
+  const confirmActionHandler = async () => {
+    if (!confirmAction) return;
+
+    const { type } = confirmAction;
+
+    if (type === 'delete') {
+      await deleteAffaire(affaireId);
+      onBack(); // Retourner à la liste après suppression
+    } else if (type === 'archive') {
+      await update({ statut: 'archive' });
+    } else if (type === 'suspend') {
+      await update({ statut: 'suspendu' });
+    }
+
+    setConfirmAction(null);
   };
 
   // Calculer la prochaine action recommandée
@@ -1026,8 +1256,19 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-light text-[#1a1a1a]">{affaire.reference}</h1>
             {affaire.urgent && <Badge variant="error">Urgent</Badge>}
-            <Badge variant={affaire.statut === 'en-cours' ? 'info' : 'success'}>
-              {affaire.statut}
+            <Badge variant={
+              affaire.statut === 'en-cours' ? 'info' :
+              affaire.statut === 'pre-rapport' ? 'warning' :
+              affaire.statut === 'termine' ? 'success' :
+              affaire.statut === 'suspendu' ? 'warning' :
+              affaire.statut === 'archive' ? 'default' : 'default'
+            }>
+              {affaire.statut === 'en-cours' ? 'En cours' :
+               affaire.statut === 'pre-rapport' ? 'Pré-rapport' :
+               affaire.statut === 'termine' ? 'Terminé' :
+               affaire.statut === 'suspendu' ? 'Suspendu' :
+               affaire.statut === 'archive' ? 'Archivé' :
+               affaire.statut || 'Nouveau'}
             </Badge>
           </div>
           <p className="text-[#737373] mt-1">
@@ -1041,6 +1282,60 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
           <Button variant="primary" icon={FileText} onClick={handleGenerateDocument}>
             Générer document
           </Button>
+
+          {/* Menu d'actions */}
+          <div className="relative">
+            <Button
+              variant="secondary"
+              icon={MoreHorizontal}
+              onClick={() => setShowActionMenu(!showActionMenu)}
+            />
+            {showActionMenu && (
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-lg border border-[#e5e5e5] py-1 z-50">
+                {/* Archiver */}
+                {affaire.statut !== 'archive' && (
+                  <button
+                    className="w-full px-4 py-2 text-left text-sm text-[#525252] hover:bg-[#f5f5f5] flex items-center gap-2"
+                    onClick={() => handleAction('archive')}
+                  >
+                    <Archive className="w-4 h-4 text-[#737373]" />
+                    Archiver
+                  </button>
+                )}
+
+                {/* Suspendre */}
+                {affaire.statut !== 'suspendu' && affaire.statut !== 'archive' && (
+                  <button
+                    className="w-full px-4 py-2 text-left text-sm text-[#525252] hover:bg-[#f5f5f5] flex items-center gap-2"
+                    onClick={() => handleAction('suspend')}
+                  >
+                    <PauseCircle className="w-4 h-4 text-amber-500" />
+                    Suspendre
+                  </button>
+                )}
+
+                {/* Réactiver */}
+                {(affaire.statut === 'suspendu' || affaire.statut === 'archive') && (
+                  <button
+                    className="w-full px-4 py-2 text-left text-sm text-green-600 hover:bg-[#f5f5f5] flex items-center gap-2"
+                    onClick={() => handleAction('reactivate')}
+                  >
+                    <Play className="w-4 h-4" />
+                    Réactiver
+                  </button>
+                )}
+
+                {/* Supprimer */}
+                <button
+                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-[#e5e5e5] mt-1 pt-2"
+                  onClick={() => handleAction('delete')}
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Supprimer
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -1222,6 +1517,90 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
             window.location.reload();
           }}
         />
+      )}
+
+      {/* Modal confirmation action */}
+      {confirmAction && (
+        <ModalBase
+          isOpen={true}
+          onClose={() => setConfirmAction(null)}
+          title={
+            confirmAction.type === 'delete' ? 'Supprimer l\'affaire' :
+            confirmAction.type === 'archive' ? 'Archiver l\'affaire' :
+            'Suspendre l\'affaire'
+          }
+          size="sm"
+        >
+          <div className="space-y-4">
+            <div className={`p-4 rounded-xl ${
+              confirmAction.type === 'delete' ? 'bg-red-50' :
+              confirmAction.type === 'archive' ? 'bg-gray-50' :
+              'bg-amber-50'
+            }`}>
+              {confirmAction.type === 'delete' ? (
+                <div className="flex items-start gap-3">
+                  <Trash2 className="w-5 h-5 text-red-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-red-800">Attention, cette action est irréversible !</p>
+                    <p className="text-sm text-red-600 mt-1">
+                      Toutes les données liées à cette affaire seront définitivement supprimées :
+                      parties, réunions, désordres, documents, vacations...
+                    </p>
+                  </div>
+                </div>
+              ) : confirmAction.type === 'archive' ? (
+                <div className="flex items-start gap-3">
+                  <Archive className="w-5 h-5 text-gray-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-gray-800">Archiver cette affaire ?</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      L'affaire sera déplacée dans les archives. Vous pourrez la réactiver ultérieurement.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start gap-3">
+                  <PauseCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-amber-800">Suspendre cette affaire ?</p>
+                    <p className="text-sm text-amber-600 mt-1">
+                      L'affaire sera mise en pause. Vous pourrez la réactiver quand vous le souhaitez.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-3 bg-[#faf8f3] rounded-xl">
+              <p className="text-xs text-[#737373] uppercase tracking-wider mb-1">Affaire concernée</p>
+              <p className="font-medium text-[#1a1a1a]">{affaire.reference}</p>
+              {affaire.tribunal && (
+                <p className="text-sm text-[#737373]">{affaire.tribunal}</p>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="secondary"
+                className="flex-1"
+                onClick={() => setConfirmAction(null)}
+              >
+                Annuler
+              </Button>
+              <Button
+                variant={confirmAction.type === 'delete' ? 'danger' : confirmAction.type === 'archive' ? 'secondary' : 'warning'}
+                className={`flex-1 ${
+                  confirmAction.type === 'delete' ? 'bg-red-600 hover:bg-red-700 text-white' :
+                  confirmAction.type === 'suspend' ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''
+                }`}
+                onClick={confirmActionHandler}
+              >
+                {confirmAction.type === 'delete' ? 'Supprimer' :
+                 confirmAction.type === 'archive' ? 'Archiver' : 'Suspendre'}
+              </Button>
+            </div>
+          </div>
+        </ModalBase>
       )}
     </div>
   );
