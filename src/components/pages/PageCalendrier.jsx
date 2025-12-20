@@ -9,7 +9,7 @@ import {
   Users, FileText, AlertTriangle, CheckCircle, Eye, Edit,
   Filter, List, Grid, Bell, Video, Phone, Car
 } from 'lucide-react';
-import { Card, Badge, Button } from '../ui';
+import { Card, Badge, Button, Input, ModalBase, useToast } from '../ui';
 import { getStoredAffaires } from '../../lib/demoData';
 import { formatDateFr } from '../../utils/helpers';
 
@@ -151,12 +151,58 @@ const CalendarCell = ({ date, events, isCurrentMonth, isToday, isSelected, onCli
 // ============================================================================
 
 export const PageCalendrier = () => {
+  const toast = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState('mois'); // 'mois', 'semaine', 'liste'
   const [filterType, setFilterType] = useState('tous');
+  const [showNewEventModal, setShowNewEventModal] = useState(false);
+  const [customEvents, setCustomEvents] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('calendar_custom_events') || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [newEvent, setNewEvent] = useState({
+    type: 'rdv',
+    titre: '',
+    date: new Date().toISOString().split('T')[0],
+    heure: '10:00',
+    lieu: '',
+    description: ''
+  });
 
   const affaires = getStoredAffaires();
+
+  const handleAddEvent = () => {
+    if (!newEvent.titre.trim()) {
+      toast.error('Erreur', 'Veuillez saisir un titre pour l\'événement');
+      return;
+    }
+
+    const event = {
+      id: `custom-${Date.now()}`,
+      ...newEvent,
+      affaire_reference: 'Personnel'
+    };
+
+    const updatedEvents = [...customEvents, event];
+    setCustomEvents(updatedEvents);
+    localStorage.setItem('calendar_custom_events', JSON.stringify(updatedEvents));
+
+    toast.success('Événement créé', `"${newEvent.titre}" a été ajouté au calendrier`);
+
+    setNewEvent({
+      type: 'rdv',
+      titre: '',
+      date: new Date().toISOString().split('T')[0],
+      heure: '10:00',
+      lieu: '',
+      description: ''
+    });
+    setShowNewEventModal(false);
+  };
 
   // Générer tous les événements
   const events = useMemo(() => {
@@ -219,8 +265,13 @@ export const PageCalendrier = () => {
       }
     });
 
+    // Ajouter les événements personnalisés
+    customEvents.forEach(event => {
+      allEvents.push(event);
+    });
+
     return allEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [affaires]);
+  }, [affaires, customEvents]);
 
   // Filtrer par type
   const filteredEvents = useMemo(() => {
@@ -327,7 +378,7 @@ export const PageCalendrier = () => {
           <Button variant="secondary" onClick={goToToday}>
             Aujourd'hui
           </Button>
-          <Button variant="primary" icon={Plus}>
+          <Button variant="primary" icon={Plus} onClick={() => setShowNewEventModal(true)}>
             Nouvel événement
           </Button>
         </div>
@@ -483,6 +534,113 @@ export const PageCalendrier = () => {
           </div>
         </div>
       </Card>
+
+      {/* Modal nouvel événement */}
+      {showNewEventModal && (
+        <ModalBase
+          title="Nouvel événement"
+          onClose={() => setShowNewEventModal(false)}
+          size="md"
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+                Type d'événement
+              </label>
+              <select
+                value={newEvent.type}
+                onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              >
+                {Object.entries(TYPES_EVENEMENT).map(([key, value]) => (
+                  <option key={key} value={key}>{value.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+                Titre *
+              </label>
+              <input
+                type="text"
+                value={newEvent.titre}
+                onChange={(e) => setNewEvent({ ...newEvent, titre: e.target.value })}
+                placeholder="Ex: Rendez-vous client, Visite chantier..."
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value={newEvent.date}
+                  onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+                  Heure
+                </label>
+                <input
+                  type="time"
+                  value={newEvent.heure}
+                  onChange={(e) => setNewEvent({ ...newEvent, heure: e.target.value })}
+                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+                Lieu (optionnel)
+              </label>
+              <input
+                type="text"
+                value={newEvent.lieu}
+                onChange={(e) => setNewEvent({ ...newEvent, lieu: e.target.value })}
+                placeholder="Adresse ou lieu de rendez-vous"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+                Notes (optionnel)
+              </label>
+              <textarea
+                value={newEvent.description}
+                onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                placeholder="Informations complémentaires..."
+                rows={3}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+              />
+            </div>
+
+            <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+              <Button
+                variant="secondary"
+                onClick={() => setShowNewEventModal(false)}
+                className="flex-1"
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleAddEvent}
+                className="flex-1"
+              >
+                Créer l'événement
+              </Button>
+            </div>
+          </div>
+        </ModalBase>
+      )}
     </div>
   );
 };

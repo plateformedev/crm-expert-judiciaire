@@ -10,7 +10,7 @@ import {
   Calendar, Building, Folder, TrendingUp, ArrowRight, Copy,
   FileCheck, Receipt, CreditCard, Banknote, PiggyBank
 } from 'lucide-react';
-import { Card, Badge, Button, Input } from '../ui';
+import { Card, Badge, Button, Input, ModalBase, useToast } from '../ui';
 import { getStoredAffaires } from '../../lib/demoData';
 import { formatDateFr } from '../../utils/helpers';
 
@@ -125,11 +125,37 @@ const FacturationRow = ({ item, onView, onEdit }) => {
 // ============================================================================
 
 export const PageFacturation = () => {
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState('tous');
   const [search, setSearch] = useState('');
   const [selectedPeriode, setSelectedPeriode] = useState('annee');
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const affaires = getStoredAffaires();
+
+  const handleViewItem = (item) => {
+    setSelectedItem(item);
+  };
+
+  const handleEditItem = (item) => {
+    toast.info('Édition', `L'édition de ${TYPES_DOCUMENT[item.type]?.label || 'ce document'} sera bientôt disponible`);
+  };
+
+  const handleCreateDevis = () => {
+    toast.info('Création de devis', 'Sélectionnez une affaire depuis la liste des affaires pour créer un devis');
+  };
+
+  const handleCreateEtatFrais = () => {
+    toast.info('État de frais', 'Les états de frais sont générés automatiquement à partir des vacations et frais enregistrés sur chaque affaire');
+  };
+
+  const handleCreateFacture = () => {
+    toast.info('Facturation', 'La création de factures sera bientôt disponible');
+  };
+
+  const handleExport = () => {
+    toast.success('Export', 'Les données de facturation sont en cours d\'export');
+  };
 
   // Générer les données de facturation à partir des affaires
   const facturation = useMemo(() => {
@@ -372,8 +398,8 @@ export const PageFacturation = () => {
               <FacturationRow
                 key={item.id}
                 item={item}
-                onView={() => {}}
-                onEdit={() => {}}
+                onView={() => handleViewItem(item)}
+                onEdit={() => handleEditItem(item)}
               />
             ))}
           </div>
@@ -382,7 +408,7 @@ export const PageFacturation = () => {
 
       {/* Actions rapides */}
       <div className="grid grid-cols-3 gap-4">
-        <Card className="p-4 hover:border-[#c9a227] transition-colors cursor-pointer">
+        <Card className="p-4 hover:border-[#c9a227] transition-colors cursor-pointer" onClick={handleCreateDevis}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
               <FileText className="w-5 h-5 text-blue-600" />
@@ -395,7 +421,7 @@ export const PageFacturation = () => {
           </div>
         </Card>
 
-        <Card className="p-4 hover:border-[#c9a227] transition-colors cursor-pointer">
+        <Card className="p-4 hover:border-[#c9a227] transition-colors cursor-pointer" onClick={handleCreateEtatFrais}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
               <Receipt className="w-5 h-5 text-purple-600" />
@@ -408,7 +434,7 @@ export const PageFacturation = () => {
           </div>
         </Card>
 
-        <Card className="p-4 hover:border-[#c9a227] transition-colors cursor-pointer">
+        <Card className="p-4 hover:border-[#c9a227] transition-colors cursor-pointer" onClick={handleCreateFacture}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
               <Euro className="w-5 h-5 text-green-600" />
@@ -436,6 +462,98 @@ export const PageFacturation = () => {
           </div>
         </div>
       </Card>
+
+      {/* Modal détail document */}
+      {selectedItem && (
+        <ModalBase
+          title={`${TYPES_DOCUMENT[selectedItem.type]?.label || 'Document'} - ${selectedItem.numero}`}
+          onClose={() => setSelectedItem(null)}
+          size="lg"
+        >
+          <div className="space-y-6">
+            {/* Informations générales */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-1">Affaire</p>
+                <p className="font-medium text-[#1a1a1a]">{selectedItem.affaire_reference}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-1">Client</p>
+                <p className="font-medium text-[#1a1a1a]">{selectedItem.client}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-1">Tribunal</p>
+                <p className="text-[#1a1a1a]">{selectedItem.tribunal}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-1">Date d'émission</p>
+                <p className="text-[#1a1a1a]">{formatDateFr(selectedItem.date_emission)}</p>
+              </div>
+            </div>
+
+            {/* Détail vacations */}
+            {selectedItem.vacations && selectedItem.vacations.length > 0 && (
+              <div>
+                <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-2">Vacations</p>
+                <div className="bg-[#fafafa] rounded-xl p-4 space-y-2">
+                  {selectedItem.vacations.map((v, idx) => (
+                    <div key={idx} className="flex justify-between text-sm">
+                      <span className="text-[#737373]">{v.description || `Vacation ${idx + 1}`}</span>
+                      <span className="font-medium">{(v.montant || 0).toLocaleString('fr-FR')} €</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Détail frais */}
+            {selectedItem.frais && selectedItem.frais.length > 0 && (
+              <div>
+                <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-2">Frais</p>
+                <div className="bg-[#fafafa] rounded-xl p-4 space-y-2">
+                  {selectedItem.frais.map((f, idx) => (
+                    <div key={idx} className="flex justify-between text-sm">
+                      <span className="text-[#737373]">{f.description || f.type || `Frais ${idx + 1}`}</span>
+                      <span className="font-medium">{(f.montant || 0).toLocaleString('fr-FR')} €</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Totaux */}
+            <div className="bg-[#1a1a1a] text-white rounded-xl p-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Total HT</span>
+                  <span>{(selectedItem.montant_ht || 0).toLocaleString('fr-FR')} €</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">TVA (20%)</span>
+                  <span>{(selectedItem.tva || 0).toLocaleString('fr-FR')} €</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-700">
+                  <span>Total TTC</span>
+                  <span>{(selectedItem.montant_ttc || 0).toLocaleString('fr-FR')} €</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+              <Button variant="secondary" icon={Printer} onClick={() => toast.info('Impression', 'L\'impression sera bientôt disponible')} className="flex-1">
+                Imprimer
+              </Button>
+              <Button variant="secondary" icon={Download} onClick={() => toast.info('Téléchargement', 'Le téléchargement PDF sera bientôt disponible')} className="flex-1">
+                Télécharger PDF
+              </Button>
+              <Button variant="primary" icon={Send} onClick={() => toast.info('Envoi', 'L\'envoi par email sera bientôt disponible')} className="flex-1">
+                Envoyer
+              </Button>
+            </div>
+          </div>
+        </ModalBase>
+      )}
     </div>
   );
 };

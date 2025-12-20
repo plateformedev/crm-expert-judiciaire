@@ -11,7 +11,7 @@ import {
   CheckCircle, AlertTriangle, Star, StarOff, MoreVertical,
   ChevronRight, ChevronDown, ArrowRight, Tag, Calendar
 } from 'lucide-react';
-import { Card, Badge, Button, Input } from '../ui';
+import { Card, Badge, Button, Input, ModalBase, useToast } from '../ui';
 import { getStoredAffaires } from '../../lib/demoData';
 import { formatDateFr } from '../../utils/helpers';
 
@@ -158,11 +158,20 @@ const DocumentItem = ({ doc, viewMode, onView, onDownload, onToggleFavorite }) =
 // ============================================================================
 
 export const PageDocuments = () => {
+  const toast = useToast();
   const [viewMode, setViewMode] = useState('grid');
   const [search, setSearch] = useState('');
   const [selectedCategorie, setSelectedCategorie] = useState('tous');
   const [selectedAffaire, setSelectedAffaire] = useState('tous');
   const [showFavorisOnly, setShowFavorisOnly] = useState(false);
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('document_favorites') || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [selectedDocument, setSelectedDocument] = useState(null);
 
   const affaires = getStoredAffaires();
 
@@ -268,11 +277,12 @@ export const PageDocuments = () => {
 
       const matchCategorie = selectedCategorie === 'tous' || doc.categorie === selectedCategorie;
       const matchAffaire = selectedAffaire === 'tous' || doc.affaire_id === selectedAffaire;
-      const matchFavori = !showFavorisOnly || doc.favori;
+      const isFavorite = favorites.includes(doc.id);
+      const matchFavori = !showFavorisOnly || isFavorite;
 
       return matchSearch && matchCategorie && matchAffaire && matchFavori;
     });
-  }, [documents, search, selectedCategorie, selectedAffaire, showFavorisOnly]);
+  }, [documents, search, selectedCategorie, selectedAffaire, showFavorisOnly, favorites]);
 
   // Stats par catégorie
   const statsCategories = useMemo(() => {
@@ -284,8 +294,36 @@ export const PageDocuments = () => {
   }, [documents]);
 
   const toggleFavorite = (docId) => {
-    // Dans une vraie app, sauvegarder en base
-    console.log('Toggle favorite:', docId);
+    setFavorites(prev => {
+      const newFavorites = prev.includes(docId)
+        ? prev.filter(id => id !== docId)
+        : [...prev, docId];
+      localStorage.setItem('document_favorites', JSON.stringify(newFavorites));
+
+      const doc = documents.find(d => d.id === docId);
+      if (newFavorites.includes(docId)) {
+        toast.success('Ajouté aux favoris', `"${doc?.nom}" a été ajouté à vos favoris`);
+      } else {
+        toast.info('Retiré des favoris', `"${doc?.nom}" a été retiré de vos favoris`);
+      }
+      return newFavorites;
+    });
+  };
+
+  const handleViewDocument = (doc) => {
+    setSelectedDocument(doc);
+  };
+
+  const handleDownloadDocument = (doc) => {
+    toast.info('Mode démo', `Le téléchargement de "${doc.nom}" n'est pas disponible en mode démonstration`);
+  };
+
+  const handleExportAll = () => {
+    toast.success('Export lancé', `${filteredDocs.length} documents en cours d'export...`);
+  };
+
+  const handleImport = () => {
+    toast.info('Import', 'L\'import de documents sera bientôt disponible');
   };
 
   return (
@@ -299,10 +337,10 @@ export const PageDocuments = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="secondary" icon={Download}>
+          <Button variant="secondary" icon={Download} onClick={handleExportAll}>
             Tout exporter
           </Button>
-          <Button variant="primary" icon={Upload}>
+          <Button variant="primary" icon={Upload} onClick={handleImport}>
             Importer
           </Button>
         </div>
@@ -431,10 +469,10 @@ export const PageDocuments = () => {
           {filteredDocs.map(doc => (
             <DocumentItem
               key={doc.id}
-              doc={doc}
+              doc={{ ...doc, favori: favorites.includes(doc.id) }}
               viewMode={viewMode}
-              onView={(doc) => console.log('View:', doc)}
-              onDownload={(doc) => console.log('Download:', doc)}
+              onView={handleViewDocument}
+              onDownload={handleDownloadDocument}
               onToggleFavorite={toggleFavorite}
             />
           ))}
@@ -455,6 +493,72 @@ export const PageDocuments = () => {
           </div>
         </div>
       </Card>
+
+      {/* Modal détail document */}
+      {selectedDocument && (
+        <ModalBase
+          title="Détail du document"
+          onClose={() => setSelectedDocument(null)}
+          size="md"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 p-4 bg-[#faf8f3] rounded-xl">
+              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center border border-[#e5e5e5]">
+                {TYPE_ICONS[selectedDocument.nom?.split('.').pop()] ?
+                  React.createElement(TYPE_ICONS[selectedDocument.nom?.split('.').pop()], {
+                    className: "w-8 h-8 text-[#737373]"
+                  }) :
+                  <FileText className="w-8 h-8 text-[#737373]" />
+                }
+              </div>
+              <div>
+                <h3 className="font-medium text-[#1a1a1a]">{selectedDocument.nom}</h3>
+                <p className="text-sm text-[#737373]">{selectedDocument.taille}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-1">Affaire</p>
+                <p className="text-[#1a1a1a]">{selectedDocument.affaire_reference}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-1">Catégorie</p>
+                <p className="text-[#1a1a1a] capitalize">
+                  {CATEGORIES_DOCUMENTS.find(c => c.id === selectedDocument.categorie)?.label || selectedDocument.categorie}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-1">Date d'ajout</p>
+                <p className="text-[#1a1a1a]">{formatDateFr(selectedDocument.date_ajout)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-1">Taille</p>
+                <p className="text-[#1a1a1a]">{selectedDocument.taille}</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+              <Button
+                variant="secondary"
+                icon={favorites.includes(selectedDocument.id) ? StarOff : Star}
+                onClick={() => toggleFavorite(selectedDocument.id)}
+                className="flex-1"
+              >
+                {favorites.includes(selectedDocument.id) ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+              </Button>
+              <Button
+                variant="primary"
+                icon={Download}
+                onClick={() => handleDownloadDocument(selectedDocument)}
+                className="flex-1"
+              >
+                Télécharger
+              </Button>
+            </div>
+          </div>
+        </ModalBase>
+      )}
     </div>
   );
 };

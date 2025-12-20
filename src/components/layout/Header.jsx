@@ -3,11 +3,12 @@
 // ============================================================================
 
 import React, { useState } from 'react';
-import { 
-  Search, Bell, Plus, User, ChevronDown, 
-  Download, Upload, Settings, LogOut
+import { useNavigate } from 'react-router-dom';
+import {
+  Search, Bell, Plus, User, ChevronDown,
+  Download, Upload, Settings, LogOut, FileDown, FileUp
 } from 'lucide-react';
-import { Button } from '../ui';
+import { Button, useToast } from '../ui';
 
 const Header = ({
   searchQuery = '',
@@ -17,16 +18,66 @@ const Header = ({
   notifications = [],
   user = { nom: 'Expert', email: 'expert@example.com' }
 }) => {
+  const navigate = useNavigate();
+  const toast = useToast();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+
   const handleNewAffaire = () => {
     if (onNewAffaire) {
       onNewAffaire();
     } else if (setShowModal) {
       setShowModal('nouvelle-affaire');
+    } else {
+      navigate('/affaires/nouveau');
     }
   };
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
-  
+
+  const handleImport = () => {
+    toast.info('Import de données', 'L\'import de données sera bientôt disponible. Vous pourrez importer vos affaires depuis un fichier CSV ou Excel.');
+  };
+
+  const handleExport = () => {
+    // Simuler un export
+    toast.success('Export lancé', 'Vos données sont en cours d\'export. Le fichier sera téléchargé automatiquement.');
+    // En mode démo, on crée un fichier JSON des affaires
+    try {
+      const affaires = JSON.parse(localStorage.getItem('crm_affaires') || '[]');
+      const dataStr = JSON.stringify(affaires, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `export_affaires_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error('Erreur', 'Impossible d\'exporter les données');
+    }
+  };
+
+  const handleViewAllNotifications = () => {
+    setShowNotifications(false);
+    navigate('/alertes');
+  };
+
+  const handleProfile = () => {
+    setShowProfile(false);
+    navigate('/parametres');
+  };
+
+  const handleSettings = () => {
+    setShowProfile(false);
+    navigate('/parametres');
+  };
+
+  const handleLogout = () => {
+    setShowProfile(false);
+    toast.info('Déconnexion', 'En mode démonstration, la déconnexion n\'est pas nécessaire.');
+  };
+
   const unreadNotifications = notifications.filter(n => !n.lu).length;
 
   return (
@@ -58,10 +109,18 @@ const Header = ({
 
         {/* Import/Export */}
         <div className="flex gap-1">
-          <button className="p-2.5 hover:bg-[#f5f5f5] rounded-xl transition-colors">
+          <button
+            onClick={handleImport}
+            className="p-2.5 hover:bg-[#f5f5f5] rounded-xl transition-colors"
+            title="Importer des données"
+          >
             <Upload className="w-5 h-5 text-[#737373]" />
           </button>
-          <button className="p-2.5 hover:bg-[#f5f5f5] rounded-xl transition-colors">
+          <button
+            onClick={handleExport}
+            className="p-2.5 hover:bg-[#f5f5f5] rounded-xl transition-colors"
+            title="Exporter les données"
+          >
             <Download className="w-5 h-5 text-[#737373]" />
           </button>
         </div>
@@ -107,7 +166,10 @@ const Header = ({
               </div>
               {notifications.length > 0 && (
                 <div className="p-3 border-t border-[#e5e5e5]">
-                  <button className="w-full text-center text-sm text-[#c9a227] hover:underline">
+                  <button
+                    onClick={handleViewAllNotifications}
+                    className="w-full text-center text-sm text-[#c9a227] hover:underline"
+                  >
                     Voir toutes les notifications
                   </button>
                 </div>
@@ -143,17 +205,26 @@ const Header = ({
                 <p className="text-sm text-[#737373]">{user.email}</p>
               </div>
               <div className="p-2">
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-[#525252] hover:bg-[#f5f5f5] rounded-xl transition-colors">
+                <button
+                  onClick={handleProfile}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-[#525252] hover:bg-[#f5f5f5] rounded-xl transition-colors"
+                >
                   <User className="w-4 h-4" />
                   <span className="text-sm">Mon profil</span>
                 </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-[#525252] hover:bg-[#f5f5f5] rounded-xl transition-colors">
+                <button
+                  onClick={handleSettings}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-[#525252] hover:bg-[#f5f5f5] rounded-xl transition-colors"
+                >
                   <Settings className="w-4 h-4" />
                   <span className="text-sm">Paramètres</span>
                 </button>
               </div>
               <div className="p-2 border-t border-[#e5e5e5]">
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-red-500 hover:bg-red-50 rounded-xl transition-colors">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                >
                   <LogOut className="w-4 h-4" />
                   <span className="text-sm">Déconnexion</span>
                 </button>
