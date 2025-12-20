@@ -24,7 +24,7 @@ const CATEGORIES_DOCUMENTS = [
   { id: 'convocations', label: 'Convocations', icon: FileText, color: 'indigo' },
   { id: 'comptes_rendus', label: 'Comptes-rendus', icon: FileText, color: 'purple' },
   { id: 'dires', label: 'Dires des parties', icon: FileText, color: 'amber' },
-  { id: 'rapports', label: 'Rapports', icon: FilePdf, color: 'green' },
+  { id: 'rapports', label: 'Rapports', icon: FileText, color: 'green' },
   { id: 'photos', label: 'Photos', icon: Image, color: 'pink' },
   { id: 'plans', label: 'Plans', icon: FileImage, color: 'cyan' },
   { id: 'devis', label: 'Devis', icon: FileSpreadsheet, color: 'orange' },
