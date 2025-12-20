@@ -2,21 +2,80 @@
 // CRM EXPERT JUDICIAIRE - CONSTANTES ET DONNÉES DE RÉFÉRENCE
 // ============================================================================
 
-// Design System
+// Design System - Style Google/Material Design 3
 export const DS = {
   colors: {
-    noir: '#1a1a1a',
+    // Fond principal blanc
+    background: '#ffffff',
+    backgroundAlt: '#f8f9fa',
+    surface: '#ffffff',
+    surfaceHover: '#f1f3f4',
+
+    // Texte
+    textPrimary: '#202124',
+    textSecondary: '#5f6368',
+    textTertiary: '#80868b',
+    textDisabled: '#bdc1c6',
+
+    // Accent or (identité Expert Judiciaire)
+    primary: '#c9a227',
+    primaryLight: '#e8d48a',
+    primaryDark: '#a68618',
+    primarySurface: '#fef9e7',
+
+    // Couleurs sémantiques (style Google)
+    success: '#34a853',
+    successLight: '#e6f4ea',
+    warning: '#fbbc04',
+    warningLight: '#fef7e0',
+    error: '#ea4335',
+    errorLight: '#fce8e6',
+    info: '#4285f4',
+    infoLight: '#e8f0fe',
+
+    // Gris Google
+    gris: {
+      50: '#f8f9fa', 100: '#f1f3f4', 200: '#e8eaed', 300: '#dadce0',
+      400: '#bdc1c6', 500: '#9aa0a6', 600: '#80868b', 700: '#5f6368',
+      800: '#3c4043', 900: '#202124'
+    },
+
+    // Legacy (compatibilité)
+    noir: '#202124',
     noirProfond: '#0d0d0d',
     blanc: '#ffffff',
-    blancCasse: '#fafafa',
+    blancCasse: '#f8f9fa',
     or: '#c9a227',
-    orClair: '#d4af37',
-    orPale: '#f5e6c8',
-    gris: {
-      50: '#fafafa', 100: '#f5f5f5', 200: '#e5e5e5', 300: '#d4d4d4',
-      400: '#a3a3a3', 500: '#737373', 600: '#525252', 700: '#404040',
-      800: '#262626', 900: '#171717'
-    }
+    orClair: '#e8d48a',
+    orPale: '#fef9e7'
+  },
+
+  // Ombres style Google (douces, pas de bordures)
+  shadows: {
+    sm: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
+    md: '0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15)',
+    lg: '0 2px 6px 2px rgba(60,64,67,0.15), 0 1px 2px 0 rgba(60,64,67,0.3)',
+    xl: '0 4px 8px 3px rgba(60,64,67,0.15), 0 1px 3px rgba(60,64,67,0.3)',
+    hover: '0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15)'
+  },
+
+  // Border radius Google (très arrondis)
+  radius: {
+    sm: '8px',
+    md: '12px',
+    lg: '16px',
+    xl: '24px',
+    full: '9999px'
+  },
+
+  // Espacement
+  spacing: {
+    xs: '4px',
+    sm: '8px',
+    md: '16px',
+    lg: '24px',
+    xl: '32px',
+    xxl: '48px'
   }
 };
 

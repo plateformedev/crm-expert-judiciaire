@@ -378,7 +378,7 @@ const AppLayout = ({ children }) => {
   }, [location.pathname, affaires, openTab]);
 
   return (
-    <div className="h-screen flex flex-col bg-[#fafafa]">
+    <div className="h-screen flex flex-col bg-white">
       {/* Bannière mode démo */}
       <DemoBanner />
 
@@ -392,7 +392,7 @@ const AppLayout = ({ children }) => {
         />
 
         {/* Main */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden bg-[#f8f9fa]">
           {/* Header */}
           <Header
             searchQuery={searchQuery}
@@ -408,7 +408,7 @@ const AppLayout = ({ children }) => {
             <div className="px-8 pt-4">
               <button
                 onClick={goBack}
-                className="flex items-center gap-2 text-sm text-[#737373] hover:text-[#c9a227] transition-colors"
+                className="flex items-center gap-2 text-sm text-[#5f6368] hover:text-[#c9a227] transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Retour
@@ -417,7 +417,7 @@ const AppLayout = ({ children }) => {
           )}
 
           {/* Content */}
-          <main className="flex-1 overflow-y-auto p-8">
+          <main className="flex-1 overflow-y-auto p-6">
             <div className="max-w-7xl mx-auto">
               {children}
             </div>

@@ -1,10 +1,10 @@
 // ============================================================================
-// CRM EXPERT JUDICIAIRE - SIDEBAR avec React Router
+// CRM EXPERT JUDICIAIRE - SIDEBAR Style Google
 // ============================================================================
 
 import React, { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
+import {
   Home, Folder, Users, Calendar, FileText, AlertCircle, Euro,
   BarChart3, BookOpen, Settings, Menu, ChevronDown, ChevronRight,
   Scale, Award, Wand2, Shield, Gavel, Target, Upload, Clock,
@@ -18,9 +18,9 @@ const ICONS = {
   Gavel, Target, Upload, Clock, Calculator, Mic, CheckCircle
 };
 
-const Sidebar = ({ 
-  modules = [], 
-  collapsed = false, 
+const Sidebar = ({
+  modules = [],
+  collapsed = false,
   setCollapsed,
   badges = {}
 }) => {
@@ -31,7 +31,7 @@ const Sidebar = ({
   // Déterminer le module actif depuis l'URL
   const { moduleActif, sousModuleActif } = useMemo(() => {
     const path = location.pathname;
-    
+
     for (const module of modules) {
       if (module.sousModules) {
         for (const sub of module.sousModules) {
@@ -46,12 +46,12 @@ const Sidebar = ({
         return { moduleActif: module.id, sousModuleActif: null };
       }
     }
-    
+
     // Dashboard par défaut
     if (path === '/') {
-      return { moduleActif: 'dashboard', sousModuleActif: null };
+      return { moduleActif: 'affaires', sousModuleActif: null };
     }
-    
+
     return { moduleActif: null, sousModuleActif: null };
   }, [location.pathname, modules]);
 
@@ -62,7 +62,6 @@ const Sidebar = ({
   const handleModuleClick = (module) => {
     if (module.sousModules && module.sousModules.length > 0) {
       toggleExpand(module.id);
-      // Si pas déjà sur ce module, naviguer vers le menu
       if (moduleActif !== module.id) {
         navigate(module.path);
       }
@@ -78,77 +77,76 @@ const Sidebar = ({
   };
 
   return (
-    <div className={`bg-[#1a1a1a] text-white flex flex-col transition-all duration-300 ${collapsed ? 'w-20' : 'w-72'}`}>
+    <div className={`
+      bg-white border-r border-[#dadce0] flex flex-col transition-all duration-300
+      ${collapsed ? 'w-20' : 'w-72'}
+    `}>
       {/* Logo */}
-      <div className="h-20 flex items-center justify-between px-6 border-b border-[#262626]">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-[#dadce0]">
         {!collapsed && (
-          <div 
-            className="flex items-center gap-3 cursor-pointer" 
+          <div
+            className="flex items-center gap-3 cursor-pointer"
             onClick={() => navigate('/')}
           >
-            <Scale className="w-8 h-8 text-[#c9a227]" />
+            <div className="w-10 h-10 bg-[#fef9e7] rounded-2xl flex items-center justify-center">
+              <Scale className="w-6 h-6 text-[#c9a227]" />
+            </div>
             <div>
-              <span className="font-light text-xl tracking-wide text-white">Expert</span>
-              <span className="text-[#c9a227] text-xl">.</span>
-              <span className="font-light text-xl tracking-wide text-white">CRM</span>
+              <span className="font-medium text-lg text-[#202124]">Expert</span>
+              <span className="text-[#c9a227] text-lg font-medium">.CRM</span>
             </div>
           </div>
         )}
         {collapsed && (
-          <Scale 
-            className="w-8 h-8 text-[#c9a227] mx-auto cursor-pointer" 
+          <div
+            className="w-10 h-10 bg-[#fef9e7] rounded-2xl flex items-center justify-center mx-auto cursor-pointer"
             onClick={() => navigate('/')}
-          />
+          >
+            <Scale className="w-6 h-6 text-[#c9a227]" />
+          </div>
         )}
-        <button 
-          onClick={() => setCollapsed(!collapsed)} 
-          className="p-2 hover:bg-[#262626] rounded-lg transition-colors"
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="p-2 hover:bg-[#f1f3f4] rounded-full transition-colors"
         >
-          <Menu className="w-5 h-5 text-[#737373]" />
+          <Menu className="w-5 h-5 text-[#5f6368]" />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4">
+      <nav className="flex-1 overflow-y-auto py-2 px-3">
         {modules.map(module => {
           const Icon = module.icon || ICONS[module.iconName] || Folder;
           const isActive = moduleActif === module.id;
           const hasSubModules = module.sousModules && module.sousModules.length > 0;
           const isExpanded = expanded[module.id] || (isActive && hasSubModules);
-          const isGold = module.color === 'gold';
           const badge = module.badge || badges[module.id] || 0;
 
           return (
-            <div key={module.id}>
+            <div key={module.id} className="mb-1">
               <button
                 onClick={() => handleModuleClick(module)}
-                className={`w-full flex items-center justify-between px-6 py-3 transition-all duration-200 ${
-                  isActive 
-                    ? isGold 
-                      ? 'bg-[#c9a227]/10 border-l-2 border-[#c9a227]' 
-                      : 'bg-[#262626] border-l-2 border-white'
-                    : 'hover:bg-[#262626]/50 border-l-2 border-transparent'
-                }`}
+                className={`
+                  w-full flex items-center justify-between px-3 py-2.5 rounded-full transition-all duration-200
+                  ${isActive
+                    ? 'bg-[#fef9e7] text-[#a68618]'
+                    : 'text-[#5f6368] hover:bg-[#f1f3f4]'
+                  }
+                `}
               >
                 <div className="flex items-center gap-3">
                   <Icon className={`w-5 h-5 flex-shrink-0 ${
-                    isActive 
-                      ? isGold ? 'text-[#c9a227]' : 'text-white' 
-                      : 'text-[#737373]'
+                    isActive ? 'text-[#c9a227]' : 'text-[#5f6368]'
                   }`} />
                   {!collapsed && (
                     <>
-                      <span className={`text-sm font-medium tracking-wide ${
-                        isActive 
-                          ? isGold ? 'text-[#c9a227]' : 'text-white' 
-                          : 'text-[#a3a3a3]'
+                      <span className={`text-sm font-medium ${
+                        isActive ? 'text-[#a68618]' : 'text-[#3c4043]'
                       }`}>
                         {module.label}
                       </span>
                       {badge > 0 && (
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                          isGold ? 'bg-[#c9a227] text-white' : 'bg-[#404040] text-white'
-                        }`}>
+                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-[#ea4335] text-white">
                           {badge}
                         </span>
                       )}
@@ -156,32 +154,32 @@ const Sidebar = ({
                   )}
                 </div>
                 {!collapsed && hasSubModules && (
-                  isExpanded 
-                    ? <ChevronDown className="w-4 h-4 text-[#737373]" />
-                    : <ChevronRight className="w-4 h-4 text-[#737373]" />
+                  isExpanded
+                    ? <ChevronDown className="w-4 h-4 text-[#5f6368]" />
+                    : <ChevronRight className="w-4 h-4 text-[#5f6368]" />
                 )}
               </button>
 
               {/* Sous-modules */}
               {!collapsed && hasSubModules && isExpanded && (
-                <div className="bg-[#0d0d0d]">
+                <div className="ml-4 mt-1 border-l-2 border-[#e8eaed]">
                   {module.sousModules.map(sub => {
                     const SubIcon = sub.icon || ICONS[sub.iconName] || Folder;
                     const isSubActive = sousModuleActif === sub.id;
-                    
+
                     return (
                       <button
                         key={sub.id}
                         onClick={() => handleSubModuleClick(sub)}
-                        className={`w-full flex items-center gap-3 px-6 pl-14 py-2.5 transition-colors ${
-                          isSubActive 
-                            ? isGold 
-                              ? 'text-[#c9a227] bg-[#c9a227]/5' 
-                              : 'text-white bg-[#262626]'
-                            : 'text-[#737373] hover:text-[#a3a3a3] hover:bg-[#262626]/30'
-                        }`}
+                        className={`
+                          w-full flex items-center gap-3 px-3 py-2 ml-2 rounded-full transition-colors
+                          ${isSubActive
+                            ? 'bg-[#fef9e7] text-[#a68618]'
+                            : 'text-[#5f6368] hover:bg-[#f1f3f4]'
+                          }
+                        `}
                       >
-                        <SubIcon className="w-4 h-4" />
+                        <SubIcon className={`w-4 h-4 ${isSubActive ? 'text-[#c9a227]' : ''}`} />
                         <span className="text-sm">{sub.label}</span>
                       </button>
                     );
@@ -195,13 +193,19 @@ const Sidebar = ({
 
       {/* Footer */}
       {!collapsed && (
-        <div className="p-4 border-t border-[#262626]">
-          <button 
+        <div className="p-3 border-t border-[#dadce0]">
+          <button
             onClick={() => navigate('/parametres')}
-            className="w-full flex items-center gap-3 px-4 py-3 text-[#737373] hover:text-white hover:bg-[#262626] rounded-xl transition-colors"
+            className={`
+              w-full flex items-center gap-3 px-3 py-2.5 rounded-full transition-colors
+              ${location.pathname === '/parametres'
+                ? 'bg-[#fef9e7] text-[#a68618]'
+                : 'text-[#5f6368] hover:bg-[#f1f3f4]'
+              }
+            `}
           >
-            <Settings className="w-5 h-5" />
-            <span className="text-sm">Paramètres</span>
+            <Settings className={`w-5 h-5 ${location.pathname === '/parametres' ? 'text-[#c9a227]' : ''}`} />
+            <span className="text-sm font-medium">Paramètres</span>
           </button>
         </div>
       )}
