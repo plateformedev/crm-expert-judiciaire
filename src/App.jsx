@@ -51,6 +51,15 @@ import {
 // Module Outils
 import { Chronometre, CalculatriceTechnique } from './components/outils';
 
+// Pages complètes
+import {
+  PageParametres,
+  PageStatistiques,
+  PageFacturation,
+  PageDocuments,
+  PageCalendrier
+} from './components/pages';
+
 // Hooks
 import { usePersistedStorage, useNotifications, useKeyboardShortcuts } from './hooks';
 import { useAffaires } from './hooks/useSupabase';
@@ -68,98 +77,13 @@ const MODULES = [
 ];
 
 // ============================================================================
-// PAGE: Calendrier (Placeholder)
-// ============================================================================
-
-const PageCalendrier = () => (
-  <div className="space-y-6">
-    <h1 className="text-2xl font-semibold text-[#1a1a1a]">Calendrier</h1>
-    <Card className="p-8">
-      <EmptyState
-        icon={Calendar}
-        title="Calendrier en développement"
-        description="Synchronisation Google Calendar bientôt disponible"
-      />
-    </Card>
-  </div>
-);
-
-// ============================================================================
-// PAGE: Contacts (Placeholder)
+// PAGE: Contacts (avec CarnetSapiteurs)
 // ============================================================================
 
 const PageContacts = () => (
   <div className="space-y-6">
     <h1 className="text-2xl font-semibold text-[#1a1a1a]">Contacts & Sapiteurs</h1>
     <CarnetSapiteurs />
-  </div>
-);
-
-// ============================================================================
-// PAGE: Documents (Placeholder)
-// ============================================================================
-
-const PageDocuments = () => (
-  <div className="space-y-6">
-    <h1 className="text-2xl font-semibold text-[#1a1a1a]">Documents</h1>
-    <Card className="p-8">
-      <EmptyState
-        icon={FileText}
-        title="Gestion documentaire"
-        description="Module en cours de développement"
-      />
-    </Card>
-  </div>
-);
-
-// ============================================================================
-// PAGE: Facturation (Placeholder)
-// ============================================================================
-
-const PageFacturation = () => (
-  <div className="space-y-6">
-    <h1 className="text-2xl font-semibold text-[#1a1a1a]">Facturation</h1>
-    <Card className="p-8">
-      <EmptyState
-        icon={Euro}
-        title="Facturation"
-        description="États de frais et facturation bientôt disponibles"
-      />
-    </Card>
-  </div>
-);
-
-// ============================================================================
-// PAGE: Statistiques (Placeholder)
-// ============================================================================
-
-const PageStatistiques = () => (
-  <div className="space-y-6">
-    <h1 className="text-2xl font-semibold text-[#1a1a1a]">Statistiques</h1>
-    <Card className="p-8">
-      <EmptyState
-        icon={BarChart3}
-        title="Statistiques"
-        description="Tableaux de bord analytiques en développement"
-      />
-    </Card>
-  </div>
-);
-
-// ============================================================================
-// PAGE: Paramètres (Placeholder)
-// ============================================================================
-
-const PageParametres = () => (
-  <div className="space-y-6">
-    <h1 className="text-2xl font-semibold text-[#1a1a1a]">Paramètres</h1>
-    <Card className="p-8">
-      <EmptyState
-        icon={Settings}
-        title="Paramètres"
-        description="Configuration de l'application"
-      />
-    </Card>
   </div>
 );
 
