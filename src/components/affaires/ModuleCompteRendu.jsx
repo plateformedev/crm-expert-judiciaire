@@ -8,7 +8,7 @@ import {
   FileText, Wand2, Save, Download, Copy, Eye, Edit,
   Check, CheckCircle, RefreshCw, Sparkles, AlertTriangle,
   Clock, Users, Camera, MapPin, Calendar, Send,
-  ChevronDown, ChevronRight, Lightbulb, Zap, FileCheck
+  ChevronDown, ChevronRight, Lightbulb, Zap, FileCheck, X
 } from 'lucide-react';
 import { Card, Badge, Button, Input, ModalBase } from '../ui';
 import { formatDateFr } from '../../utils/helpers';
@@ -391,37 +391,54 @@ export const ModuleCompteRendu = ({ affaire, reunion, expert, onUpdate, onClose 
   };
 
   return (
-    <div className="space-y-6">
-      {/* En-tête */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-light text-[#1a1a1a]">
-            Compte-rendu {reunion?.numero === 1 ? 'R1' : `R${reunion?.numero || ''}`}
-          </h2>
-          <p className="text-sm text-[#737373]">
-            {affaire?.reference} • {formatDateFr(reunion?.date_reunion)}
-          </p>
+    <div className="fixed inset-0 z-50 bg-[#f5f5f0] overflow-hidden flex flex-col">
+      {/* En-tête fixe */}
+      <div className="bg-[#1a1a1a] text-white px-6 py-4 flex items-center justify-between shadow-lg">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onClose}
+            className="flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+            <span className="text-sm">Retour à l'affaire</span>
+          </button>
+          <div className="h-6 w-px bg-white/20" />
+          <div>
+            <h1 className="text-lg font-medium">
+              Compte-rendu {reunion?.numero === 1 ? 'R1 - Accédit contradictoire' : `R${reunion?.numero || ''}`}
+            </h1>
+            <p className="text-sm text-white/60">
+              {affaire?.reference} • {formatDateFr(reunion?.date_reunion)}
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="text-right mr-4">
-            <p className="text-xs text-[#737373]">Progression</p>
-            <p className="text-2xl font-light text-[#c9a227]">{progression}%</p>
+        <div className="flex items-center gap-4">
+          {/* Progression */}
+          <div className="flex items-center gap-3 bg-white/10 rounded-lg px-4 py-2">
+            <div className="w-32 h-2 bg-white/20 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#c9a227] transition-all"
+                style={{ width: `${progression}%` }}
+              />
+            </div>
+            <span className="text-lg font-mono text-[#c9a227]">{progression}%</span>
           </div>
 
           <Button
             variant="secondary"
             icon={previewMode ? Edit : Eye}
             onClick={() => setPreviewMode(!previewMode)}
+            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
           >
             {previewMode ? 'Éditer' : 'Aperçu'}
           </Button>
 
-          <Button variant="secondary" icon={Copy} onClick={handleCopy}>
+          <Button variant="secondary" icon={Copy} onClick={handleCopy} className="bg-white/10 border-white/20 text-white hover:bg-white/20">
             Copier
           </Button>
 
-          <Button variant="secondary" icon={Download}>
+          <Button variant="secondary" icon={Download} className="bg-white/10 border-white/20 text-white hover:bg-white/20">
             PDF
           </Button>
 
@@ -430,132 +447,133 @@ export const ModuleCompteRendu = ({ affaire, reunion, expert, onUpdate, onClose 
             icon={Save}
             onClick={handleSave}
             loading={saving}
+            className="bg-[#c9a227] hover:bg-[#b8922a]"
           >
             Enregistrer
           </Button>
+        </div>
+      </div>
 
-          {onClose && (
-            <Button variant="secondary" onClick={onClose}>
-              Fermer
-            </Button>
+      {/* Contenu scrollable */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-5xl mx-auto p-6 space-y-6">
+          {/* Actions rapides - Génération IA */}
+          <Card className="p-4 bg-gradient-to-r from-blue-50 to-white border-blue-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-5 h-5 text-blue-600" />
+                <div>
+                  <p className="font-medium text-blue-800">Génération assistée par IA</p>
+                  <p className="text-xs text-blue-600">
+                    Générez automatiquement le compte-rendu à partir des notes de la réunion R1
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="primary"
+                icon={Zap}
+                onClick={generateAll}
+                className="bg-blue-600 hover:bg-blue-700"
+                disabled={!!generatingSection}
+              >
+                Générer tout le compte-rendu
+              </Button>
+            </div>
+          </Card>
+
+          {/* Info sur les données disponibles */}
+          <div className="grid grid-cols-4 gap-4">
+            <Card className="p-3">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-[#c9a227]" />
+                <div>
+                  <p className="text-xs text-[#737373]">Présents</p>
+                  <p className="font-medium text-[#1a1a1a]">{reunion?.presents?.length || 0}</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-3">
+              <div className="flex items-center gap-2">
+                <Camera className="w-4 h-4 text-[#c9a227]" />
+                <div>
+                  <p className="text-xs text-[#737373]">Photos</p>
+                  <p className="font-medium text-[#1a1a1a]">{reunion?.photos?.length || 0}</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-3">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#c9a227]" />
+                <div>
+                  <p className="text-xs text-[#737373]">Notes</p>
+                  <p className="font-medium text-[#1a1a1a]">
+                    {Object.keys(reunion?.notes_etapes || {}).length} étapes
+                  </p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-3">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#c9a227]" />
+                <div>
+                  <p className="text-xs text-[#737373]">Durée</p>
+                  <p className="font-medium text-[#1a1a1a]">
+                    {reunion?.duree_heures ? `${reunion.duree_heures}h` : '—'}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Mode aperçu ou édition */}
+          {previewMode ? (
+            <Card className="p-6">
+              <h3 className="text-lg font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
+                <Eye className="w-5 h-5 text-[#c9a227]" />
+                Aperçu du compte-rendu
+              </h3>
+              <pre className="whitespace-pre-wrap font-mono text-sm text-[#525252] bg-[#faf8f3] p-6 rounded-xl">
+                {generateFullDocument() || '[Aucun contenu - Commencez par générer ou rédiger les sections]'}
+              </pre>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-[#1a1a1a] flex items-center gap-2">
+                <Edit className="w-5 h-5 text-[#c9a227]" />
+                Sections du compte-rendu ({SECTIONS_COMPTE_RENDU.length})
+              </h3>
+
+              {SECTIONS_COMPTE_RENDU.map(section => (
+                <SectionEditable
+                  key={section.id}
+                  section={section}
+                  contenu={sections[section.id]}
+                  onChange={updateSection}
+                  onGenerate={generateSection}
+                  isGenerating={generatingSection === section.id}
+                />
+              ))}
+            </div>
           )}
+
+          {/* Conseils */}
+          <Card className="p-4 bg-amber-50 border-amber-200">
+            <div className="flex items-start gap-3">
+              <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0" />
+              <div>
+                <p className="font-medium text-amber-800">Conseils pour un bon compte-rendu</p>
+                <ul className="text-xs text-amber-700 mt-2 space-y-1">
+                  <li>• Restez factuel et objectif dans vos descriptions</li>
+                  <li>• Distinguez clairement les déclarations des parties de vos constatations</li>
+                  <li>• Mentionnez les documents et pièces communiqués</li>
+                  <li>• Précisez les délais accordés aux parties pour leurs dires</li>
+                  <li>• Relisez attentivement avant d'envoyer aux parties</li>
+                </ul>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
-
-      {/* Barre de progression */}
-      <div className="h-2 bg-[#e5e5e5] rounded-full overflow-hidden">
-        <div
-          className="h-full bg-[#c9a227] transition-all"
-          style={{ width: `${progression}%` }}
-        />
-      </div>
-
-      {/* Actions rapides */}
-      <Card className="p-4 bg-gradient-to-r from-blue-50 to-white border-blue-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Sparkles className="w-5 h-5 text-blue-600" />
-            <div>
-              <p className="font-medium text-blue-800">Génération assistée par IA</p>
-              <p className="text-xs text-blue-600">
-                Générez automatiquement le compte-rendu à partir des notes de la réunion
-              </p>
-            </div>
-          </div>
-          <Button
-            variant="primary"
-            icon={Zap}
-            onClick={generateAll}
-            className="bg-blue-600 hover:bg-blue-700"
-            disabled={!!generatingSection}
-          >
-            Tout générer
-          </Button>
-        </div>
-      </Card>
-
-      {/* Info sur les données disponibles */}
-      <div className="grid grid-cols-4 gap-4">
-        <Card className="p-3">
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-[#c9a227]" />
-            <div>
-              <p className="text-xs text-[#737373]">Présents</p>
-              <p className="font-medium text-[#1a1a1a]">{reunion?.presents?.length || 0}</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-3">
-          <div className="flex items-center gap-2">
-            <Camera className="w-4 h-4 text-[#c9a227]" />
-            <div>
-              <p className="text-xs text-[#737373]">Photos</p>
-              <p className="font-medium text-[#1a1a1a]">{reunion?.photos?.length || 0}</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-3">
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-[#c9a227]" />
-            <div>
-              <p className="text-xs text-[#737373]">Notes</p>
-              <p className="font-medium text-[#1a1a1a]">
-                {Object.keys(reunion?.notes_etapes || {}).length} étapes
-              </p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-3">
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-[#c9a227]" />
-            <div>
-              <p className="text-xs text-[#737373]">Durée</p>
-              <p className="font-medium text-[#1a1a1a]">
-                {reunion?.duree_heures ? `${reunion.duree_heures}h` : '—'}
-              </p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Mode aperçu ou édition */}
-      {previewMode ? (
-        <Card className="p-6">
-          <pre className="whitespace-pre-wrap font-mono text-sm text-[#525252]">
-            {generateFullDocument() || '[Aucun contenu - Commencez par générer ou rédiger les sections]'}
-          </pre>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {SECTIONS_COMPTE_RENDU.map(section => (
-            <SectionEditable
-              key={section.id}
-              section={section}
-              contenu={sections[section.id]}
-              onChange={updateSection}
-              onGenerate={generateSection}
-              isGenerating={generatingSection === section.id}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Conseils */}
-      <Card className="p-4 bg-amber-50 border-amber-200">
-        <div className="flex items-start gap-3">
-          <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <div>
-            <p className="font-medium text-amber-800">Conseils pour un bon compte-rendu</p>
-            <ul className="text-xs text-amber-700 mt-2 space-y-1">
-              <li>• Restez factuel et objectif dans vos descriptions</li>
-              <li>• Distinguez clairement les déclarations des parties de vos constatations</li>
-              <li>• Mentionnez les documents et pièces communiqués</li>
-              <li>• Précisez les délais accordés aux parties pour leurs dires</li>
-              <li>• Relisez attentivement avant d'envoyer aux parties</li>
-            </ul>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 };

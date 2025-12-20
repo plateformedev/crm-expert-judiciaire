@@ -9,7 +9,7 @@ import {
   Check, AlertTriangle, Edit, Eye, Copy, Download, Printer,
   Plus, Trash2, ChevronRight, Building, User, Briefcase,
   CheckCircle, XCircle, RefreshCw, Wand2, Save, ExternalLink,
-  Phone, AtSign, Home, FileCheck, Stamp
+  Phone, AtSign, Home, FileCheck, Stamp, X, ArrowLeft
 } from 'lucide-react';
 import { Card, Badge, Button, Input, ModalBase } from '../ui';
 import { formatDateFr } from '../../utils/helpers';
@@ -493,163 +493,167 @@ export const ModuleConvocation = ({ affaire, reunion, expert, onUpdate, onClose 
   const toutesPartiesConvoquees = partiesConvoquees.length === parties.length;
 
   return (
-    <div className="space-y-6">
-      {/* En-tête */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-light text-[#1a1a1a]">
-            Convocation {reunion?.numero === 1 ? 'R1' : `R${reunion?.numero || ''}`}
-          </h2>
-          <p className="text-sm text-[#737373]">
-            {affaire?.reference} • {parties.length} partie(s) à convoquer
-          </p>
+    <div className="fixed inset-0 z-50 bg-[#f5f5f0] overflow-hidden flex flex-col">
+      {/* En-tête fixe */}
+      <div className="bg-[#1a1a1a] text-white px-6 py-4 flex items-center justify-between shadow-lg">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onClose}
+            className="flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+            <span className="text-sm">Retour à l'affaire</span>
+          </button>
+          <div className="h-6 w-px bg-white/20" />
+          <div>
+            <h1 className="text-lg font-medium">
+              Convocation {reunion?.numero === 1 ? 'R1 - Accédit contradictoire' : `R${reunion?.numero || ''}`}
+            </h1>
+            <p className="text-sm text-white/60">
+              {affaire?.reference} • {parties.length} partie(s) à convoquer
+            </p>
+          </div>
         </div>
 
-        {/* Statut global */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+          {/* Infos réunion compactes */}
+          <div className="flex items-center gap-4 bg-white/10 rounded-lg px-4 py-2 text-sm">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-[#c9a227]" />
+              <span>{reunion?.date_reunion ? formatDateFr(reunion.date_reunion) : 'Date non définie'}</span>
+            </div>
+            <div className="w-px h-4 bg-white/20" />
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#c9a227]" />
+              <span>{reunion?.heure || '—'}</span>
+            </div>
+            <div className="w-px h-4 bg-white/20" />
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-[#c9a227]" />
+              <span className="max-w-[200px] truncate">{reunion?.lieu || affaire?.bien_adresse || 'Lieu non défini'}</span>
+            </div>
+          </div>
+
+          {/* Statut */}
           {toutesPartiesConvoquees ? (
-            <Badge variant="success" className="flex items-center gap-1">
+            <Badge variant="success" className="flex items-center gap-1 py-1.5">
               <CheckCircle className="w-3 h-3" />
-              Toutes les parties convoquées
+              Toutes convoquées
             </Badge>
           ) : partiesConvoquees.length > 0 ? (
-            <Badge variant="warning" className="flex items-center gap-1">
+            <Badge variant="warning" className="flex items-center gap-1 py-1.5">
               <AlertTriangle className="w-3 h-3" />
-              {partiesConvoquees.length}/{parties.length} convoquée(s)
+              {partiesConvoquees.length}/{parties.length}
             </Badge>
-          ) : null}
-
-          {onClose && (
-            <Button variant="secondary" onClick={onClose}>
-              Fermer
-            </Button>
+          ) : (
+            <Badge variant="info" className="py-1.5">
+              À envoyer
+            </Badge>
           )}
         </div>
       </div>
 
-      {/* Informations réunion */}
-      <Card className="p-4 bg-gradient-to-r from-[#faf8f3] to-white">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <Calendar className="w-5 h-5 text-[#c9a227]" />
-            <div>
-              <p className="text-xs text-[#737373]">Date</p>
-              <p className="font-medium text-[#1a1a1a]">
-                {reunion?.date_reunion ? formatDateFr(reunion.date_reunion) : 'Non définie'}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Clock className="w-5 h-5 text-[#c9a227]" />
-            <div>
-              <p className="text-xs text-[#737373]">Heure</p>
-              <p className="font-medium text-[#1a1a1a]">{reunion?.heure || 'Non définie'}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <MapPin className="w-5 h-5 text-[#c9a227]" />
-            <div>
-              <p className="text-xs text-[#737373]">Lieu</p>
-              <p className="font-medium text-[#1a1a1a]">
-                {reunion?.lieu || affaire?.bien_adresse || 'Non défini'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-[#e5e5e5]">
-        <button
-          onClick={() => setActiveTab('composer')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'composer'
-              ? 'border-[#c9a227] text-[#c9a227]'
-              : 'border-transparent text-[#737373] hover:text-[#1a1a1a]'
-          }`}
-        >
-          <Edit className="w-4 h-4 inline mr-2" />
-          Composer
-        </button>
-        <button
-          onClick={() => setActiveTab('historique')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'historique'
-              ? 'border-[#c9a227] text-[#c9a227]'
-              : 'border-transparent text-[#737373] hover:text-[#1a1a1a]'
-          }`}
-        >
-          <FileCheck className="w-4 h-4 inline mr-2" />
-          Historique ({envois.length})
-        </button>
-      </div>
-
-      {activeTab === 'composer' ? (
-        <div className="grid grid-cols-3 gap-6">
-          {/* Colonne 1: Destinataires + Mode */}
-          <div className="space-y-6">
-            <Card className="p-4">
-              <SelecteurDestinataires
-                parties={parties}
-                selectedIds={selectedParties}
-                onToggle={togglePartie}
-                onSelectAll={toggleSelectAll}
-              />
-            </Card>
-
-            <Card className="p-4">
-              <SelecteurModeEnvoi
-                selectedMode={modeEnvoi}
-                onSelect={setModeEnvoi}
-              />
-            </Card>
+      {/* Contenu scrollable */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto p-6">
+          {/* Tabs */}
+          <div className="flex gap-2 border-b border-[#e5e5e5] mb-6">
+            <button
+              onClick={() => setActiveTab('composer')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'composer'
+                  ? 'border-[#c9a227] text-[#c9a227]'
+                  : 'border-transparent text-[#737373] hover:text-[#1a1a1a]'
+              }`}
+            >
+              <Edit className="w-4 h-4 inline mr-2" />
+              Composer la convocation
+            </button>
+            <button
+              onClick={() => setActiveTab('historique')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'historique'
+                  ? 'border-[#c9a227] text-[#c9a227]'
+                  : 'border-transparent text-[#737373] hover:text-[#1a1a1a]'
+              }`}
+            >
+              <FileCheck className="w-4 h-4 inline mr-2" />
+              Historique des envois ({envois.length})
+            </button>
           </div>
 
-          {/* Colonnes 2-3: Éditeur */}
-          <div className="col-span-2">
-            <Card className="p-4">
-              <EditeurConvocation
-                contenu={contenu}
-                onChange={setContenu}
-                affaire={affaire}
-                reunion={reunion}
-                partie={parties.find(p => selectedParties.includes(p.id))}
-                expert={expert}
-                onRegenerate={regenererContenu}
-              />
+          {activeTab === 'composer' ? (
+            <div className="grid grid-cols-3 gap-6">
+              {/* Colonne 1: Destinataires + Mode */}
+              <div className="space-y-6">
+                <Card className="p-4">
+                  <SelecteurDestinataires
+                    parties={parties}
+                    selectedIds={selectedParties}
+                    onToggle={togglePartie}
+                    onSelectAll={toggleSelectAll}
+                  />
+                </Card>
 
-              {/* Actions */}
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#e5e5e5]">
-                <div className="flex gap-2">
-                  <Button variant="secondary" icon={Copy} onClick={handleCopier}>
-                    Copier
-                  </Button>
-                  <Button variant="secondary" icon={Download} onClick={handleTelecharger}>
-                    PDF
-                  </Button>
-                  <Button variant="secondary" icon={Printer}>
-                    Imprimer
-                  </Button>
-                </div>
-
-                <Button
-                  variant="primary"
-                  icon={Send}
-                  onClick={() => setShowConfirmModal(true)}
-                  disabled={selectedParties.length === 0 || !contenu}
-                >
-                  Envoyer ({selectedParties.length})
-                </Button>
+                <Card className="p-4">
+                  <SelecteurModeEnvoi
+                    selectedMode={modeEnvoi}
+                    onSelect={setModeEnvoi}
+                  />
+                </Card>
               </div>
+
+              {/* Colonnes 2-3: Éditeur */}
+              <div className="col-span-2">
+                <Card className="p-4">
+                  <EditeurConvocation
+                    contenu={contenu}
+                    onChange={setContenu}
+                    affaire={affaire}
+                    reunion={reunion}
+                    partie={parties.find(p => selectedParties.includes(p.id))}
+                    expert={expert}
+                    onRegenerate={regenererContenu}
+                  />
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#e5e5e5]">
+                    <div className="flex gap-2">
+                      <Button variant="secondary" icon={Copy} onClick={handleCopier}>
+                        Copier
+                      </Button>
+                      <Button variant="secondary" icon={Download} onClick={handleTelecharger}>
+                        PDF
+                      </Button>
+                      <Button variant="secondary" icon={Printer}>
+                        Imprimer
+                      </Button>
+                    </div>
+
+                    <Button
+                      variant="primary"
+                      icon={Send}
+                      onClick={() => setShowConfirmModal(true)}
+                      disabled={selectedParties.length === 0 || !contenu}
+                      className="bg-[#c9a227] hover:bg-[#b8922a]"
+                    >
+                      Envoyer la convocation ({selectedParties.length})
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+            </div>
+          ) : (
+            <Card className="p-6">
+              <h3 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
+                <FileCheck className="w-5 h-5 text-[#c9a227]" />
+                Historique des envois
+              </h3>
+              <HistoriqueEnvois envois={envois} parties={parties} />
             </Card>
-          </div>
+          )}
         </div>
-      ) : (
-        <Card className="p-6">
-          <h3 className="font-medium text-[#1a1a1a] mb-4">Historique des envois</h3>
-          <HistoriqueEnvois envois={envois} parties={parties} />
-        </Card>
-      )}
+      </div>
 
       {/* Modal de confirmation */}
       {showConfirmModal && (
