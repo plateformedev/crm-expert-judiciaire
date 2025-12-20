@@ -11,7 +11,7 @@ import {
   CheckCircle, XCircle, RefreshCw, Wand2, Save, ExternalLink,
   Phone, AtSign, Home, FileCheck, Stamp, X, ArrowLeft
 } from 'lucide-react';
-import { Card, Badge, Button, Input, ModalBase } from '../ui';
+import { Card, Badge, Button, Input, ModalBase, useToast } from '../ui';
 import { formatDateFr } from '../../utils/helpers';
 
 // ============================================================================
@@ -395,6 +395,7 @@ const HistoriqueEnvois = ({ envois, parties }) => {
 // ============================================================================
 
 export const ModuleConvocation = ({ affaire, reunion, expert, onUpdate, onClose }) => {
+  const toast = useToast();
   // États
   const [selectedParties, setSelectedParties] = useState([]);
   const [modeEnvoi, setModeEnvoi] = useState('ar24');
@@ -480,7 +481,7 @@ export const ModuleConvocation = ({ affaire, reunion, expert, onUpdate, onClose 
 
   // Télécharger en PDF (simulé)
   const handleTelecharger = () => {
-    alert('Téléchargement PDF (simulation)');
+    toast.info('Mode démo', 'Le téléchargement PDF n\'est pas disponible en mode démonstration');
   };
 
   // Calculer si toutes les parties ont été convoquées

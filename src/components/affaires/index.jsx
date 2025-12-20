@@ -13,7 +13,7 @@ import {
   Timer, Play, Square, Banknote, CircleDot, ArrowRight,
   Archive, PauseCircle, MoreHorizontal
 } from 'lucide-react';
-import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase } from '../ui';
+import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase, useToast } from '../ui';
 import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
 import { useAutoTimer } from '../../hooks';
 import { ETAPES_TUNNEL, GARANTIES, STATUTS_REUNION } from '../../data';
@@ -1163,6 +1163,7 @@ const ChecklistItem = ({ done, label }) => (
 // ============================================================================
 
 export const FicheAffaire = ({ affaireId, onBack }) => {
+  const toast = useToast();
   const { affaire, loading, error, update } = useAffaireDetail(affaireId);
   const { deleteAffaire } = useAffaires();
   const [activeTab, setActiveTab] = useState('general');
@@ -1182,7 +1183,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
 
   // Gestionnaire pour générer un document
   const handleGenerateDocument = () => {
-    alert('Générateur de document - Fonctionnalité en cours de développement');
+    toast.info('Fonctionnalité à venir', 'Le générateur de document sera bientôt disponible');
   };
 
   // Gestionnaire d'actions (archiver, suspendre, supprimer)
@@ -1233,7 +1234,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
     if (doc.url) {
       window.open(doc.url, '_blank');
     } else {
-      alert(`Téléchargement de "${doc.titre}" - URL non disponible en mode démo`);
+      toast.info('Mode démo', `Le téléchargement de "${doc.titre}" n'est pas disponible en mode démonstration`);
     }
   };
 

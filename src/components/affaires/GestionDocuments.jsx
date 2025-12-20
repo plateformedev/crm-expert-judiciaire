@@ -9,7 +9,7 @@ import {
   Calendar, User, Tag, MoreVertical, Plus, X, Check,
   AlertTriangle, Clock, ExternalLink, Paperclip
 } from 'lucide-react';
-import { Card, Badge, Button, Input, ModalBase } from '../ui';
+import { Card, Badge, Button, Input, ModalBase, useConfirmation, useToast } from '../ui';
 import { formatDateFr } from '../../utils/helpers';
 
 // ============================================================================
@@ -344,6 +344,8 @@ const ModalAjoutDocument = ({ isOpen, onClose, onSave, parties }) => {
 // ============================================================================
 
 export const GestionDocuments = ({ affaire, onUpdate }) => {
+  const confirm = useConfirmation();
+  const toast = useToast();
   const [showAddModal, setShowAddModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterDirection, setFilterDirection] = useState('tous');
@@ -393,10 +395,12 @@ export const GestionDocuments = ({ affaire, onUpdate }) => {
   };
 
   // Supprimer un document
-  const handleDeleteDocument = (doc) => {
-    if (confirm('Supprimer ce document ?')) {
+  const handleDeleteDocument = async (doc) => {
+    const confirmed = await confirm.delete('ce document');
+    if (confirmed) {
       const updatedDocs = documents.filter(d => d.id !== doc.id);
       onUpdate({ documents: updatedDocs });
+      toast.success('Document supprimé', `"${doc.nom}" a été supprimé`);
     }
   };
 
@@ -407,7 +411,7 @@ export const GestionDocuments = ({ affaire, onUpdate }) => {
 
   // Télécharger un document (simulé)
   const handleDownloadDocument = (doc) => {
-    alert(`Téléchargement de "${doc.nom}" (simulation)`);
+    toast.info('Mode démo', `Le téléchargement de "${doc.nom}" n'est pas disponible en mode démonstration`);
   };
 
   return (

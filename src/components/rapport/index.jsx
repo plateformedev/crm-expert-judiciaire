@@ -10,7 +10,7 @@ import {
   Book, List, Image, Euro, Users, Calendar, Scale,
   RefreshCw, Save, Folder, CheckCircle, Clock
 } from 'lucide-react';
-import { Card, Badge, Button, ProgressBar, ModalBase } from '../ui';
+import { Card, Badge, Button, ProgressBar, ModalBase, useToast } from '../ui';
 import { formatDateFr, formatMontant } from '../../utils/helpers';
 import { pdfService } from '../../services/pdf';
 import { getStoredAffaires, saveAffaires } from '../../lib/demoData';
@@ -122,12 +122,13 @@ const SECTIONS_RAPPORT = [
 // COMPOSANT PRINCIPAL - GÉNÉRATEUR DE RAPPORT
 // ============================================================================
 
-export const GenerateurRapport = ({ 
-  affaire, 
+export const GenerateurRapport = ({
+  affaire,
   expert,
   onSave,
-  onExport 
+  onExport
 }) => {
+  const toast = useToast();
   const [sections, setSections] = useState(
     SECTIONS_RAPPORT.map(s => ({
       ...s,
@@ -303,11 +304,11 @@ export const GenerateurRapport = ({
       }
 
       // Notifier l'utilisateur
-      alert(`${titreDoc} généré et sauvegardé avec succès !`);
+      toast.success('Document généré', `${titreDoc} a été sauvegardé avec succès`);
 
     } catch (error) {
       console.error('Erreur génération rapport:', error);
-      alert('Erreur lors de la génération du rapport. Veuillez réessayer.');
+      toast.error('Erreur', 'La génération du rapport a échoué. Veuillez réessayer.');
     } finally {
       setGenerating(false);
     }

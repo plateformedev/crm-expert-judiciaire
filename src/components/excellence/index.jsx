@@ -9,7 +9,7 @@ import {
   TrendingUp, FlaskConical, Upload, CheckCircle, XCircle,
   AlertCircle, ChevronRight, Info
 } from 'lucide-react';
-import { Card, Badge, Button, ProgressBar, Tabs } from '../ui';
+import { Card, Badge, Button, ProgressBar, Tabs, useToast } from '../ui';
 import { 
   CHECKLIST_CONFORMITE, CHECKLIST_PROTECTION, CHECKLIST_ASSURANCES,
   BASE_DTU, JURISPRUDENCE, QUALIFICATION_DESORDRES, TYPES_ASSURANCES,
@@ -570,6 +570,7 @@ export const ImputabiliteModule = ({ affaire, onUpdate }) => {
 // ============================================================================
 
 export const OpalexeModule = ({ affaire }) => {
+  const toast = useToast();
   const [verifications, setVerifications] = useState({});
 
   const handleCheck = (key) => {
@@ -629,7 +630,7 @@ export const OpalexeModule = ({ affaire }) => {
         disabled={score < 100}
         onClick={() => {
           if (score >= 100) {
-            alert('Préparation du dépôt Opalexe - Fonctionnalité en cours de développement');
+            toast.info('Fonctionnalité à venir', 'La préparation du dépôt Opalexe sera bientôt disponible');
           }
         }}
       >

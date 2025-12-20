@@ -9,7 +9,7 @@ import {
   ClipboardList, MessageSquare, ChevronDown, ChevronRight, Play,
   Pause, CheckCircle, Mail, Phone, Download, Copy
 } from 'lucide-react';
-import { Card, Badge, Button, Input, ModalBase } from '../ui';
+import { Card, Badge, Button, Input, ModalBase, useToast } from '../ui';
 import { TYPES_REUNION, STATUTS_REUNION } from '../../data';
 import { formatDateFr } from '../../utils/helpers';
 
@@ -545,6 +545,7 @@ const ModalAjoutReunion = ({ reunion, reunionNumero, affaire, onClose, onSave })
 // ============================================================================
 
 const ModalPriseNotes = ({ reunion, affaire, onClose, onSave, onTerminer }) => {
+  const toast = useToast();
   const [notes, setNotes] = useState(reunion.notes || '');
   const [presents, setPresents] = useState(reunion.presents || []);
   const [absents, setAbsents] = useState(reunion.absents || []);
@@ -653,7 +654,7 @@ const ModalPriseNotes = ({ reunion, affaire, onClose, onSave, onTerminer }) => {
           <Button
             variant="secondary"
             icon={Camera}
-            onClick={() => alert('Fonctionnalité photo à venir')}
+            onClick={() => toast.info('Fonctionnalité à venir', 'L\'ajout de photos sera bientôt disponible')}
           >
             Ajouter photo
           </Button>

@@ -9,7 +9,7 @@ import {
   TrendingUp, Calendar, Banknote, PiggyBank, ChevronRight,
   RefreshCw, Mail, Download, Eye, Trash2, Edit
 } from 'lucide-react';
-import { Card, Badge, Button, Input, ModalBase } from '../ui';
+import { Card, Badge, Button, Input, ModalBase, useConfirmation, useToast } from '../ui';
 import { formatDateFr } from '../../utils/helpers';
 
 // ============================================================================
@@ -289,6 +289,8 @@ const ModalConsignation = ({ isOpen, onClose, onSave, consignation, isProvision 
 // ============================================================================
 
 export const GestionConsignations = ({ affaire, onUpdate }) => {
+  const confirm = useConfirmation();
+  const toast = useToast();
   const [showModal, setShowModal] = useState(false);
   const [editingConsignation, setEditingConsignation] = useState(null);
   const [isProvision, setIsProvision] = useState(false);
@@ -367,10 +369,12 @@ export const GestionConsignations = ({ affaire, onUpdate }) => {
   };
 
   // Supprimer consignation
-  const handleDeleteConsignation = (consignation) => {
-    if (confirm('Supprimer cette consignation ?')) {
+  const handleDeleteConsignation = async (consignation) => {
+    const confirmed = await confirm.delete('cette consignation');
+    if (confirmed) {
       const updatedConsignations = consignations.filter(c => c.id !== consignation.id);
       onUpdate({ consignations_supplementaires: updatedConsignations });
+      toast.success('Consignation supprimée', 'La consignation a été supprimée');
     }
   };
 

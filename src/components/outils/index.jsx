@@ -8,7 +8,7 @@ import {
   Calculator, Camera, FolderOpen, CalendarClock,
   Receipt, Library, FileSignature, Plus, X
 } from 'lucide-react';
-import { Card, Badge, Button } from '../ui';
+import { Card, Badge, Button, useToast } from '../ui';
 import { TAUX_VACATIONS, CALCULS_TECHNIQUES } from '../../data';
 import { formatDuree } from '../../utils/helpers';
 
@@ -281,6 +281,7 @@ export const CalculatriceTechnique = () => {
 // ============================================================================
 
 export const DicteeVocale = ({ onTranscription }) => {
+  const toast = useToast();
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState('');
   const [duration, setDuration] = useState(0);
@@ -351,7 +352,7 @@ export const DicteeVocale = ({ onTranscription }) => {
             >
               Copier
             </Button>
-            <Button variant="secondary" size="sm" onClick={() => alert('Correction IA - Fonctionnalité en cours de développement')}>
+            <Button variant="secondary" size="sm" onClick={() => toast.info('Fonctionnalité à venir', 'La correction IA sera bientôt disponible')}>
               Corriger avec IA
             </Button>
           </div>

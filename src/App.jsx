@@ -16,6 +16,8 @@ import {
 
 // Composants UI
 import { Card, Badge, Button, ProgressBar, EmptyState, LoadingSpinner } from './components/ui';
+import { ToastProvider, ConfirmationProvider, useToast } from './components/ui';
+import { DemoBanner, HelpPanel, HelpButton, useHelp } from './components/ui';
 
 // Composants Layout
 import Sidebar from './components/layout/Sidebar';
@@ -226,6 +228,7 @@ const DashboardWrapper = () => {
   const navigate = useNavigate();
   const { affaires } = useAffaires();
   const { expert } = useAuth();
+  const toast = useToast();
 
   const handleNavigate = (action) => {
     switch (action) {
@@ -245,8 +248,7 @@ const DashboardWrapper = () => {
         navigate('/affaires');
         break;
       case 'lrar':
-        // Pour l'instant, notification que cette fonctionnalité arrive
-        alert('Fonctionnalité LRAR bientôt disponible');
+        toast.info('Fonctionnalité à venir', 'Le module LRAR sera bientôt disponible');
         break;
       case 'alertes':
         navigate('/alertes');
@@ -290,6 +292,7 @@ const AppLayout = ({ children }) => {
   const { notifications } = useNotifications();
   const { affaires } = useAffaires();
   const { goBack, canGoBack, tabs, openTab } = useTabs();
+  const { isHelpOpen, initialTerm, openHelp, closeHelp } = useHelp();
 
   // Calculer les badges pour la navigation
   const badges = useMemo(() => ({
@@ -324,50 +327,61 @@ const AppLayout = ({ children }) => {
   }, [location.pathname, affaires, openTab]);
 
   return (
-    <div className="h-screen flex bg-[#fafafa]">
-      {/* Sidebar */}
-      <Sidebar
-        modules={MODULES}
-        collapsed={sidebarCollapsed}
-        setCollapsed={setSidebarCollapsed}
-        badges={badges}
-      />
+    <div className="h-screen flex flex-col bg-[#fafafa]">
+      {/* Bannière mode démo */}
+      <DemoBanner />
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <Header
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          notifications={notifications}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar
+          modules={MODULES}
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
+          badges={badges}
         />
 
-        {/* Barre d'onglets (style navigateur) */}
-        <TabBar />
+        {/* Main */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Header */}
+          <Header
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            notifications={notifications}
+          />
 
-        {/* Bouton retour contextuel */}
-        {canGoBack && (
-          <div className="px-8 pt-4">
-            <button
-              onClick={goBack}
-              className="flex items-center gap-2 text-sm text-[#737373] hover:text-[#c9a227] transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Retour
-            </button>
-          </div>
-        )}
+          {/* Barre d'onglets (style navigateur) */}
+          <TabBar />
 
-        {/* Content */}
-        <main className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
-        </main>
+          {/* Bouton retour contextuel */}
+          {canGoBack && (
+            <div className="px-8 pt-4">
+              <button
+                onClick={goBack}
+                className="flex items-center gap-2 text-sm text-[#737373] hover:text-[#c9a227] transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Retour
+              </button>
+            </div>
+          )}
+
+          {/* Content */}
+          <main className="flex-1 overflow-y-auto p-8">
+            <div className="max-w-7xl mx-auto">
+              {children}
+            </div>
+          </main>
+        </div>
+
+        {/* Chatbot IA */}
+        <ChatbotIA />
       </div>
 
-      {/* Chatbot IA */}
-      <ChatbotIA />
+      {/* Bouton d'aide global */}
+      <HelpButton onClick={() => openHelp()} />
+
+      {/* Panneau d'aide */}
+      <HelpPanel isOpen={isHelpOpen} onClose={closeHelp} initialTerm={initialTerm} />
     </div>
   );
 };
@@ -392,10 +406,12 @@ const App = () => {
   }
 
   return (
-    <TabsProvider>
-      <AppLayout>
-        <Suspense fallback={<LoadingSpinner size="lg" />}>
-          <Routes>
+    <ToastProvider>
+      <ConfirmationProvider>
+        <TabsProvider>
+          <AppLayout>
+            <Suspense fallback={<LoadingSpinner size="lg" />}>
+              <Routes>
           {/* Affaires - Page principale */}
           <Route path="/" element={<ListeAffaires />} />
           <Route path="/affaires" element={<ListeAffaires />} />
@@ -435,12 +451,14 @@ const App = () => {
           <Route path="/outils/calculatrice" element={<CalculatriceTechnique />} />
           <Route path="/outils/dictee" element={<DicteeVocale />} />
           
-          {/* 404 */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </AppLayout>
-    </TabsProvider>
+              {/* 404 */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </AppLayout>
+        </TabsProvider>
+      </ConfirmationProvider>
+    </ToastProvider>
   );
 };
 

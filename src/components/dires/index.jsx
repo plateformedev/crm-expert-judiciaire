@@ -10,7 +10,7 @@ import {
   Eye, Edit, Trash2, Download, Copy, ChevronRight, Paperclip,
   AlertCircle, FileCheck, Mail, Archive, Tag
 } from 'lucide-react';
-import { Card, Badge, Button, Input, Select, Textarea, ModalBase, EmptyState } from '../ui';
+import { Card, Badge, Button, Input, Select, Textarea, ModalBase, EmptyState, useToast } from '../ui';
 import { formatDateFr, joursEntre } from '../../utils/helpers';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
@@ -137,6 +137,7 @@ export const useDires = (affaireId) => {
 // ============================================================================
 
 export const GestionDires = ({ affaireId, affaire, parties = [] }) => {
+  const toast = useToast();
   const { dires, loading, stats, addDire, updateDire, repondre } = useDires(affaireId);
   const [showNewModal, setShowNewModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(null);
@@ -566,7 +567,7 @@ const ModalDetailDire = ({ isOpen, onClose, dire, onReply }) => {
             <Button variant="ghost" size="sm" icon={Copy} onClick={() => {
               const text = `Dire de ${dire.partie_nom || 'N/C'}\n\n${dire.contenu || ''}${dire.reponse_expert ? `\n\nRéponse:\n${dire.reponse_expert}` : ''}`;
               navigator.clipboard.writeText(text);
-              alert('Contenu copié dans le presse-papier');
+              toast.success('Copié', 'Le contenu a été copié dans le presse-papier');
             }}>
               Copier
             </Button>
