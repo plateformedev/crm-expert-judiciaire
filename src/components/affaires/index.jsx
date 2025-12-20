@@ -14,6 +14,7 @@ import {
 import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase } from '../ui';
 import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
 import { ETAPES_TUNNEL, GARANTIES } from '../../data';
+import { getStoredAffaires, saveAffaires } from '../../lib/demoData';
 import { formatDateFr, calculerDelaiRestant, calculerAvancementTunnel } from '../../utils/helpers';
 
 // ============================================================================
@@ -1139,22 +1140,27 @@ const ModalAjoutPartie = ({ affaireId, onClose, onSuccess }) => {
     setLoading(true);
 
     try {
-      // Mode démo - sauvegarder dans localStorage
-      const stored = localStorage.getItem('crm_demo_affaires');
-      if (stored) {
-        const affaires = JSON.parse(stored);
-        const affaire = affaires.find(a => a.id === affaireId);
-        if (affaire) {
-          const newPartie = {
-            id: `partie-${Date.now()}`,
-            ...data,
-            created_at: new Date().toISOString()
-          };
-          if (!affaire.parties) affaire.parties = [];
-          affaire.parties.push(newPartie);
-          localStorage.setItem('crm_demo_affaires', JSON.stringify(affaires));
-          onSuccess();
+      // Récupérer les affaires (depuis localStorage ou données démo)
+      const affaires = getStoredAffaires();
+      const affaireIndex = affaires.findIndex(a => a.id === affaireId);
+
+      if (affaireIndex !== -1) {
+        const newPartie = {
+          id: `partie-${Date.now()}`,
+          ...data,
+          created_at: new Date().toISOString()
+        };
+
+        if (!affaires[affaireIndex].parties) {
+          affaires[affaireIndex].parties = [];
         }
+        affaires[affaireIndex].parties.push(newPartie);
+
+        // Sauvegarder dans localStorage
+        saveAffaires(affaires);
+        onSuccess();
+      } else {
+        console.error('Affaire non trouvée:', affaireId);
       }
     } catch (error) {
       console.error('Erreur ajout partie:', error);
@@ -1331,28 +1337,33 @@ const ModalAjoutReunion = ({ affaireId, reunionNumero, adresseBien, onClose, onS
       // Combiner date et heure
       const dateReunion = `${data.date_reunion}T${data.heure_reunion}:00`;
 
-      // Mode démo - sauvegarder dans localStorage
-      const stored = localStorage.getItem('crm_demo_affaires');
-      if (stored) {
-        const affaires = JSON.parse(stored);
-        const affaire = affaires.find(a => a.id === affaireId);
-        if (affaire) {
-          const newReunion = {
-            id: `reunion-${Date.now()}`,
-            numero: data.numero,
-            date_reunion: dateReunion,
-            lieu: data.lieu,
-            type: data.type,
-            duree_prevue: data.duree_prevue,
-            observations: data.observations,
-            statut: 'planifiee',
-            created_at: new Date().toISOString()
-          };
-          if (!affaire.reunions) affaire.reunions = [];
-          affaire.reunions.push(newReunion);
-          localStorage.setItem('crm_demo_affaires', JSON.stringify(affaires));
-          onSuccess();
+      // Récupérer les affaires (depuis localStorage ou données démo)
+      const affaires = getStoredAffaires();
+      const affaireIndex = affaires.findIndex(a => a.id === affaireId);
+
+      if (affaireIndex !== -1) {
+        const newReunion = {
+          id: `reunion-${Date.now()}`,
+          numero: data.numero,
+          date_reunion: dateReunion,
+          lieu: data.lieu,
+          type: data.type,
+          duree_prevue: data.duree_prevue,
+          observations: data.observations,
+          statut: 'planifiee',
+          created_at: new Date().toISOString()
+        };
+
+        if (!affaires[affaireIndex].reunions) {
+          affaires[affaireIndex].reunions = [];
         }
+        affaires[affaireIndex].reunions.push(newReunion);
+
+        // Sauvegarder dans localStorage
+        saveAffaires(affaires);
+        onSuccess();
+      } else {
+        console.error('Affaire non trouvée:', affaireId);
       }
     } catch (error) {
       console.error('Erreur ajout réunion:', error);
@@ -1473,22 +1484,27 @@ const ModalAjoutDesordre = ({ affaireId, desordreNumero, onClose, onSuccess }) =
     setLoading(true);
 
     try {
-      // Mode démo - sauvegarder dans localStorage
-      const stored = localStorage.getItem('crm_demo_affaires');
-      if (stored) {
-        const affaires = JSON.parse(stored);
-        const affaire = affaires.find(a => a.id === affaireId);
-        if (affaire) {
-          const newPathologie = {
-            id: `patho-${Date.now()}`,
-            ...data,
-            created_at: new Date().toISOString()
-          };
-          if (!affaire.pathologies) affaire.pathologies = [];
-          affaire.pathologies.push(newPathologie);
-          localStorage.setItem('crm_demo_affaires', JSON.stringify(affaires));
-          onSuccess();
+      // Récupérer les affaires (depuis localStorage ou données démo)
+      const affaires = getStoredAffaires();
+      const affaireIndex = affaires.findIndex(a => a.id === affaireId);
+
+      if (affaireIndex !== -1) {
+        const newPathologie = {
+          id: `patho-${Date.now()}`,
+          ...data,
+          created_at: new Date().toISOString()
+        };
+
+        if (!affaires[affaireIndex].pathologies) {
+          affaires[affaireIndex].pathologies = [];
         }
+        affaires[affaireIndex].pathologies.push(newPathologie);
+
+        // Sauvegarder dans localStorage
+        saveAffaires(affaires);
+        onSuccess();
+      } else {
+        console.error('Affaire non trouvée:', affaireId);
       }
     } catch (error) {
       console.error('Erreur ajout désordre:', error);
