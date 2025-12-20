@@ -3,9 +3,9 @@
 // ============================================================================
 
 import React, { useState, useMemo } from 'react';
-import { 
+import {
   Shield, Scale, FileCheck, BookOpen, Gavel, Calculator,
-  Target, ShieldCheck, Users, HandshakeIcon, AlertTriangle,
+  Target, ShieldCheck, Users, Handshake, AlertTriangle,
   TrendingUp, FlaskConical, Upload, CheckCircle, XCircle,
   AlertCircle, ChevronRight, Info
 } from 'lucide-react';
