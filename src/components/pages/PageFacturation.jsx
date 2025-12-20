@@ -130,6 +130,8 @@ export const PageFacturation = () => {
   const [search, setSearch] = useState('');
   const [selectedPeriode, setSelectedPeriode] = useState('annee');
   const [selectedItem, setSelectedItem] = useState(null);
+  const [showNewDocModal, setShowNewDocModal] = useState(null); // 'devis' | 'etat_frais' | 'facture'
+  const [showSimulateur, setShowSimulateur] = useState(false);
 
   const affaires = getStoredAffaires();
 
@@ -142,19 +144,45 @@ export const PageFacturation = () => {
   };
 
   const handleCreateDevis = () => {
-    toast.info('Création de devis', 'Sélectionnez une affaire depuis la liste des affaires pour créer un devis');
+    setShowNewDocModal('devis');
   };
 
   const handleCreateEtatFrais = () => {
-    toast.info('État de frais', 'Les états de frais sont générés automatiquement à partir des vacations et frais enregistrés sur chaque affaire');
+    setShowNewDocModal('etat_frais');
   };
 
   const handleCreateFacture = () => {
-    toast.info('Facturation', 'La création de factures sera bientôt disponible');
+    setShowNewDocModal('facture');
   };
 
   const handleExport = () => {
-    toast.success('Export', 'Les données de facturation sont en cours d\'export');
+    try {
+      const csvData = [
+        ['Type', 'Numéro', 'Affaire', 'Client', 'Date', 'Montant HT', 'TVA', 'Montant TTC', 'Statut'],
+        ...facturation.map(item => [
+          TYPES_DOCUMENT[item.type]?.label || item.type,
+          item.numero,
+          item.affaire_reference,
+          item.client,
+          formatDateFr(item.date_emission),
+          item.montant_ht,
+          item.tva,
+          item.montant_ttc,
+          STATUTS_FACTURE[item.statut]?.label || item.statut
+        ])
+      ];
+      const csvContent = csvData.map(row => row.join(';')).join('\n');
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `facturation_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Export réussi', 'Les données ont été exportées au format CSV');
+    } catch (error) {
+      toast.error('Erreur', 'Impossible d\'exporter les données');
+    }
   };
 
   // Générer les données de facturation à partir des affaires
@@ -297,10 +325,13 @@ export const PageFacturation = () => {
           <p className="text-sm text-[#737373]">Gestion de vos états de frais, devis et factures</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="secondary" icon={Calculator}>
+          <Button variant="secondary" icon={Download} onClick={handleExport}>
+            Exporter
+          </Button>
+          <Button variant="secondary" icon={Calculator} onClick={() => setShowSimulateur(true)}>
             Simulateur
           </Button>
-          <Button variant="primary" icon={Plus}>
+          <Button variant="primary" icon={Plus} onClick={() => setShowNewDocModal('devis')}>
             Nouveau document
           </Button>
         </div>
@@ -554,7 +585,436 @@ export const PageFacturation = () => {
           </div>
         </ModalBase>
       )}
+
+      {/* Modal création de document */}
+      {showNewDocModal && (
+        <ModalCreationDocument
+          type={showNewDocModal}
+          affaires={affaires}
+          onClose={() => setShowNewDocModal(null)}
+          onSuccess={(doc) => {
+            toast.success('Document créé', `${TYPES_DOCUMENT[doc.type]?.label || 'Document'} créé avec succès`);
+            setShowNewDocModal(null);
+          }}
+        />
+      )}
+
+      {/* Modal simulateur */}
+      {showSimulateur && (
+        <ModalSimulateur
+          onClose={() => setShowSimulateur(false)}
+        />
+      )}
     </div>
+  );
+};
+
+// ============================================================================
+// MODAL CRÉATION DOCUMENT
+// ============================================================================
+
+const ModalCreationDocument = ({ type, affaires, onClose, onSuccess }) => {
+  const toast = useToast();
+  const [selectedAffaire, setSelectedAffaire] = useState('');
+  const [formData, setFormData] = useState({
+    description: '',
+    montant_ht: 0,
+    tva_taux: 20,
+    validite: 30,
+    conditions: ''
+  });
+
+  const affaire = affaires.find(a => a.id === selectedAffaire);
+
+  const calculerMontants = () => {
+    const montantHT = parseFloat(formData.montant_ht) || 0;
+    const tva = montantHT * (formData.tva_taux / 100);
+    return { montantHT, tva, montantTTC: montantHT + tva };
+  };
+
+  const handleSubmit = () => {
+    if (!selectedAffaire) {
+      toast.error('Erreur', 'Veuillez sélectionner une affaire');
+      return;
+    }
+
+    const montants = calculerMontants();
+    const doc = {
+      id: `${type.substring(0, 3)}-${Date.now()}`,
+      type,
+      numero: `${type === 'devis' ? 'DEV' : type === 'etat_frais' ? 'EF' : 'FAC'}-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999)).padStart(4, '0')}`,
+      affaire_id: selectedAffaire,
+      affaire_reference: affaire?.reference,
+      client: affaire?.parties?.find(p => p.type === 'demandeur')?.nom || 'Client',
+      tribunal: affaire?.tribunal,
+      date_emission: new Date().toISOString(),
+      montant_ht: montants.montantHT,
+      tva: montants.tva,
+      montant_ttc: montants.montantTTC,
+      statut: 'brouillon',
+      description: formData.description,
+      validite: formData.validite
+    };
+
+    onSuccess(doc);
+  };
+
+  const montants = calculerMontants();
+
+  return (
+    <ModalBase
+      title={`Créer un ${TYPES_DOCUMENT[type]?.label || 'document'}`}
+      onClose={onClose}
+      size="lg"
+    >
+      <div className="space-y-6">
+        {/* Sélection affaire */}
+        <div>
+          <label className="block text-sm font-medium text-[#525252] mb-2">Affaire concernée *</label>
+          <select
+            value={selectedAffaire}
+            onChange={(e) => setSelectedAffaire(e.target.value)}
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+          >
+            <option value="">Sélectionner une affaire...</option>
+            {affaires.map(a => (
+              <option key={a.id} value={a.id}>{a.reference} - {a.parties?.find(p => p.type === 'demandeur')?.nom || 'Client'}</option>
+            ))}
+          </select>
+        </div>
+
+        {selectedAffaire && (
+          <>
+            {/* Infos affaire */}
+            <Card className="p-4 bg-[#fafafa]">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-[#a3a3a3]">Référence</p>
+                  <p className="font-medium">{affaire?.reference}</p>
+                </div>
+                <div>
+                  <p className="text-[#a3a3a3]">Tribunal</p>
+                  <p className="font-medium">{affaire?.tribunal}</p>
+                </div>
+                <div>
+                  <p className="text-[#a3a3a3]">Client</p>
+                  <p className="font-medium">{affaire?.parties?.find(p => p.type === 'demandeur')?.nom || 'Non défini'}</p>
+                </div>
+                <div>
+                  <p className="text-[#a3a3a3]">Statut</p>
+                  <p className="font-medium">{affaire?.statut}</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium text-[#525252] mb-2">Description / Objet</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder={type === 'devis' ? 'Mission d\'expertise judiciaire...' : 'Honoraires et frais d\'expertise...'}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none h-24"
+              />
+            </div>
+
+            {/* Montants */}
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-[#525252] mb-2">Montant HT (€)</label>
+                <Input
+                  type="number"
+                  value={formData.montant_ht}
+                  onChange={(e) => setFormData({ ...formData, montant_ht: e.target.value })}
+                  icon={Euro}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#525252] mb-2">Taux TVA (%)</label>
+                <select
+                  value={formData.tva_taux}
+                  onChange={(e) => setFormData({ ...formData, tva_taux: parseFloat(e.target.value) })}
+                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                >
+                  <option value="0">0% (Non assujetti)</option>
+                  <option value="10">10%</option>
+                  <option value="20">20%</option>
+                </select>
+              </div>
+              {type === 'devis' && (
+                <div>
+                  <label className="block text-sm font-medium text-[#525252] mb-2">Validité (jours)</label>
+                  <Input
+                    type="number"
+                    value={formData.validite}
+                    onChange={(e) => setFormData({ ...formData, validite: parseInt(e.target.value) })}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Récapitulatif */}
+            <Card className="p-4 bg-[#1a1a1a] text-white">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Total HT</span>
+                  <span>{montants.montantHT.toLocaleString('fr-FR')} €</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">TVA ({formData.tva_taux}%)</span>
+                  <span>{montants.tva.toLocaleString('fr-FR')} €</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-700">
+                  <span>Total TTC</span>
+                  <span>{montants.montantTTC.toLocaleString('fr-FR')} €</span>
+                </div>
+              </div>
+            </Card>
+          </>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+          <Button variant="secondary" className="flex-1" onClick={onClose}>
+            Annuler
+          </Button>
+          <Button
+            variant="primary"
+            className="flex-1"
+            onClick={handleSubmit}
+            disabled={!selectedAffaire}
+          >
+            Créer le {TYPES_DOCUMENT[type]?.label || 'document'}
+          </Button>
+        </div>
+      </div>
+    </ModalBase>
+  );
+};
+
+// ============================================================================
+// MODAL SIMULATEUR HONORAIRES
+// ============================================================================
+
+const ModalSimulateur = ({ onClose }) => {
+  const [params, setParams] = useState({
+    heuresExpertise: 0,
+    heuresEtude: 0,
+    heuresRedaction: 0,
+    heuresDeplacement: 0,
+    kilometres: 0,
+    fraisDivers: 0,
+    tauxExpertise: 90,
+    tauxEtude: 80,
+    tauxRedaction: 80,
+    tauxDeplacement: 50,
+    indemnitesKm: 0.60,
+    tva: 20
+  });
+
+  const calculer = () => {
+    const vacationsExpertise = params.heuresExpertise * params.tauxExpertise;
+    const vacationsEtude = params.heuresEtude * params.tauxEtude;
+    const vacationsRedaction = params.heuresRedaction * params.tauxRedaction;
+    const vacationsDeplacement = params.heuresDeplacement * params.tauxDeplacement;
+    const fraisKm = params.kilometres * params.indemnitesKm;
+
+    const totalVacations = vacationsExpertise + vacationsEtude + vacationsRedaction + vacationsDeplacement;
+    const totalFrais = fraisKm + parseFloat(params.fraisDivers || 0);
+    const totalHT = totalVacations + totalFrais;
+    const tva = totalHT * (params.tva / 100);
+    const totalTTC = totalHT + tva;
+
+    return {
+      vacationsExpertise,
+      vacationsEtude,
+      vacationsRedaction,
+      vacationsDeplacement,
+      fraisKm,
+      totalVacations,
+      totalFrais,
+      totalHT,
+      tva,
+      totalTTC
+    };
+  };
+
+  const resultats = calculer();
+
+  return (
+    <ModalBase title="Simulateur d'honoraires" onClose={onClose} size="xl">
+      <div className="grid grid-cols-2 gap-6">
+        {/* Paramètres */}
+        <div className="space-y-6">
+          <Card className="p-4">
+            <h4 className="font-medium text-[#1a1a1a] mb-4">Vacations (heures)</h4>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-[#737373]">Expertise (réunion, visite)</label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={params.heuresExpertise}
+                    onChange={(e) => setParams({ ...params, heuresExpertise: parseFloat(e.target.value) || 0 })}
+                    className="w-20 text-right"
+                  />
+                  <span className="text-sm text-[#a3a3a3]">× {params.tauxExpertise}€</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-[#737373]">Étude de dossier</label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={params.heuresEtude}
+                    onChange={(e) => setParams({ ...params, heuresEtude: parseFloat(e.target.value) || 0 })}
+                    className="w-20 text-right"
+                  />
+                  <span className="text-sm text-[#a3a3a3]">× {params.tauxEtude}€</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-[#737373]">Rédaction (CR, rapport)</label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={params.heuresRedaction}
+                    onChange={(e) => setParams({ ...params, heuresRedaction: parseFloat(e.target.value) || 0 })}
+                    className="w-20 text-right"
+                  />
+                  <span className="text-sm text-[#a3a3a3]">× {params.tauxRedaction}€</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-[#737373]">Déplacement</label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={params.heuresDeplacement}
+                    onChange={(e) => setParams({ ...params, heuresDeplacement: parseFloat(e.target.value) || 0 })}
+                    className="w-20 text-right"
+                  />
+                  <span className="text-sm text-[#a3a3a3]">× {params.tauxDeplacement}€</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <h4 className="font-medium text-[#1a1a1a] mb-4">Frais</h4>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-[#737373]">Kilomètres</label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={params.kilometres}
+                    onChange={(e) => setParams({ ...params, kilometres: parseFloat(e.target.value) || 0 })}
+                    className="w-20 text-right"
+                  />
+                  <span className="text-sm text-[#a3a3a3]">× {params.indemnitesKm}€</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-[#737373]">Frais divers (€)</label>
+                <Input
+                  type="number"
+                  value={params.fraisDivers}
+                  onChange={(e) => setParams({ ...params, fraisDivers: parseFloat(e.target.value) || 0 })}
+                  className="w-24 text-right"
+                />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <h4 className="font-medium text-[#1a1a1a] mb-4">TVA</h4>
+            <select
+              value={params.tva}
+              onChange={(e) => setParams({ ...params, tva: parseFloat(e.target.value) })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl"
+            >
+              <option value="0">Non assujetti (0%)</option>
+              <option value="10">Taux réduit (10%)</option>
+              <option value="20">Taux normal (20%)</option>
+            </select>
+          </Card>
+        </div>
+
+        {/* Résultats */}
+        <div className="space-y-4">
+          <Card className="p-4 bg-[#fafafa]">
+            <h4 className="font-medium text-[#1a1a1a] mb-4">Détail des vacations</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-[#737373]">Expertise</span>
+                <span className="font-medium">{resultats.vacationsExpertise.toLocaleString('fr-FR')} €</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#737373]">Étude</span>
+                <span className="font-medium">{resultats.vacationsEtude.toLocaleString('fr-FR')} €</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#737373]">Rédaction</span>
+                <span className="font-medium">{resultats.vacationsRedaction.toLocaleString('fr-FR')} €</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#737373]">Déplacement</span>
+                <span className="font-medium">{resultats.vacationsDeplacement.toLocaleString('fr-FR')} €</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-[#e5e5e5] font-medium">
+                <span>Sous-total vacations</span>
+                <span>{resultats.totalVacations.toLocaleString('fr-FR')} €</span>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-[#fafafa]">
+            <h4 className="font-medium text-[#1a1a1a] mb-4">Détail des frais</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-[#737373]">Indemnités km</span>
+                <span className="font-medium">{resultats.fraisKm.toLocaleString('fr-FR')} €</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#737373]">Frais divers</span>
+                <span className="font-medium">{parseFloat(params.fraisDivers || 0).toLocaleString('fr-FR')} €</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-[#e5e5e5] font-medium">
+                <span>Sous-total frais</span>
+                <span>{resultats.totalFrais.toLocaleString('fr-FR')} €</span>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6 bg-[#1a1a1a] text-white">
+            <h4 className="font-medium mb-4">Total estimé</h4>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Total HT</span>
+                <span className="text-xl">{resultats.totalHT.toLocaleString('fr-FR')} €</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">TVA ({params.tva}%)</span>
+                <span>{resultats.tva.toLocaleString('fr-FR')} €</span>
+              </div>
+              <div className="flex justify-between pt-3 border-t border-gray-700">
+                <span className="text-lg font-medium">Total TTC</span>
+                <span className="text-2xl font-bold text-[#c9a227]">{resultats.totalTTC.toLocaleString('fr-FR')} €</span>
+              </div>
+            </div>
+          </Card>
+
+          <p className="text-xs text-[#a3a3a3] text-center">
+            Ce simulateur donne une estimation. Les honoraires définitifs sont fixés par le juge (taxation).
+          </p>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-3 pt-4 mt-4 border-t border-[#e5e5e5]">
+        <Button variant="secondary" onClick={onClose}>Fermer</Button>
+      </div>
+    </ModalBase>
   );
 };
 

@@ -220,6 +220,19 @@ const MatriceImputabiliteWrapper = () => {
   return <MatriceImputabilite affaireId={id} pathologies={affaire?.pathologies || []} parties={affaire?.parties || []} />;
 };
 
+const CentreAlertesWrapper = () => {
+  const navigate = useNavigate();
+  const { affaires } = useAffaires();
+
+  const handleAlertClick = (alerte) => {
+    if (alerte.affaireId) {
+      navigate(`/affaires/${alerte.affaireId}`);
+    }
+  };
+
+  return <CentreAlertes affaires={affaires} onAlertClick={handleAlertClick} />;
+};
+
 // ============================================================================
 // DASHBOARD WRAPPER - Avec navigation fonctionnelle
 // ============================================================================
@@ -424,7 +437,7 @@ const App = () => {
           <Route path="/affaires/:id/imputabilite" element={<MatriceImputabiliteWrapper />} />
           
           {/* Alertes */}
-          <Route path="/alertes" element={<CentreAlertes />} />
+          <Route path="/alertes" element={<CentreAlertesWrapper />} />
           
           {/* Pages principales */}
           <Route path="/calendrier" element={<PageCalendrier />} />

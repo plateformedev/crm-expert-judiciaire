@@ -11,7 +11,7 @@ import {
   Key, Lock, Eye, EyeOff, AlertTriangle, CheckCircle,
   HelpCircle, Download, Upload, Trash2, RefreshCw
 } from 'lucide-react';
-import { Card, Badge, Button, Input } from '../ui';
+import { Card, Badge, Button, Input, ModalBase, useToast } from '../ui';
 
 // ============================================================================
 // DONNÉES PAR DÉFAUT
@@ -143,9 +143,21 @@ const FormField = ({ label, required, help, children }) => (
 // ============================================================================
 
 export const PageParametres = () => {
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState('profil');
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  // Modals
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // Password fields
+  const [passwords, setPasswords] = useState({
+    current: '',
+    newPassword: '',
+    confirm: ''
+  });
 
   // États des données
   const [profile, setProfile] = useState(() => {
@@ -187,6 +199,42 @@ export const PageParametres = () => {
     a.href = url;
     a.download = `parametres-expert-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
+    toast.success('Export réussi', 'Vos paramètres ont été exportés');
+  };
+
+  // Modifier le mot de passe
+  const handleChangePassword = () => {
+    if (!passwords.current) {
+      toast.error('Erreur', 'Veuillez saisir votre mot de passe actuel');
+      return;
+    }
+    if (passwords.newPassword.length < 8) {
+      toast.error('Erreur', 'Le nouveau mot de passe doit contenir au moins 8 caractères');
+      return;
+    }
+    if (passwords.newPassword !== passwords.confirm) {
+      toast.error('Erreur', 'Les mots de passe ne correspondent pas');
+      return;
+    }
+    // Simuler le changement (en mode démo)
+    toast.success('Mot de passe modifié', 'Votre mot de passe a été mis à jour avec succès');
+    setShowPasswordModal(false);
+    setPasswords({ current: '', newPassword: '', confirm: '' });
+  };
+
+  // Supprimer le compte
+  const handleDeleteAccount = () => {
+    // Effacer toutes les données localStorage
+    const keysToKeep = []; // Ajouter des clés à conserver si nécessaire
+    Object.keys(localStorage).forEach(key => {
+      if (!keysToKeep.includes(key)) {
+        localStorage.removeItem(key);
+      }
+    });
+    toast.success('Compte supprimé', 'Toutes vos données ont été effacées');
+    setShowDeleteModal(false);
+    // Rediriger vers l'accueil
+    window.location.href = '/';
   };
 
   // Calculer la complétion du profil
@@ -702,16 +750,12 @@ export const PageParametres = () => {
         <div className="grid grid-cols-2 gap-6">
           <FormSection title="Mot de passe" icon={Key} description="Sécurisez votre compte">
             <div className="space-y-4">
-              <FormField label="Mot de passe actuel">
-                <Input type="password" placeholder="••••••••" icon={Lock} />
-              </FormField>
-              <FormField label="Nouveau mot de passe">
-                <Input type="password" placeholder="••••••••" icon={Lock} />
-              </FormField>
-              <FormField label="Confirmer le nouveau mot de passe">
-                <Input type="password" placeholder="••••••••" icon={Lock} />
-              </FormField>
-              <Button variant="secondary">Modifier le mot de passe</Button>
+              <p className="text-sm text-[#737373]">
+                Pour des raisons de sécurité, modifiez régulièrement votre mot de passe.
+              </p>
+              <Button variant="secondary" icon={Lock} onClick={() => setShowPasswordModal(true)}>
+                Modifier le mot de passe
+              </Button>
             </div>
           </FormSection>
 
@@ -732,7 +776,12 @@ export const PageParametres = () => {
                 <p className="text-xs text-red-600 mb-3">
                   La suppression de votre compte est irréversible. Toutes vos données seront perdues.
                 </p>
-                <Button variant="secondary" className="text-red-600 border-red-300 hover:bg-red-100" icon={Trash2}>
+                <Button
+                  variant="secondary"
+                  className="text-red-600 border-red-300 hover:bg-red-100"
+                  icon={Trash2}
+                  onClick={() => setShowDeleteModal(true)}
+                >
                   Supprimer mon compte
                 </Button>
               </div>
@@ -754,6 +803,105 @@ export const PageParametres = () => {
           </div>
         </div>
       </Card>
+
+      {/* Modal modification mot de passe */}
+      {showPasswordModal && (
+        <ModalBase
+          title="Modifier le mot de passe"
+          onClose={() => {
+            setShowPasswordModal(false);
+            setPasswords({ current: '', newPassword: '', confirm: '' });
+          }}
+          size="sm"
+        >
+          <div className="space-y-4">
+            <FormField label="Mot de passe actuel">
+              <Input
+                type="password"
+                placeholder="••••••••"
+                icon={Lock}
+                value={passwords.current}
+                onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
+              />
+            </FormField>
+            <FormField label="Nouveau mot de passe" help="Minimum 8 caractères">
+              <Input
+                type="password"
+                placeholder="••••••••"
+                icon={Lock}
+                value={passwords.newPassword}
+                onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+              />
+            </FormField>
+            <FormField label="Confirmer le nouveau mot de passe">
+              <Input
+                type="password"
+                placeholder="••••••••"
+                icon={Lock}
+                value={passwords.confirm}
+                onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+              />
+            </FormField>
+            <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+              <Button
+                variant="secondary"
+                className="flex-1"
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setPasswords({ current: '', newPassword: '', confirm: '' });
+                }}
+              >
+                Annuler
+              </Button>
+              <Button variant="primary" className="flex-1" onClick={handleChangePassword}>
+                Modifier
+              </Button>
+            </div>
+          </div>
+        </ModalBase>
+      )}
+
+      {/* Modal suppression compte */}
+      {showDeleteModal && (
+        <ModalBase
+          title="Supprimer mon compte"
+          onClose={() => setShowDeleteModal(false)}
+          size="sm"
+        >
+          <div className="space-y-4">
+            <div className="p-4 bg-red-50 rounded-xl">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-red-800">Attention !</p>
+                  <p className="text-sm text-red-600 mt-1">
+                    Cette action est irréversible. Toutes vos données seront définitivement supprimées :
+                  </p>
+                  <ul className="text-sm text-red-600 mt-2 list-disc list-inside">
+                    <li>Affaires et dossiers</li>
+                    <li>Documents et photos</li>
+                    <li>Paramètres et préférences</li>
+                    <li>Historique complet</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+              <Button variant="secondary" className="flex-1" onClick={() => setShowDeleteModal(false)}>
+                Annuler
+              </Button>
+              <Button
+                variant="secondary"
+                className="flex-1 bg-red-600 text-white hover:bg-red-700 border-red-600"
+                icon={Trash2}
+                onClick={handleDeleteAccount}
+              >
+                Supprimer définitivement
+              </Button>
+            </div>
+          </div>
+        </ModalBase>
+      )}
     </div>
   );
 };

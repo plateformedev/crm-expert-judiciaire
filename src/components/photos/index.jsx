@@ -502,12 +502,25 @@ const PhotoCard = ({ photo, onClick, onEdit, onDelete }) => {
 // LIGNE PHOTO (LIST)
 // ============================================================================
 
-const PhotoListItem = ({ photo, onClick, onEdit, onDelete }) => {
+const PhotoListItem = ({ photo, onClick, onEdit, onDelete, onDownload }) => {
+  const handleDownload = () => {
+    if (photo.url) {
+      // Créer un lien temporaire pour télécharger l'image
+      const link = document.createElement('a');
+      link.href = photo.url;
+      link.download = photo.filename || `photo_${photo.id}.jpg`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   return (
     <Card className="p-4 hover:shadow-sm transition-shadow">
       <div className="flex items-center gap-4">
         {/* Miniature */}
-        <div 
+        <div
           className="w-20 h-20 rounded-lg overflow-hidden bg-[#f5f5f5] flex-shrink-0 cursor-pointer"
           onClick={onClick}
         >
@@ -541,13 +554,13 @@ const PhotoListItem = ({ photo, onClick, onEdit, onDelete }) => {
 
         {/* Actions */}
         <div className="flex gap-2">
-          <button onClick={onEdit} className="p-2 hover:bg-[#f5f5f5] rounded-lg">
+          <button onClick={onEdit} className="p-2 hover:bg-[#f5f5f5] rounded-lg" title="Annoter">
             <Edit className="w-5 h-5 text-[#737373]" />
           </button>
-          <button onClick={() => {}} className="p-2 hover:bg-[#f5f5f5] rounded-lg">
+          <button onClick={onDownload || handleDownload} className="p-2 hover:bg-[#f5f5f5] rounded-lg" title="Télécharger">
             <Download className="w-5 h-5 text-[#737373]" />
           </button>
-          <button onClick={onDelete} className="p-2 hover:bg-red-50 rounded-lg">
+          <button onClick={onDelete} className="p-2 hover:bg-red-50 rounded-lg" title="Supprimer">
             <Trash2 className="w-5 h-5 text-red-600" />
           </button>
         </div>
@@ -725,13 +738,27 @@ const ModalVisualisationPhoto = ({ isOpen, photo, photos, onClose, onEdit, onNav
             >
               <ZoomIn className="w-5 h-5" />
             </button>
-            <button onClick={onEdit} className="p-2 text-white hover:bg-white/10 rounded-lg">
+            <button onClick={onEdit} className="p-2 text-white hover:bg-white/10 rounded-lg" title="Annoter">
               <Edit className="w-5 h-5" />
             </button>
-            <button className="p-2 text-white hover:bg-white/10 rounded-lg">
+            <button
+              onClick={() => {
+                if (photo.url) {
+                  const link = document.createElement('a');
+                  link.href = photo.url;
+                  link.download = photo.filename || `photo_${photo.id}.jpg`;
+                  link.target = '_blank';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }
+              }}
+              className="p-2 text-white hover:bg-white/10 rounded-lg"
+              title="Télécharger"
+            >
               <Download className="w-5 h-5" />
             </button>
-            <button onClick={onClose} className="p-2 text-white hover:bg-white/10 rounded-lg">
+            <button onClick={onClose} className="p-2 text-white hover:bg-white/10 rounded-lg" title="Fermer">
               <X className="w-5 h-5" />
             </button>
           </div>

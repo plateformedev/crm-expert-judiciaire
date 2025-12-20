@@ -243,7 +243,6 @@ export const GenerateurRapport = ({
         }
 
         saveAffaires(affaires);
-        console.log('Document sauvegardé:', newDoc);
         return true;
       }
       return false;

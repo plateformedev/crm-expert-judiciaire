@@ -3,15 +3,16 @@
 // Dashboard analytique complet pour le suivi d'activité
 // ============================================================================
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   BarChart3, TrendingUp, TrendingDown, Calendar, Euro, Clock,
   Folder, Users, FileText, CheckCircle, AlertTriangle, Target,
   PieChart, Activity, Award, ArrowUp, ArrowDown, Minus,
   Filter, Download, RefreshCw, ChevronRight, Eye
 } from 'lucide-react';
-import { Card, Badge, Button } from '../ui';
+import { Card, Badge, Button, useToast } from '../ui';
 import { getStoredAffaires } from '../../lib/demoData';
+import { formatDateFr } from '../../utils/helpers';
 
 // ============================================================================
 // COMPOSANT: Carte KPI
@@ -188,8 +189,55 @@ const RankingTable = ({ data, title, columns }) => (
 // ============================================================================
 
 export const PageStatistiques = () => {
+  const toast = useToast();
   const [periode, setPeriode] = useState('annee'); // 'mois', 'trimestre', 'annee'
+  const [refreshKey, setRefreshKey] = useState(0);
   const affaires = getStoredAffaires();
+
+  // Exporter les statistiques en CSV
+  const handleExport = useCallback(() => {
+    try {
+      const csvData = [
+        ['Statistiques CRM Expert Judiciaire'],
+        ['Export du', formatDateFr(new Date().toISOString())],
+        ['Période', periode === 'mois' ? 'Ce mois' : periode === 'trimestre' ? 'Ce trimestre' : periode === 'annee' ? 'Cette année' : 'Depuis le début'],
+        [],
+        ['Indicateur', 'Valeur'],
+        ['Affaires totales', affaires.length],
+        ['Affaires en cours', affaires.filter(a => a.statut === 'en-cours').length],
+        ['Affaires terminées', affaires.filter(a => a.statut === 'rapport-depose' || a.statut === 'archive').length],
+        ['Affaires urgentes', affaires.filter(a => a.urgent).length],
+        [],
+        ['Finances', ''],
+        ['Honoraires générés', affaires.reduce((sum, a) => sum + (a.vacations || []).reduce((s, v) => s + (v.montant || 0), 0), 0) + ' €'],
+        ['Provisions reçues', affaires.filter(a => a.provision_recue).reduce((sum, a) => sum + (a.provision_montant || 0), 0) + ' €'],
+        ['Provisions en attente', affaires.filter(a => !a.provision_recue && a.provision_montant).reduce((sum, a) => sum + (a.provision_montant || 0), 0) + ' €'],
+        [],
+        ['Activité', ''],
+        ['Heures travaillées', affaires.reduce((sum, a) => sum + (a.vacations || []).reduce((s, v) => s + (v.duree_heures || 0), 0), 0) + ' h'],
+        ['Réunions totales', affaires.reduce((sum, a) => sum + (a.reunions?.length || 0), 0)],
+        ['Dires en attente', affaires.reduce((sum, a) => sum + (a.dires?.filter(d => d.statut === 'recu' || d.statut === 'en-analyse').length || 0), 0)]
+      ];
+
+      const csvContent = csvData.map(row => row.join(';')).join('\n');
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `statistiques_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Export réussi', 'Les statistiques ont été exportées au format CSV');
+    } catch (error) {
+      toast.error('Erreur', 'Impossible d\'exporter les statistiques');
+    }
+  }, [affaires, periode, toast]);
+
+  // Actualiser les données
+  const handleRefresh = useCallback(() => {
+    setRefreshKey(prev => prev + 1);
+    toast.info('Actualisation', 'Les statistiques ont été actualisées');
+  }, [toast]);
 
   // Calculs statistiques
   const stats = useMemo(() => {
@@ -301,7 +349,7 @@ export const PageStatistiques = () => {
         ? Math.round((parStatut['rapport-depose'] + parStatut['archive']) / affaires.length * 100)
         : 0
     };
-  }, [affaires, periode]);
+  }, [affaires, periode, refreshKey]);
 
   return (
     <div className="space-y-6">
@@ -322,10 +370,10 @@ export const PageStatistiques = () => {
             <option value="annee">Cette année</option>
             <option value="tout">Depuis le début</option>
           </select>
-          <Button variant="secondary" icon={Download}>
+          <Button variant="secondary" icon={Download} onClick={handleExport}>
             Exporter
           </Button>
-          <Button variant="secondary" icon={RefreshCw}>
+          <Button variant="secondary" icon={RefreshCw} onClick={handleRefresh}>
             Actualiser
           </Button>
         </div>
