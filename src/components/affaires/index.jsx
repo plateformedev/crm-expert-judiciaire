@@ -33,6 +33,11 @@ import { EtatFrais } from './EtatFrais';
 import { GestionDocuments } from './GestionDocuments';
 import { TimelineDossier } from './TimelineDossier';
 
+// Modules workflow (Convocation, Réunion, Compte-rendu)
+import { ModuleConvocation } from './ModuleConvocation';
+import { ModuleReunion } from './ModuleReunion';
+import { ModuleCompteRendu } from './ModuleCompteRendu';
+
 // ============================================================================
 // LISTE DES AFFAIRES
 // ============================================================================
@@ -1168,6 +1173,10 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null); // { type: 'delete'|'archive'|'suspend' }
 
+  // États pour les modules workflow
+  const [activeModule, setActiveModule] = useState(null); // 'convocation' | 'reunion' | 'compte-rendu'
+  const [selectedReunion, setSelectedReunion] = useState(null);
+
   // ⏱️ Chronomètre automatique - démarre à l'entrée, sauvegarde à la sortie
   const timer = useAutoTimer(affaireId, 90); // 90€/h par défaut
 
@@ -1371,11 +1380,32 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
       <WorkflowTunnel
         affaire={affaire}
         onEtapeClick={(etape) => {
-          // Naviguer vers l'onglet correspondant
-          if (etape.id === 'saisie-dossier') setActiveTab('general');
-          else if (etape.id === 'convocation-r1' || etape.id === 'reunion-r1' || etape.id === 'reunions-supplementaires') setActiveTab('reunions');
-          else if (etape.id === 'dires') setActiveTab('dires');
-          else if (etape.id === 'provision') setActiveTab('financier');
+          // Ouvrir le module correspondant ou naviguer vers l'onglet
+          const reunions = affaire.reunions || [];
+          const reunionR1 = reunions.find(r => r.numero === 1) || reunions[0];
+
+          if (etape.id === 'convocation-r1') {
+            // Ouvrir le module Convocation R1
+            setSelectedReunion(reunionR1 || { numero: 1, type: 'contradictoire', statut: 'planifiee' });
+            setActiveModule('convocation');
+          } else if (etape.id === 'reunion-r1') {
+            // Ouvrir le module Réunion R1
+            setSelectedReunion(reunionR1 || { numero: 1, type: 'contradictoire', statut: 'planifiee' });
+            setActiveModule('reunion');
+          } else if (etape.id === 'compte-rendu-r1') {
+            // Ouvrir le module Compte-rendu R1
+            setSelectedReunion(reunionR1 || { numero: 1, type: 'contradictoire', statut: 'terminee' });
+            setActiveModule('compte-rendu');
+          } else if (etape.id === 'reunions-supplementaires') {
+            // Pour les réunions supplémentaires, on peut naviguer vers l'onglet réunions
+            setActiveTab('reunions');
+          } else if (etape.id === 'saisie-dossier') {
+            setActiveTab('general');
+          } else if (etape.id === 'dires') {
+            setActiveTab('dires');
+          } else if (etape.id === 'provision') {
+            setActiveTab('financier');
+          }
         }}
       />
 
@@ -1592,6 +1622,78 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
             </div>
           </div>
         </ModalBase>
+      )}
+
+      {/* Module Convocation R1 */}
+      {activeModule === 'convocation' && selectedReunion && (
+        <ModuleConvocation
+          affaire={affaire}
+          reunion={selectedReunion}
+          expert={{ nom: 'Expert', prenom: 'Judiciaire', email: 'expert@domaine.fr' }}
+          onUpdate={(data) => {
+            // Mettre à jour la réunion avec les données de convocation
+            const reunions = [...(affaire.reunions || [])];
+            const idx = reunions.findIndex(r => r.id === selectedReunion.id || r.numero === selectedReunion.numero);
+            if (idx >= 0) {
+              reunions[idx] = { ...reunions[idx], ...data };
+            } else {
+              reunions.push({ ...selectedReunion, ...data, id: Date.now() });
+            }
+            update({ reunions });
+          }}
+          onClose={() => {
+            setActiveModule(null);
+            setSelectedReunion(null);
+          }}
+        />
+      )}
+
+      {/* Module Réunion R1 */}
+      {activeModule === 'reunion' && selectedReunion && (
+        <ModuleReunion
+          affaire={affaire}
+          reunion={selectedReunion}
+          expert={{ nom: 'Expert', prenom: 'Judiciaire', email: 'expert@domaine.fr' }}
+          onUpdate={(data) => {
+            // Mettre à jour la réunion avec les données du module
+            const reunions = [...(affaire.reunions || [])];
+            const idx = reunions.findIndex(r => r.id === selectedReunion.id || r.numero === selectedReunion.numero);
+            if (idx >= 0) {
+              reunions[idx] = { ...reunions[idx], ...data };
+            } else {
+              reunions.push({ ...selectedReunion, ...data, id: Date.now() });
+            }
+            update({ reunions });
+          }}
+          onClose={() => {
+            setActiveModule(null);
+            setSelectedReunion(null);
+          }}
+        />
+      )}
+
+      {/* Module Compte-rendu R1 */}
+      {activeModule === 'compte-rendu' && selectedReunion && (
+        <ModuleCompteRendu
+          affaire={affaire}
+          reunion={selectedReunion}
+          expert={{ nom: 'Expert', prenom: 'Judiciaire', email: 'expert@domaine.fr' }}
+          onUpdate={(data) => {
+            // Mettre à jour la réunion avec les données du compte-rendu
+            const reunions = [...(affaire.reunions || [])];
+            const idx = reunions.findIndex(r => r.id === selectedReunion.id || r.numero === selectedReunion.numero);
+            if (idx >= 0) {
+              reunions[idx] = { ...reunions[idx], ...data };
+            } else {
+              reunions.push({ ...selectedReunion, ...data, id: Date.now() });
+            }
+            update({ reunions });
+          }}
+          onClose={() => {
+            setActiveModule(null);
+            setSelectedReunion(null);
+          }}
+        />
       )}
     </div>
   );
