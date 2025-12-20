@@ -5,12 +5,12 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/',
+  base: '/crm-expert-judiciaire/',
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      scope: '/',
+      scope: '/crm-expert-judiciaire/',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
         name: 'CRM Expert Judiciaire',
@@ -20,8 +20,8 @@ export default defineConfig({
         background_color: '#1a1a1a',
         display: 'standalone',
         orientation: 'any',
-        scope: '/',
-        start_url: '/',
+        scope: '/crm-expert-judiciaire/',
+        start_url: '/crm-expert-judiciaire/',
         icons: [
           {
             src: 'icons/icon-72.png',
