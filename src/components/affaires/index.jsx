@@ -26,6 +26,13 @@ import { ReponseJuge } from './ReponseJuge';
 import { GestionReunions } from './GestionReunions';
 import { GestionDires } from './GestionDires';
 
+// Nouveaux composants Phase 2
+import { EditeurNoteSynthese } from './EditeurNoteSynthese';
+import { EditeurRapportFinal } from './EditeurRapportFinal';
+import { EtatFrais } from './EtatFrais';
+import { GestionDocuments } from './GestionDocuments';
+import { TimelineDossier } from './TimelineDossier';
+
 // ============================================================================
 // LISTE DES AFFAIRES
 // ============================================================================
@@ -1248,7 +1255,9 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
     { id: 'desordres', label: `Désordres (${affaire.pathologies?.length || 0})`, icon: AlertTriangle },
     { id: 'dires', label: `Dires (${affaire.dires?.length || 0})`, icon: FileText },
     { id: 'documents', label: `Documents (${affaire.documents?.length || 0})`, icon: Folder },
+    { id: 'rapports', label: 'Rapports', icon: BookOpen },
     { id: 'financier', label: 'Financier', icon: Euro },
+    { id: 'timeline', label: 'Historique', icon: Clock },
     { id: 'outils', label: 'Outils', icon: Wand2 }
   ];
 
@@ -1439,8 +1448,25 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
             onUpdate={(updates) => update(updates)}
           />
         )}
-        {activeTab === 'documents' && <TabDocuments affaire={affaire} onDownload={handleDownloadDocument} />}
-        {activeTab === 'financier' && <TabFinancier affaire={affaire} />}
+        {activeTab === 'documents' && (
+          <GestionDocuments
+            affaire={affaire}
+            onUpdate={(updates) => update(updates)}
+          />
+        )}
+        {activeTab === 'rapports' && (
+          <TabRapports
+            affaire={affaire}
+            onUpdate={(updates) => update(updates)}
+          />
+        )}
+        {activeTab === 'financier' && (
+          <EtatFrais
+            affaire={affaire}
+            onSave={(updates) => update(updates)}
+          />
+        )}
+        {activeTab === 'timeline' && <TimelineDossier affaire={affaire} />}
         {activeTab === 'outils' && <TabOutils affaire={affaire} />}
       </div>
 
@@ -1810,11 +1836,91 @@ const TabDocuments = ({ affaire, onDownload }) => (
   </div>
 );
 
+// ============================================================================
+// TAB RAPPORTS - Note de synthèse et Rapport final
+// ============================================================================
+
+const TabRapports = ({ affaire, onUpdate }) => {
+  const [activeRapport, setActiveRapport] = useState('note-synthese'); // 'note-synthese' | 'rapport-final'
+
+  return (
+    <div className="space-y-6">
+      {/* Sélection du type de rapport */}
+      <Card className="p-4">
+        <div className="flex gap-4">
+          <button
+            onClick={() => setActiveRapport('note-synthese')}
+            className={`flex-1 p-4 rounded-xl border-2 transition-all ${
+              activeRapport === 'note-synthese'
+                ? 'border-[#c9a227] bg-[#faf8f3]'
+                : 'border-[#e5e5e5] hover:border-[#c9a227]'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                activeRapport === 'note-synthese' ? 'bg-[#c9a227] text-white' : 'bg-gray-100 text-gray-500'
+              }`}>
+                <FileText className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-[#1a1a1a]">Note de synthèse</p>
+                <p className="text-xs text-[#737373]">Pré-rapport pour observations</p>
+              </div>
+              {affaire.note_synthese_date && (
+                <Badge variant="success" className="ml-auto">Créée</Badge>
+              )}
+            </div>
+          </button>
+
+          <button
+            onClick={() => setActiveRapport('rapport-final')}
+            className={`flex-1 p-4 rounded-xl border-2 transition-all ${
+              activeRapport === 'rapport-final'
+                ? 'border-[#c9a227] bg-[#faf8f3]'
+                : 'border-[#e5e5e5] hover:border-[#c9a227]'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                activeRapport === 'rapport-final' ? 'bg-[#c9a227] text-white' : 'bg-gray-100 text-gray-500'
+              }`}>
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-[#1a1a1a]">Rapport final</p>
+                <p className="text-xs text-[#737373]">Document définitif</p>
+              </div>
+              {affaire.rapport_final_verrouille ? (
+                <Badge variant="success" className="ml-auto">Finalisé</Badge>
+              ) : affaire.rapport_final_date ? (
+                <Badge variant="warning" className="ml-auto">En cours</Badge>
+              ) : null}
+            </div>
+          </button>
+        </div>
+      </Card>
+
+      {/* Contenu de l'éditeur */}
+      {activeRapport === 'note-synthese' ? (
+        <EditeurNoteSynthese
+          affaire={affaire}
+          onSave={onUpdate}
+        />
+      ) : (
+        <EditeurRapportFinal
+          affaire={affaire}
+          onSave={onUpdate}
+        />
+      )}
+    </div>
+  );
+};
+
 const TabFinancier = ({ affaire }) => {
   const totalVacations = (affaire.vacations || []).reduce((acc, v) => acc + (parseFloat(v.montant) || 0), 0);
   const totalFrais = (affaire.frais || []).reduce((acc, f) => acc + (parseFloat(f.montant) || 0), 0);
   const provision = parseFloat(affaire.provision_montant) || 0;
-  
+
   return (
     <div className="grid grid-cols-2 gap-6">
       <Card className="p-6">
