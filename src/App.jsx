@@ -281,14 +281,15 @@ const ModuleChiffrageWrapper = () => {
   const { id } = useParams();
   const { affaires } = useAffaires();
   const affaire = affaires.find(a => a.id === id);
-  return <ModuleChiffrage affaireId={id} affaire={affaire} />;
+  return <ModuleChiffrage affaireId={id} affaire={affaire} pathologies={affaire?.pathologies || []} />;
 };
 
 const GenerateurRapportWrapper = () => {
   const { id } = useParams();
   const { affaires } = useAffaires();
+  const { expert } = useAuth();
   const affaire = affaires.find(a => a.id === id);
-  return <GenerateurRapport affaireId={id} affaire={affaire} />;
+  return <GenerateurRapport affaireId={id} affaire={affaire} expert={expert} />;
 };
 
 const MatriceImputabiliteWrapper = () => {

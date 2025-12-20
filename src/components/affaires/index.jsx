@@ -545,35 +545,44 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
         {activeTab === 'outils' && <TabOutils affaire={affaire} />}
       </div>
 
-      {/* Modals pour ajout (placeholders pour l'instant) */}
+      {/* Modal Ajout Partie */}
       {showAddPartie && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-lg p-6">
-            <h3 className="text-lg font-medium mb-4">Ajouter une partie</h3>
-            <p className="text-[#737373] mb-4">Fonctionnalité en cours de développement</p>
-            <Button variant="secondary" onClick={() => setShowAddPartie(false)}>Fermer</Button>
-          </Card>
-        </div>
+        <ModalAjoutPartie
+          affaireId={affaireId}
+          onClose={() => setShowAddPartie(false)}
+          onSuccess={() => {
+            setShowAddPartie(false);
+            // Rafraîchir les données
+            window.location.reload();
+          }}
+        />
       )}
 
+      {/* Modal Ajout Réunion */}
       {showAddReunion && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-lg p-6">
-            <h3 className="text-lg font-medium mb-4">Planifier une réunion</h3>
-            <p className="text-[#737373] mb-4">Fonctionnalité en cours de développement</p>
-            <Button variant="secondary" onClick={() => setShowAddReunion(false)}>Fermer</Button>
-          </Card>
-        </div>
+        <ModalAjoutReunion
+          affaireId={affaireId}
+          reunionNumero={(affaire.reunions?.length || 0) + 1}
+          adresseBien={`${affaire.bien_adresse || ''}, ${affaire.bien_code_postal || ''} ${affaire.bien_ville || ''}`}
+          onClose={() => setShowAddReunion(false)}
+          onSuccess={() => {
+            setShowAddReunion(false);
+            window.location.reload();
+          }}
+        />
       )}
 
+      {/* Modal Ajout Désordre */}
       {showAddDesordre && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-lg p-6">
-            <h3 className="text-lg font-medium mb-4">Ajouter un désordre</h3>
-            <p className="text-[#737373] mb-4">Fonctionnalité en cours de développement</p>
-            <Button variant="secondary" onClick={() => setShowAddDesordre(false)}>Fermer</Button>
-          </Card>
-        </div>
+        <ModalAjoutDesordre
+          affaireId={affaireId}
+          desordreNumero={(affaire.pathologies?.length || 0) + 1}
+          onClose={() => setShowAddDesordre(false)}
+          onSuccess={() => {
+            setShowAddDesordre(false);
+            window.location.reload();
+          }}
+        />
       )}
     </div>
   );
@@ -1100,6 +1109,487 @@ const TabOutils = ({ affaire }) => {
 };
 
 // ============================================================================
+// MODAL AJOUT PARTIE
+// ============================================================================
+
+const ModalAjoutPartie = ({ affaireId, onClose, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({
+    type: 'demandeur',
+    nom: '',
+    prenom: '',
+    raison_sociale: '',
+    role: '',
+    email: '',
+    telephone: '',
+    adresse: '',
+    code_postal: '',
+    ville: '',
+    avocat_nom: '',
+    avocat_email: ''
+  });
+  const [isEntreprise, setIsEntreprise] = useState(false);
+
+  const handleChange = (field, value) => {
+    setData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Mode démo - sauvegarder dans localStorage
+      const stored = localStorage.getItem('crm_demo_affaires');
+      if (stored) {
+        const affaires = JSON.parse(stored);
+        const affaire = affaires.find(a => a.id === affaireId);
+        if (affaire) {
+          const newPartie = {
+            id: `partie-${Date.now()}`,
+            ...data,
+            created_at: new Date().toISOString()
+          };
+          if (!affaire.parties) affaire.parties = [];
+          affaire.parties.push(newPartie);
+          localStorage.setItem('crm_demo_affaires', JSON.stringify(affaires));
+          onSuccess();
+        }
+      }
+    } catch (error) {
+      console.error('Erreur ajout partie:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <ModalBase isOpen={true} onClose={onClose} title="Ajouter une partie" size="lg">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Type de partie */}
+        <div className="flex gap-4">
+          <Select
+            label="Type de partie"
+            value={data.type}
+            onChange={(e) => handleChange('type', e.target.value)}
+            options={[
+              { value: 'demandeur', label: 'Demandeur' },
+              { value: 'defenseur', label: 'Défendeur' },
+              { value: 'intervenant', label: 'Intervenant' },
+              { value: 'assureur', label: 'Assureur' }
+            ]}
+            className="flex-1"
+          />
+          <div className="flex items-end">
+            <label className="flex items-center gap-3 p-3 bg-[#fafafa] rounded-xl cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isEntreprise}
+                onChange={(e) => setIsEntreprise(e.target.checked)}
+                className="w-5 h-5 rounded border-[#d4d4d4] text-[#c9a227] focus:ring-[#c9a227]"
+              />
+              <span className="text-sm text-[#525252]">Personne morale</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Identité */}
+        {isEntreprise ? (
+          <Input
+            label="Raison sociale"
+            value={data.raison_sociale}
+            onChange={(e) => handleChange('raison_sociale', e.target.value)}
+            placeholder="Nom de l'entreprise"
+            required
+          />
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Nom"
+              value={data.nom}
+              onChange={(e) => handleChange('nom', e.target.value)}
+              placeholder="Nom"
+              required
+            />
+            <Input
+              label="Prénom"
+              value={data.prenom}
+              onChange={(e) => handleChange('prenom', e.target.value)}
+              placeholder="Prénom"
+            />
+          </div>
+        )}
+
+        {/* Rôle */}
+        <Input
+          label="Rôle / Qualité"
+          value={data.role}
+          onChange={(e) => handleChange('role', e.target.value)}
+          placeholder="Ex: Maître d'ouvrage, Entreprise générale, Assureur DO..."
+        />
+
+        {/* Contact */}
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Email"
+            type="email"
+            value={data.email}
+            onChange={(e) => handleChange('email', e.target.value)}
+            placeholder="email@exemple.fr"
+          />
+          <Input
+            label="Téléphone"
+            type="tel"
+            value={data.telephone}
+            onChange={(e) => handleChange('telephone', e.target.value)}
+            placeholder="01 23 45 67 89"
+          />
+        </div>
+
+        {/* Adresse */}
+        <Input
+          label="Adresse"
+          value={data.adresse}
+          onChange={(e) => handleChange('adresse', e.target.value)}
+          placeholder="Numéro et nom de rue"
+        />
+        <div className="grid grid-cols-3 gap-4">
+          <Input
+            label="Code postal"
+            value={data.code_postal}
+            onChange={(e) => handleChange('code_postal', e.target.value)}
+            placeholder="75001"
+          />
+          <Input
+            label="Ville"
+            value={data.ville}
+            onChange={(e) => handleChange('ville', e.target.value)}
+            placeholder="Paris"
+            className="col-span-2"
+          />
+        </div>
+
+        {/* Avocat */}
+        <div className="border-t border-[#e5e5e5] pt-4">
+          <h4 className="text-xs uppercase tracking-wider text-[#a3a3a3] font-medium mb-4">Représentant (optionnel)</h4>
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Nom de l'avocat"
+              value={data.avocat_nom}
+              onChange={(e) => handleChange('avocat_nom', e.target.value)}
+              placeholder="Me Dupont"
+            />
+            <Input
+              label="Email avocat"
+              type="email"
+              value={data.avocat_email}
+              onChange={(e) => handleChange('avocat_email', e.target.value)}
+              placeholder="avocat@cabinet.fr"
+            />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+          <Button variant="secondary" type="button" onClick={onClose} className="flex-1">
+            Annuler
+          </Button>
+          <Button variant="gold" type="submit" loading={loading} className="flex-1">
+            Ajouter la partie
+          </Button>
+        </div>
+      </form>
+    </ModalBase>
+  );
+};
+
+// ============================================================================
+// MODAL AJOUT RÉUNION
+// ============================================================================
+
+const ModalAjoutReunion = ({ affaireId, reunionNumero, adresseBien, onClose, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({
+    numero: reunionNumero,
+    date_reunion: '',
+    heure_reunion: '09:00',
+    lieu: adresseBien || '',
+    type: 'expertise',
+    duree_prevue: 120,
+    observations: ''
+  });
+
+  const handleChange = (field, value) => {
+    setData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Combiner date et heure
+      const dateReunion = `${data.date_reunion}T${data.heure_reunion}:00`;
+
+      // Mode démo - sauvegarder dans localStorage
+      const stored = localStorage.getItem('crm_demo_affaires');
+      if (stored) {
+        const affaires = JSON.parse(stored);
+        const affaire = affaires.find(a => a.id === affaireId);
+        if (affaire) {
+          const newReunion = {
+            id: `reunion-${Date.now()}`,
+            numero: data.numero,
+            date_reunion: dateReunion,
+            lieu: data.lieu,
+            type: data.type,
+            duree_prevue: data.duree_prevue,
+            observations: data.observations,
+            statut: 'planifiee',
+            created_at: new Date().toISOString()
+          };
+          if (!affaire.reunions) affaire.reunions = [];
+          affaire.reunions.push(newReunion);
+          localStorage.setItem('crm_demo_affaires', JSON.stringify(affaires));
+          onSuccess();
+        }
+      }
+    } catch (error) {
+      console.error('Erreur ajout réunion:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <ModalBase isOpen={true} onClose={onClose} title={`Planifier la réunion n°${reunionNumero}`} size="md">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Date et heure */}
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Date de réunion"
+            type="date"
+            value={data.date_reunion}
+            onChange={(e) => handleChange('date_reunion', e.target.value)}
+            required
+          />
+          <Input
+            label="Heure"
+            type="time"
+            value={data.heure_reunion}
+            onChange={(e) => handleChange('heure_reunion', e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Type de réunion */}
+        <Select
+          label="Type de réunion"
+          value={data.type}
+          onChange={(e) => handleChange('type', e.target.value)}
+          options={[
+            { value: 'expertise', label: 'Réunion d\'expertise sur site' },
+            { value: 'contradictoire', label: 'Réunion contradictoire' },
+            { value: 'technique', label: 'Réunion technique' },
+            { value: 'finale', label: 'Réunion finale' }
+          ]}
+        />
+
+        {/* Lieu */}
+        <Input
+          label="Lieu"
+          value={data.lieu}
+          onChange={(e) => handleChange('lieu', e.target.value)}
+          placeholder="Adresse de la réunion"
+          required
+        />
+
+        {/* Durée prévue */}
+        <Select
+          label="Durée prévue"
+          value={data.duree_prevue}
+          onChange={(e) => handleChange('duree_prevue', parseInt(e.target.value))}
+          options={[
+            { value: 60, label: '1 heure' },
+            { value: 90, label: '1h30' },
+            { value: 120, label: '2 heures' },
+            { value: 180, label: '3 heures' },
+            { value: 240, label: '4 heures' },
+            { value: 300, label: '5 heures' }
+          ]}
+        />
+
+        {/* Observations */}
+        <div>
+          <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+            Observations
+          </label>
+          <textarea
+            value={data.observations}
+            onChange={(e) => handleChange('observations', e.target.value)}
+            placeholder="Notes particulières pour cette réunion..."
+            rows={3}
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+          <Button variant="secondary" type="button" onClick={onClose} className="flex-1">
+            Annuler
+          </Button>
+          <Button variant="gold" type="submit" loading={loading} className="flex-1">
+            Planifier la réunion
+          </Button>
+        </div>
+      </form>
+    </ModalBase>
+  );
+};
+
+// ============================================================================
+// MODAL AJOUT DÉSORDRE/PATHOLOGIE
+// ============================================================================
+
+const ModalAjoutDesordre = ({ affaireId, desordreNumero, onClose, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({
+    numero: desordreNumero,
+    intitule: '',
+    localisation: '',
+    description: '',
+    gravite: 'moyenne',
+    garantie: '',
+    cause_presumee: '',
+    photos: []
+  });
+
+  const handleChange = (field, value) => {
+    setData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Mode démo - sauvegarder dans localStorage
+      const stored = localStorage.getItem('crm_demo_affaires');
+      if (stored) {
+        const affaires = JSON.parse(stored);
+        const affaire = affaires.find(a => a.id === affaireId);
+        if (affaire) {
+          const newPathologie = {
+            id: `patho-${Date.now()}`,
+            ...data,
+            created_at: new Date().toISOString()
+          };
+          if (!affaire.pathologies) affaire.pathologies = [];
+          affaire.pathologies.push(newPathologie);
+          localStorage.setItem('crm_demo_affaires', JSON.stringify(affaires));
+          onSuccess();
+        }
+      }
+    } catch (error) {
+      console.error('Erreur ajout désordre:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <ModalBase isOpen={true} onClose={onClose} title={`Ajouter le désordre n°${desordreNumero}`} size="lg">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Intitulé */}
+        <Input
+          label="Intitulé du désordre"
+          value={data.intitule}
+          onChange={(e) => handleChange('intitule', e.target.value)}
+          placeholder="Ex: Fissures structurelles, Infiltrations, Défaut d'étanchéité..."
+          required
+        />
+
+        {/* Localisation */}
+        <Input
+          label="Localisation"
+          value={data.localisation}
+          onChange={(e) => handleChange('localisation', e.target.value)}
+          placeholder="Ex: Mur porteur salon, Terrasse RDC, Façade nord..."
+          required
+        />
+
+        {/* Description */}
+        <div>
+          <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+            Description détaillée
+          </label>
+          <textarea
+            value={data.description}
+            onChange={(e) => handleChange('description', e.target.value)}
+            placeholder="Décrivez le désordre constaté, son étendue, ses manifestations..."
+            rows={4}
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            required
+          />
+        </div>
+
+        {/* Gravité et Garantie */}
+        <div className="grid grid-cols-2 gap-4">
+          <Select
+            label="Gravité"
+            value={data.gravite}
+            onChange={(e) => handleChange('gravite', e.target.value)}
+            options={[
+              { value: 'mineure', label: 'Mineure (esthétique)' },
+              { value: 'moyenne', label: 'Moyenne (fonctionnel)' },
+              { value: 'majeure', label: 'Majeure (structurel)' },
+              { value: 'critique', label: 'Critique (sécurité)' }
+            ]}
+          />
+          <Select
+            label="Qualification garantie"
+            value={data.garantie}
+            onChange={(e) => handleChange('garantie', e.target.value)}
+            options={[
+              { value: '', label: 'À déterminer' },
+              { value: 'gpa', label: 'GPA (1 an)' },
+              { value: 'biennale', label: 'Biennale (2 ans)' },
+              { value: 'decennale', label: 'Décennale (10 ans)' },
+              { value: 'hors_garantie', label: 'Hors garantie' },
+              { value: 'responsabilite_civile', label: 'Responsabilité civile' }
+            ]}
+          />
+        </div>
+
+        {/* Cause présumée */}
+        <div>
+          <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+            Cause présumée (optionnel)
+          </label>
+          <textarea
+            value={data.cause_presumee}
+            onChange={(e) => handleChange('cause_presumee', e.target.value)}
+            placeholder="Hypothèses sur l'origine du désordre..."
+            rows={2}
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+          <Button variant="secondary" type="button" onClick={onClose} className="flex-1">
+            Annuler
+          </Button>
+          <Button variant="gold" type="submit" loading={loading} className="flex-1">
+            Ajouter le désordre
+          </Button>
+        </div>
+      </form>
+    </ModalBase>
+  );
+};
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 
@@ -1107,5 +1597,8 @@ export default {
   ListeAffaires,
   FicheAffaire,
   AffaireCard,
-  ModalNouvelleAffaire
+  ModalNouvelleAffaire,
+  ModalAjoutPartie,
+  ModalAjoutReunion,
+  ModalAjoutDesordre
 };

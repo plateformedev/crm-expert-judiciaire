@@ -206,7 +206,7 @@ export const GenerateurRapport = ({
   // Générer tout le rapport
   const genererRapportComplet = async () => {
     setGenerating(true);
-    
+
     try {
       // Générer chaque section
       const sectionsGenerees = sections
@@ -218,12 +218,36 @@ export const GenerateurRapport = ({
 
       // Assembler le HTML complet
       const html = assemblerRapportHTML(sectionsGenerees, affaire, expert);
-      
-      // Générer le PDF
-      await pdfService.downloadPDF('rapport', { html }, `Rapport_${affaire.reference}.pdf`);
-      
+
+      // Ouvrir dans une nouvelle fenêtre pour impression/PDF
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      if (printWindow) {
+        printWindow.document.write(html);
+        printWindow.document.close();
+
+        // Attendre le chargement avant impression
+        printWindow.onload = () => {
+          setTimeout(() => {
+            printWindow.focus();
+            printWindow.print();
+          }, 500);
+        };
+      } else {
+        // Si popup bloquée, proposer téléchargement HTML
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Rapport_${affaire?.reference || 'expertise'}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
     } catch (error) {
       console.error('Erreur génération rapport:', error);
+      alert('Erreur lors de la génération du rapport. Veuillez réessayer.');
     } finally {
       setGenerating(false);
     }
