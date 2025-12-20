@@ -3,7 +3,18 @@
 // ============================================================================
 
 // Constantes principales
-export { DS, GARANTIES, ETAPES_TUNNEL, TAUX_VACATIONS, DELAIS_LEGAUX } from './constants';
+export {
+  DS,
+  GARANTIES,
+  ETAPES_TUNNEL,
+  TAUX_VACATIONS,
+  DELAIS_LEGAUX,
+  STATUTS_REPONSE_JUGE,
+  MOTIFS_REFUS,
+  TYPES_REUNION,
+  STATUTS_REUNION,
+  STATUTS_DIRE
+} from './constants';
 
 // Références techniques
 export { 

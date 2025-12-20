@@ -28,17 +28,174 @@ export const GARANTIES = {
   prescription: { code: 'PDC', nom: 'Prescription Droit Commun', dureeJours: 1826, article: 'Art. 2224 CC' }
 };
 
-// Étapes du tunnel
+// Étapes du tunnel - Workflow Expert Judiciaire Complet
 export const ETAPES_TUNNEL = [
-  { id: 'assignation', label: 'Assignation', onglet: 'mission', color: 'blue' },
-  { id: 'parties', label: 'Parties', onglet: 'assignation', color: 'purple' },
-  { id: 'premiere-reunion', label: '1ère Réunion', onglet: 'reunions', color: 'orange' },
-  { id: 'constatations', label: 'Constatations', onglet: 'pathologies', color: 'red' },
-  { id: 'dires', label: 'Dires', onglet: 'dires', color: 'indigo' },
-  { id: 'analyses', label: 'Analyses', onglet: 'excellence', color: 'teal' },
-  { id: 'chiffrage', label: 'Chiffrage', onglet: 'chiffrage', color: 'green' },
-  { id: 'pre-rapport', label: 'Pré-Rapport', onglet: 'synthese', color: 'amber' },
-  { id: 'rapport-final', label: 'Rapport Final', onglet: 'rapport', color: 'emerald' }
+  {
+    id: 'assignation',
+    numero: 1,
+    label: 'Assignation reçue',
+    description: 'Réception de l\'ordonnance du juge',
+    icon: 'FileInput',
+    color: 'blue',
+    delaiJours: null,
+    obligatoire: true
+  },
+  {
+    id: 'reponse-juge',
+    numero: 2,
+    label: 'Réponse au juge',
+    description: 'Accepter, refuser ou se récuser',
+    icon: 'Send',
+    color: 'indigo',
+    delaiJours: 15,
+    obligatoire: true
+  },
+  {
+    id: 'saisie-dossier',
+    numero: 3,
+    label: 'Saisie du dossier',
+    description: 'Infos ordonnance, parties, mission',
+    icon: 'ClipboardList',
+    color: 'purple',
+    delaiJours: null,
+    obligatoire: true
+  },
+  {
+    id: 'provision',
+    numero: 4,
+    label: 'Vérification provision',
+    description: 'Consignation reçue ou relance',
+    icon: 'Banknote',
+    color: 'emerald',
+    delaiJours: null,
+    obligatoire: true
+  },
+  {
+    id: 'convocation-r1',
+    numero: 5,
+    label: 'Convocation R1',
+    description: 'Proposer date et envoyer aux parties',
+    icon: 'CalendarPlus',
+    color: 'orange',
+    delaiJours: 8,
+    obligatoire: true
+  },
+  {
+    id: 'reunion-r1',
+    numero: 6,
+    label: 'Réunion R1',
+    description: 'Notes, observations, photos',
+    icon: 'Users',
+    color: 'amber',
+    delaiJours: null,
+    obligatoire: true
+  },
+  {
+    id: 'compte-rendu-r1',
+    numero: 7,
+    label: 'Compte-rendu R1',
+    description: 'Rapport de réunion + observations',
+    icon: 'FileText',
+    color: 'yellow',
+    delaiJours: 15,
+    obligatoire: true
+  },
+  {
+    id: 'dires',
+    numero: 8,
+    label: 'Dires des parties',
+    description: 'Réception et traitement des dires',
+    icon: 'MessageSquare',
+    color: 'cyan',
+    delaiJours: 30,
+    obligatoire: false
+  },
+  {
+    id: 'reunions-supplementaires',
+    numero: 9,
+    label: 'Réunions R2, R3...',
+    description: 'Réunions complémentaires si nécessaire',
+    icon: 'CalendarRange',
+    color: 'teal',
+    delaiJours: null,
+    obligatoire: false
+  },
+  {
+    id: 'note-synthese',
+    numero: 10,
+    label: 'Note de synthèse',
+    description: 'Pré-rapport aux parties',
+    icon: 'FileSearch',
+    color: 'lime',
+    delaiJours: null,
+    obligatoire: true
+  },
+  {
+    id: 'rapport-final',
+    numero: 11,
+    label: 'Rapport définitif',
+    description: 'Rédaction et dépôt du rapport',
+    icon: 'FileCheck',
+    color: 'green',
+    delaiJours: null,
+    obligatoire: true
+  },
+  {
+    id: 'taxation',
+    numero: 12,
+    label: 'Taxation honoraires',
+    description: 'État de frais et demande de taxation',
+    icon: 'Receipt',
+    color: 'gold',
+    delaiJours: null,
+    obligatoire: true
+  }
+];
+
+// Statuts de réponse au juge
+export const STATUTS_REPONSE_JUGE = [
+  { id: 'en-attente', label: 'En attente de réponse', color: 'gray' },
+  { id: 'acceptee', label: 'Mission acceptée', color: 'green' },
+  { id: 'refusee', label: 'Mission refusée', color: 'red' },
+  { id: 'recusation', label: 'Récusation', color: 'orange' }
+];
+
+// Motifs de refus/récusation
+export const MOTIFS_REFUS = [
+  { id: 'conflit-interet', label: 'Conflit d\'intérêt' },
+  { id: 'incompetence', label: 'Hors domaine de compétence' },
+  { id: 'indisponibilite', label: 'Indisponibilité (charge de travail)' },
+  { id: 'eloignement', label: 'Éloignement géographique' },
+  { id: 'connaissance-partie', label: 'Connaissance personnelle d\'une partie' },
+  { id: 'autre', label: 'Autre motif' }
+];
+
+// Types de réunion
+export const TYPES_REUNION = [
+  { id: 'expertise', label: 'Réunion d\'expertise contradictoire' },
+  { id: 'visite', label: 'Visite des lieux' },
+  { id: 'accedit', label: 'Accédit (visite technique)' },
+  { id: 'conciliation', label: 'Tentative de conciliation' },
+  { id: 'complement', label: 'Investigations complémentaires' }
+];
+
+// Statuts de réunion
+export const STATUTS_REUNION = [
+  { id: 'planifiee', label: 'Planifiée', color: 'blue' },
+  { id: 'convocations-envoyees', label: 'Convocations envoyées', color: 'indigo' },
+  { id: 'confirmee', label: 'Confirmée', color: 'purple' },
+  { id: 'en-cours', label: 'En cours', color: 'orange' },
+  { id: 'terminee', label: 'Terminée', color: 'green' },
+  { id: 'reportee', label: 'Reportée', color: 'amber' },
+  { id: 'annulee', label: 'Annulée', color: 'red' }
+];
+
+// Statuts des dires
+export const STATUTS_DIRE = [
+  { id: 'recu', label: 'Reçu', color: 'blue' },
+  { id: 'en-analyse', label: 'En analyse', color: 'amber' },
+  { id: 'repondu', label: 'Répondu', color: 'green' },
+  { id: 'rejete', label: 'Rejeté (hors délai)', color: 'red' }
 ];
 
 // Taux vacations
