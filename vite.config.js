@@ -10,6 +10,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      scope: '/crm-expert-judiciaire/',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
         name: 'CRM Expert Judiciaire',
@@ -19,6 +20,7 @@ export default defineConfig({
         background_color: '#1a1a1a',
         display: 'standalone',
         orientation: 'any',
+        scope: '/crm-expert-judiciaire/',
         start_url: '/crm-expert-judiciaire/',
         icons: [
           {
