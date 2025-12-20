@@ -14,6 +14,7 @@ import {
 import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase } from '../ui';
 import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
 import { ETAPES_TUNNEL, GARANTIES } from '../../data';
+import { getStoredAffaires, saveAffaires } from '../../lib/demoData';
 import { formatDateFr, calculerDelaiRestant, calculerAvancementTunnel } from '../../utils/helpers';
 
 // ============================================================================
@@ -136,7 +137,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
         </Button>
       </div>
 
-      {/* Liste */}
+      {/* Tableau des affaires */}
       {affairesFiltrees.length === 0 ? (
         <EmptyState
           icon={Folder}
@@ -146,15 +147,153 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
           actionLabel="Créer une affaire"
         />
       ) : (
-        <div className="grid gap-4">
-          {affairesFiltrees.map(affaire => (
-            <AffaireCard
-              key={affaire.id}
-              affaire={affaire}
-              onClick={() => handleSelectAffaire(affaire)}
-            />
-          ))}
-        </div>
+        <Card className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-[#1a1a1a] text-white">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Référence</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">N° RG</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Tribunal</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Ville</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Statut</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Échéance</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Progress.</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Parties</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Réunions</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Désordres</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider">Provision</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e5e5e5]">
+                {affairesFiltrees.map(affaire => {
+                  const avancement = calculerAvancementTunnel(affaire);
+                  const delaiRestant = affaire.date_echeance ? calculerDelaiRestant(affaire.date_echeance) : null;
+
+                  return (
+                    <tr
+                      key={affaire.id}
+                      className={`hover:bg-[#faf8f3] cursor-pointer transition-colors ${affaire.urgent ? 'bg-red-50' : ''}`}
+                      onClick={() => handleSelectAffaire(affaire)}
+                    >
+                      {/* Référence */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          {affaire.urgent && <AlertTriangle className="w-4 h-4 text-red-500" />}
+                          <span className="font-medium text-[#1a1a1a]">{affaire.reference}</span>
+                        </div>
+                      </td>
+
+                      {/* N° RG */}
+                      <td className="px-4 py-3 text-sm text-[#525252]">
+                        {affaire.rg || '-'}
+                      </td>
+
+                      {/* Tribunal */}
+                      <td className="px-4 py-3 text-sm text-[#525252]">
+                        {affaire.tribunal || '-'}
+                      </td>
+
+                      {/* Ville */}
+                      <td className="px-4 py-3 text-sm text-[#525252]">
+                        {affaire.bien_ville || '-'}
+                      </td>
+
+                      {/* Statut */}
+                      <td className="px-4 py-3 text-center">
+                        <Badge variant={
+                          affaire.statut === 'en-cours' ? 'info' :
+                          affaire.statut === 'pre-rapport' ? 'warning' :
+                          affaire.statut === 'termine' ? 'success' : 'default'
+                        }>
+                          {affaire.statut === 'en-cours' ? 'En cours' :
+                           affaire.statut === 'pre-rapport' ? 'Pré-rapport' :
+                           affaire.statut === 'termine' ? 'Terminé' :
+                           affaire.statut || 'Nouveau'}
+                        </Badge>
+                      </td>
+
+                      {/* Échéance */}
+                      <td className="px-4 py-3 text-center">
+                        {delaiRestant !== null ? (
+                          <span className={`text-xs font-medium px-2 py-1 rounded ${
+                            delaiRestant <= 7 ? 'bg-red-100 text-red-600' :
+                            delaiRestant <= 30 ? 'bg-amber-100 text-amber-600' :
+                            'bg-[#f5f5f5] text-[#737373]'
+                          }`}>
+                            {delaiRestant > 0 ? `J-${delaiRestant}` : 'Dépassée'}
+                          </span>
+                        ) : (
+                          <span className="text-[#a3a3a3]">-</span>
+                        )}
+                      </td>
+
+                      {/* Progression */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-2 bg-[#e5e5e5] rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${
+                                avancement >= 80 ? 'bg-green-500' :
+                                avancement >= 40 ? 'bg-amber-500' : 'bg-blue-500'
+                              }`}
+                              style={{ width: `${avancement}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-[#737373] w-8">{avancement}%</span>
+                        </div>
+                      </td>
+
+                      {/* Parties */}
+                      <td className="px-4 py-3 text-center">
+                        <span className={`text-sm ${(affaire.parties?.length || 0) > 0 ? 'text-[#1a1a1a]' : 'text-[#a3a3a3]'}`}>
+                          {affaire.parties?.length || 0}
+                        </span>
+                      </td>
+
+                      {/* Réunions */}
+                      <td className="px-4 py-3 text-center">
+                        <span className={`text-sm ${(affaire.reunions?.length || 0) > 0 ? 'text-[#1a1a1a]' : 'text-[#a3a3a3]'}`}>
+                          {affaire.reunions?.length || 0}
+                        </span>
+                      </td>
+
+                      {/* Désordres */}
+                      <td className="px-4 py-3 text-center">
+                        <span className={`text-sm ${(affaire.pathologies?.length || 0) > 0 ? 'text-[#1a1a1a]' : 'text-[#a3a3a3]'}`}>
+                          {affaire.pathologies?.length || 0}
+                        </span>
+                      </td>
+
+                      {/* Provision */}
+                      <td className="px-4 py-3 text-right">
+                        <span className="text-sm font-medium text-[#1a1a1a]">
+                          {affaire.provision_montant
+                            ? `${parseFloat(affaire.provision_montant).toLocaleString('fr-FR')} €`
+                            : '-'}
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          className="p-2 hover:bg-[#e5e5e5] rounded-lg transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectAffaire(affaire);
+                          }}
+                        >
+                          <Eye className="w-4 h-4 text-[#737373]" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
 
       {/* Modal création */}
@@ -388,6 +527,23 @@ const ModalNouvelleAffaire = ({ onClose, onCreate }) => {
           </div>
         </div>
 
+        {/* Mission */}
+        <div className="space-y-4">
+          <h4 className="text-xs uppercase tracking-wider text-[#a3a3a3] font-medium">Mission</h4>
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+              Texte de la mission
+            </label>
+            <textarea
+              value={data.mission}
+              onChange={(e) => handleChange('mission', e.target.value)}
+              placeholder="Nous désignons M./Mme ... en qualité d'expert avec pour mission de..."
+              rows={4}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            />
+          </div>
+        </div>
+
         {/* Provision */}
         <div className="grid grid-cols-2 gap-4">
           <Input
@@ -432,6 +588,23 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
   const { affaire, loading, error, update } = useAffaireDetail(affaireId);
   const [activeTab, setActiveTab] = useState('general');
   const [editing, setEditing] = useState(false);
+  const [showAddPartie, setShowAddPartie] = useState(false);
+  const [showAddReunion, setShowAddReunion] = useState(false);
+  const [showAddDesordre, setShowAddDesordre] = useState(false);
+
+  // Gestionnaire pour générer un document
+  const handleGenerateDocument = () => {
+    alert('Générateur de document - Fonctionnalité en cours de développement');
+  };
+
+  // Gestionnaire pour télécharger un document
+  const handleDownloadDocument = (doc) => {
+    if (doc.url) {
+      window.open(doc.url, '_blank');
+    } else {
+      alert(`Téléchargement de "${doc.titre}" - URL non disponible en mode démo`);
+    }
+  };
 
   if (loading) {
     return (
@@ -486,7 +659,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
           <Button variant="secondary" icon={Edit} onClick={() => setEditing(true)}>
             Modifier
           </Button>
-          <Button variant="primary" icon={FileText}>
+          <Button variant="primary" icon={FileText} onClick={handleGenerateDocument}>
             Générer document
           </Button>
         </div>
@@ -520,13 +693,53 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
       {/* Contenu des tabs */}
       <div className="min-h-[400px]">
         {activeTab === 'general' && <TabGeneral affaire={affaire} />}
-        {activeTab === 'parties' && <TabParties affaire={affaire} />}
-        {activeTab === 'reunions' && <TabReunions affaire={affaire} />}
-        {activeTab === 'desordres' && <TabDesordres affaire={affaire} />}
-        {activeTab === 'documents' && <TabDocuments affaire={affaire} />}
+        {activeTab === 'parties' && <TabParties affaire={affaire} onAddPartie={() => setShowAddPartie(true)} />}
+        {activeTab === 'reunions' && <TabReunions affaire={affaire} onAddReunion={() => setShowAddReunion(true)} />}
+        {activeTab === 'desordres' && <TabDesordres affaire={affaire} onAddDesordre={() => setShowAddDesordre(true)} />}
+        {activeTab === 'documents' && <TabDocuments affaire={affaire} onDownload={handleDownloadDocument} />}
         {activeTab === 'financier' && <TabFinancier affaire={affaire} />}
         {activeTab === 'outils' && <TabOutils affaire={affaire} />}
       </div>
+
+      {/* Modal Ajout Partie */}
+      {showAddPartie && (
+        <ModalAjoutPartie
+          affaireId={affaireId}
+          onClose={() => setShowAddPartie(false)}
+          onSuccess={() => {
+            setShowAddPartie(false);
+            // Rafraîchir les données
+            window.location.reload();
+          }}
+        />
+      )}
+
+      {/* Modal Ajout Réunion */}
+      {showAddReunion && (
+        <ModalAjoutReunion
+          affaireId={affaireId}
+          reunionNumero={(affaire.reunions?.length || 0) + 1}
+          adresseBien={`${affaire.bien_adresse || ''}, ${affaire.bien_code_postal || ''} ${affaire.bien_ville || ''}`}
+          onClose={() => setShowAddReunion(false)}
+          onSuccess={() => {
+            setShowAddReunion(false);
+            window.location.reload();
+          }}
+        />
+      )}
+
+      {/* Modal Ajout Désordre */}
+      {showAddDesordre && (
+        <ModalAjoutDesordre
+          affaireId={affaireId}
+          desordreNumero={(affaire.pathologies?.length || 0) + 1}
+          onClose={() => setShowAddDesordre(false)}
+          onSuccess={() => {
+            setShowAddDesordre(false);
+            window.location.reload();
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -597,7 +810,7 @@ const TabGeneral = ({ affaire }) => (
   </div>
 );
 
-const TabParties = ({ affaire }) => {
+const TabParties = ({ affaire, onAddPartie }) => {
   const parties = affaire.parties || [];
 
   const partiesByType = {
@@ -652,20 +865,21 @@ const TabParties = ({ affaire }) => {
         )
       ))}
       
-      <Button variant="secondary" icon={Plus} className="w-full">
+      <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddPartie}>
         Ajouter une partie
       </Button>
     </div>
   );
 };
 
-const TabReunions = ({ affaire }) => (
+const TabReunions = ({ affaire, onAddReunion }) => (
   <div className="space-y-4">
     {(affaire.reunions || []).length === 0 ? (
       <EmptyState
         icon={Calendar}
         title="Aucune réunion"
         description="Planifiez la première réunion d'expertise"
+        action={onAddReunion}
         actionLabel="Planifier"
       />
     ) : (
@@ -692,19 +906,20 @@ const TabReunions = ({ affaire }) => (
         </Card>
       ))
     )}
-    <Button variant="secondary" icon={Plus} className="w-full">
+    <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddReunion}>
       Planifier une réunion
     </Button>
   </div>
 );
 
-const TabDesordres = ({ affaire }) => (
+const TabDesordres = ({ affaire, onAddDesordre }) => (
   <div className="space-y-4">
     {(affaire.pathologies || []).length === 0 ? (
       <EmptyState
         icon={AlertTriangle}
         title="Aucun désordre"
         description="Ajoutez les désordres constatés"
+        action={onAddDesordre}
         actionLabel="Ajouter"
       />
     ) : (
@@ -731,13 +946,13 @@ const TabDesordres = ({ affaire }) => (
         </Card>
       ))
     )}
-    <Button variant="secondary" icon={Plus} className="w-full">
+    <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddDesordre}>
       Ajouter un désordre
     </Button>
   </div>
 );
 
-const TabDocuments = ({ affaire }) => (
+const TabDocuments = ({ affaire, onDownload }) => (
   <div className="space-y-4">
     {(affaire.documents || []).length === 0 ? (
       <EmptyState
@@ -758,7 +973,7 @@ const TabDocuments = ({ affaire }) => (
                 </p>
               </div>
             </div>
-            <Button variant="ghost" size="sm" icon={Download}>
+            <Button variant="ghost" size="sm" icon={Download} onClick={() => onDownload && onDownload(doc)}>
               Télécharger
             </Button>
           </div>
@@ -1052,6 +1267,502 @@ const TabOutils = ({ affaire }) => {
 };
 
 // ============================================================================
+// MODAL AJOUT PARTIE
+// ============================================================================
+
+const ModalAjoutPartie = ({ affaireId, onClose, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({
+    type: 'demandeur',
+    nom: '',
+    prenom: '',
+    raison_sociale: '',
+    role: '',
+    email: '',
+    telephone: '',
+    adresse: '',
+    code_postal: '',
+    ville: '',
+    avocat_nom: '',
+    avocat_email: ''
+  });
+  const [isEntreprise, setIsEntreprise] = useState(false);
+
+  const handleChange = (field, value) => {
+    setData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Récupérer les affaires (depuis localStorage ou données démo)
+      const affaires = getStoredAffaires();
+      const affaireIndex = affaires.findIndex(a => a.id === affaireId);
+
+      if (affaireIndex !== -1) {
+        const newPartie = {
+          id: `partie-${Date.now()}`,
+          ...data,
+          created_at: new Date().toISOString()
+        };
+
+        if (!affaires[affaireIndex].parties) {
+          affaires[affaireIndex].parties = [];
+        }
+        affaires[affaireIndex].parties.push(newPartie);
+
+        // Sauvegarder dans localStorage
+        saveAffaires(affaires);
+        onSuccess();
+      } else {
+        console.error('Affaire non trouvée:', affaireId);
+      }
+    } catch (error) {
+      console.error('Erreur ajout partie:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <ModalBase isOpen={true} onClose={onClose} title="Ajouter une partie" size="lg">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Type de partie */}
+        <div className="flex gap-4">
+          <Select
+            label="Type de partie"
+            value={data.type}
+            onChange={(e) => handleChange('type', e.target.value)}
+            options={[
+              { value: 'demandeur', label: 'Demandeur' },
+              { value: 'defenseur', label: 'Défendeur' },
+              { value: 'intervenant', label: 'Intervenant' },
+              { value: 'assureur', label: 'Assureur' }
+            ]}
+            className="flex-1"
+          />
+          <div className="flex items-end">
+            <label className="flex items-center gap-3 p-3 bg-[#fafafa] rounded-xl cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isEntreprise}
+                onChange={(e) => setIsEntreprise(e.target.checked)}
+                className="w-5 h-5 rounded border-[#d4d4d4] text-[#c9a227] focus:ring-[#c9a227]"
+              />
+              <span className="text-sm text-[#525252]">Personne morale</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Identité */}
+        {isEntreprise ? (
+          <Input
+            label="Raison sociale"
+            value={data.raison_sociale}
+            onChange={(e) => handleChange('raison_sociale', e.target.value)}
+            placeholder="Nom de l'entreprise"
+            required
+          />
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Nom"
+              value={data.nom}
+              onChange={(e) => handleChange('nom', e.target.value)}
+              placeholder="Nom"
+              required
+            />
+            <Input
+              label="Prénom"
+              value={data.prenom}
+              onChange={(e) => handleChange('prenom', e.target.value)}
+              placeholder="Prénom"
+            />
+          </div>
+        )}
+
+        {/* Rôle */}
+        <Input
+          label="Rôle / Qualité"
+          value={data.role}
+          onChange={(e) => handleChange('role', e.target.value)}
+          placeholder="Ex: Maître d'ouvrage, Entreprise générale, Assureur DO..."
+        />
+
+        {/* Contact */}
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Email"
+            type="email"
+            value={data.email}
+            onChange={(e) => handleChange('email', e.target.value)}
+            placeholder="email@exemple.fr"
+          />
+          <Input
+            label="Téléphone"
+            type="tel"
+            value={data.telephone}
+            onChange={(e) => handleChange('telephone', e.target.value)}
+            placeholder="01 23 45 67 89"
+          />
+        </div>
+
+        {/* Adresse */}
+        <Input
+          label="Adresse"
+          value={data.adresse}
+          onChange={(e) => handleChange('adresse', e.target.value)}
+          placeholder="Numéro et nom de rue"
+        />
+        <div className="grid grid-cols-3 gap-4">
+          <Input
+            label="Code postal"
+            value={data.code_postal}
+            onChange={(e) => handleChange('code_postal', e.target.value)}
+            placeholder="75001"
+          />
+          <Input
+            label="Ville"
+            value={data.ville}
+            onChange={(e) => handleChange('ville', e.target.value)}
+            placeholder="Paris"
+            className="col-span-2"
+          />
+        </div>
+
+        {/* Avocat */}
+        <div className="border-t border-[#e5e5e5] pt-4">
+          <h4 className="text-xs uppercase tracking-wider text-[#a3a3a3] font-medium mb-4">Représentant (optionnel)</h4>
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Nom de l'avocat"
+              value={data.avocat_nom}
+              onChange={(e) => handleChange('avocat_nom', e.target.value)}
+              placeholder="Me Dupont"
+            />
+            <Input
+              label="Email avocat"
+              type="email"
+              value={data.avocat_email}
+              onChange={(e) => handleChange('avocat_email', e.target.value)}
+              placeholder="avocat@cabinet.fr"
+            />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+          <Button variant="secondary" type="button" onClick={onClose} className="flex-1">
+            Annuler
+          </Button>
+          <Button variant="gold" type="submit" loading={loading} className="flex-1">
+            Ajouter la partie
+          </Button>
+        </div>
+      </form>
+    </ModalBase>
+  );
+};
+
+// ============================================================================
+// MODAL AJOUT RÉUNION
+// ============================================================================
+
+const ModalAjoutReunion = ({ affaireId, reunionNumero, adresseBien, onClose, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({
+    numero: reunionNumero,
+    date_reunion: '',
+    heure_reunion: '09:00',
+    lieu: adresseBien || '',
+    type: 'expertise',
+    duree_prevue: 120,
+    observations: ''
+  });
+
+  const handleChange = (field, value) => {
+    setData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Combiner date et heure
+      const dateReunion = `${data.date_reunion}T${data.heure_reunion}:00`;
+
+      // Récupérer les affaires (depuis localStorage ou données démo)
+      const affaires = getStoredAffaires();
+      const affaireIndex = affaires.findIndex(a => a.id === affaireId);
+
+      if (affaireIndex !== -1) {
+        const newReunion = {
+          id: `reunion-${Date.now()}`,
+          numero: data.numero,
+          date_reunion: dateReunion,
+          lieu: data.lieu,
+          type: data.type,
+          duree_prevue: data.duree_prevue,
+          observations: data.observations,
+          statut: 'planifiee',
+          created_at: new Date().toISOString()
+        };
+
+        if (!affaires[affaireIndex].reunions) {
+          affaires[affaireIndex].reunions = [];
+        }
+        affaires[affaireIndex].reunions.push(newReunion);
+
+        // Sauvegarder dans localStorage
+        saveAffaires(affaires);
+        onSuccess();
+      } else {
+        console.error('Affaire non trouvée:', affaireId);
+      }
+    } catch (error) {
+      console.error('Erreur ajout réunion:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <ModalBase isOpen={true} onClose={onClose} title={`Planifier la réunion n°${reunionNumero}`} size="md">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Date et heure */}
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Date de réunion"
+            type="date"
+            value={data.date_reunion}
+            onChange={(e) => handleChange('date_reunion', e.target.value)}
+            required
+          />
+          <Input
+            label="Heure"
+            type="time"
+            value={data.heure_reunion}
+            onChange={(e) => handleChange('heure_reunion', e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Type de réunion */}
+        <Select
+          label="Type de réunion"
+          value={data.type}
+          onChange={(e) => handleChange('type', e.target.value)}
+          options={[
+            { value: 'expertise', label: 'Réunion d\'expertise sur site' },
+            { value: 'contradictoire', label: 'Réunion contradictoire' },
+            { value: 'technique', label: 'Réunion technique' },
+            { value: 'finale', label: 'Réunion finale' }
+          ]}
+        />
+
+        {/* Lieu */}
+        <Input
+          label="Lieu"
+          value={data.lieu}
+          onChange={(e) => handleChange('lieu', e.target.value)}
+          placeholder="Adresse de la réunion"
+          required
+        />
+
+        {/* Durée prévue */}
+        <Select
+          label="Durée prévue"
+          value={data.duree_prevue}
+          onChange={(e) => handleChange('duree_prevue', parseInt(e.target.value))}
+          options={[
+            { value: 60, label: '1 heure' },
+            { value: 90, label: '1h30' },
+            { value: 120, label: '2 heures' },
+            { value: 180, label: '3 heures' },
+            { value: 240, label: '4 heures' },
+            { value: 300, label: '5 heures' }
+          ]}
+        />
+
+        {/* Observations */}
+        <div>
+          <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+            Observations
+          </label>
+          <textarea
+            value={data.observations}
+            onChange={(e) => handleChange('observations', e.target.value)}
+            placeholder="Notes particulières pour cette réunion..."
+            rows={3}
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+          <Button variant="secondary" type="button" onClick={onClose} className="flex-1">
+            Annuler
+          </Button>
+          <Button variant="gold" type="submit" loading={loading} className="flex-1">
+            Planifier la réunion
+          </Button>
+        </div>
+      </form>
+    </ModalBase>
+  );
+};
+
+// ============================================================================
+// MODAL AJOUT DÉSORDRE/PATHOLOGIE
+// ============================================================================
+
+const ModalAjoutDesordre = ({ affaireId, desordreNumero, onClose, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({
+    numero: desordreNumero,
+    intitule: '',
+    localisation: '',
+    description: '',
+    gravite: 'moyenne',
+    garantie: '',
+    cause_presumee: '',
+    photos: []
+  });
+
+  const handleChange = (field, value) => {
+    setData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Récupérer les affaires (depuis localStorage ou données démo)
+      const affaires = getStoredAffaires();
+      const affaireIndex = affaires.findIndex(a => a.id === affaireId);
+
+      if (affaireIndex !== -1) {
+        const newPathologie = {
+          id: `patho-${Date.now()}`,
+          ...data,
+          created_at: new Date().toISOString()
+        };
+
+        if (!affaires[affaireIndex].pathologies) {
+          affaires[affaireIndex].pathologies = [];
+        }
+        affaires[affaireIndex].pathologies.push(newPathologie);
+
+        // Sauvegarder dans localStorage
+        saveAffaires(affaires);
+        onSuccess();
+      } else {
+        console.error('Affaire non trouvée:', affaireId);
+      }
+    } catch (error) {
+      console.error('Erreur ajout désordre:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <ModalBase isOpen={true} onClose={onClose} title={`Ajouter le désordre n°${desordreNumero}`} size="lg">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Intitulé */}
+        <Input
+          label="Intitulé du désordre"
+          value={data.intitule}
+          onChange={(e) => handleChange('intitule', e.target.value)}
+          placeholder="Ex: Fissures structurelles, Infiltrations, Défaut d'étanchéité..."
+          required
+        />
+
+        {/* Localisation */}
+        <Input
+          label="Localisation"
+          value={data.localisation}
+          onChange={(e) => handleChange('localisation', e.target.value)}
+          placeholder="Ex: Mur porteur salon, Terrasse RDC, Façade nord..."
+          required
+        />
+
+        {/* Description */}
+        <div>
+          <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+            Description détaillée
+          </label>
+          <textarea
+            value={data.description}
+            onChange={(e) => handleChange('description', e.target.value)}
+            placeholder="Décrivez le désordre constaté, son étendue, ses manifestations..."
+            rows={4}
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            required
+          />
+        </div>
+
+        {/* Gravité et Garantie */}
+        <div className="grid grid-cols-2 gap-4">
+          <Select
+            label="Gravité"
+            value={data.gravite}
+            onChange={(e) => handleChange('gravite', e.target.value)}
+            options={[
+              { value: 'mineure', label: 'Mineure (esthétique)' },
+              { value: 'moyenne', label: 'Moyenne (fonctionnel)' },
+              { value: 'majeure', label: 'Majeure (structurel)' },
+              { value: 'critique', label: 'Critique (sécurité)' }
+            ]}
+          />
+          <Select
+            label="Qualification garantie"
+            value={data.garantie}
+            onChange={(e) => handleChange('garantie', e.target.value)}
+            options={[
+              { value: '', label: 'À déterminer' },
+              { value: 'gpa', label: 'GPA (1 an)' },
+              { value: 'biennale', label: 'Biennale (2 ans)' },
+              { value: 'decennale', label: 'Décennale (10 ans)' },
+              { value: 'hors_garantie', label: 'Hors garantie' },
+              { value: 'responsabilite_civile', label: 'Responsabilité civile' }
+            ]}
+          />
+        </div>
+
+        {/* Cause présumée */}
+        <div>
+          <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+            Cause présumée (optionnel)
+          </label>
+          <textarea
+            value={data.cause_presumee}
+            onChange={(e) => handleChange('cause_presumee', e.target.value)}
+            placeholder="Hypothèses sur l'origine du désordre..."
+            rows={2}
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+          <Button variant="secondary" type="button" onClick={onClose} className="flex-1">
+            Annuler
+          </Button>
+          <Button variant="gold" type="submit" loading={loading} className="flex-1">
+            Ajouter le désordre
+          </Button>
+        </div>
+      </form>
+    </ModalBase>
+  );
+};
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 
@@ -1059,5 +1770,8 @@ export default {
   ListeAffaires,
   FicheAffaire,
   AffaireCard,
-  ModalNouvelleAffaire
+  ModalNouvelleAffaire,
+  ModalAjoutPartie,
+  ModalAjoutReunion,
+  ModalAjoutDesordre
 };

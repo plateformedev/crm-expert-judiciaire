@@ -7,11 +7,11 @@ import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate, useParams, useLocation } from 'react-router-dom';
 import {
   Home, Folder, Users, Calendar, FileText, AlertCircle, Euro,
-  BarChart3, BookOpen, Settings, Award, Wand2, Scale, 
+  BarChart3, BookOpen, Settings, Award, Wand2, Scale,
   Plus, Search, Filter, ChevronRight, Clock, MapPin,
   CheckCircle, XCircle, AlertTriangle, TrendingUp,
   Camera, MessageSquare, FileEdit, Calculator, Mic,
-  Target, Upload, Shield, Gavel
+  Target, Upload, Shield, Gavel, ArrowLeft
 } from 'lucide-react';
 
 // Composants UI
@@ -20,6 +20,10 @@ import { Card, Badge, Button, ProgressBar, EmptyState, LoadingSpinner } from './
 // Composants Layout
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
+
+// Composants Navigation - Onglets
+import { TabsProvider, useTabs } from './contexts/TabsContext';
+import TabBar from './components/navigation/TabBar';
 
 // Contexte Auth
 import { useAuth } from './contexts/AuthContext';
@@ -58,14 +62,9 @@ import { ETAPES_TUNNEL, DS } from './data';
 // CONFIGURATION MODULES (Navigation)
 // ============================================================================
 
+// Navigation simplifiée - Module par module
 const MODULES = [
-  { id: 'dashboard', path: '/', label: 'Tableau de bord', icon: Home },
-  { id: 'affaires', path: '/affaires', label: 'Affaires', icon: Folder },
-  { id: 'alertes', path: '/alertes', label: 'Alertes', icon: AlertCircle },
-  { id: 'calendrier', path: '/calendrier', label: 'Calendrier', icon: Calendar },
-  { id: 'contacts', path: '/contacts', label: 'Contacts', icon: Users },
-  { id: 'documents', path: '/documents', label: 'Documents', icon: FileText },
-  { id: 'parametres', path: '/parametres', label: 'Paramètres', icon: Settings }
+  { id: 'affaires', path: '/', label: 'Affaires', icon: Folder }
 ];
 
 // ============================================================================
@@ -277,14 +276,15 @@ const ModuleChiffrageWrapper = () => {
   const { id } = useParams();
   const { affaires } = useAffaires();
   const affaire = affaires.find(a => a.id === id);
-  return <ModuleChiffrage affaireId={id} affaire={affaire} />;
+  return <ModuleChiffrage affaireId={id} affaire={affaire} pathologies={affaire?.pathologies || []} />;
 };
 
 const GenerateurRapportWrapper = () => {
   const { id } = useParams();
   const { affaires } = useAffaires();
+  const { expert } = useAuth();
   const affaire = affaires.find(a => a.id === id);
-  return <GenerateurRapport affaireId={id} affaire={affaire} />;
+  return <GenerateurRapport affaireId={id} affaire={affaire} expert={expert} />;
 };
 
 const MatriceImputabiliteWrapper = () => {
@@ -292,6 +292,66 @@ const MatriceImputabiliteWrapper = () => {
   const { affaires } = useAffaires();
   const affaire = affaires.find(a => a.id === id);
   return <MatriceImputabilite affaireId={id} pathologies={affaire?.pathologies || []} parties={affaire?.parties || []} />;
+};
+
+// ============================================================================
+// DASHBOARD WRAPPER - Avec navigation fonctionnelle
+// ============================================================================
+
+const DashboardWrapper = () => {
+  const navigate = useNavigate();
+  const { affaires } = useAffaires();
+  const { expert } = useAuth();
+
+  const handleNavigate = (action) => {
+    switch (action) {
+      case 'nouvelle-affaire':
+        navigate('/affaires/nouveau');
+        break;
+      case 'nouvelle-reunion':
+        // Si des affaires existent, aller vers la première pour planifier
+        if (affaires.length > 0) {
+          navigate(`/affaires/${affaires[0].id}`);
+        } else {
+          navigate('/affaires');
+        }
+        break;
+      case 'document':
+        // Aller vers la liste des affaires pour choisir
+        navigate('/affaires');
+        break;
+      case 'lrar':
+        // Pour l'instant, notification que cette fonctionnalité arrive
+        alert('Fonctionnalité LRAR bientôt disponible');
+        break;
+      case 'alertes':
+        navigate('/alertes');
+        break;
+      case 'dires':
+        if (affaires.length > 0) {
+          navigate(`/affaires/${affaires[0].id}/dires`);
+        }
+        break;
+      case 'finances':
+        navigate('/affaires');
+        break;
+      default:
+        console.log('Action non gérée:', action);
+    }
+  };
+
+  const handleSelectAffaire = (affaire) => {
+    navigate(`/affaires/${affaire.id}`);
+  };
+
+  return (
+    <DashboardExpert
+      expert={expert}
+      affaires={affaires}
+      onNavigate={handleNavigate}
+      onSelectAffaire={handleSelectAffaire}
+    />
+  );
 };
 
 // ============================================================================
@@ -305,6 +365,7 @@ const AppLayout = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { notifications } = useNotifications();
   const { affaires } = useAffaires();
+  const { goBack, canGoBack, tabs, openTab } = useTabs();
 
   // Calculer les badges pour la navigation
   const badges = useMemo(() => ({
@@ -317,7 +378,26 @@ const AppLayout = ({ children }) => {
     'ctrl+k': () => document.querySelector('[data-search]')?.focus(),
     'ctrl+n': () => navigate('/affaires/nouveau'),
     'ctrl+h': () => navigate('/'),
+    'alt+ArrowLeft': () => canGoBack && goBack(),
   });
+
+  // Ouvrir automatiquement un onglet quand on navigue vers une affaire
+  useEffect(() => {
+    const match = location.pathname.match(/^\/affaires\/([^/]+)$/);
+    if (match && match[1] !== 'nouveau') {
+      const affaireId = match[1];
+      const affaire = affaires.find(a => a.id === affaireId);
+      if (affaire) {
+        openTab({
+          id: `affaire-${affaireId}`,
+          type: 'affaire',
+          label: affaire.reference || 'Affaire',
+          path: location.pathname,
+          data: { affaireId }
+        });
+      }
+    }
+  }, [location.pathname, affaires, openTab]);
 
   return (
     <div className="h-screen flex bg-[#fafafa]">
@@ -337,6 +417,22 @@ const AppLayout = ({ children }) => {
           setSearchQuery={setSearchQuery}
           notifications={notifications}
         />
+
+        {/* Barre d'onglets (style navigateur) */}
+        <TabBar />
+
+        {/* Bouton retour contextuel */}
+        {canGoBack && (
+          <div className="px-8 pt-4">
+            <button
+              onClick={goBack}
+              className="flex items-center gap-2 text-sm text-[#737373] hover:text-[#c9a227] transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour
+            </button>
+          </div>
+        )}
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-8">
@@ -372,13 +468,12 @@ const App = () => {
   }
 
   return (
-    <AppLayout>
-      <Suspense fallback={<LoadingSpinner size="lg" />}>
-        <Routes>
-          {/* Dashboard */}
-          <Route path="/" element={<DashboardExpert />} />
-          
-          {/* Affaires */}
+    <TabsProvider>
+      <AppLayout>
+        <Suspense fallback={<LoadingSpinner size="lg" />}>
+          <Routes>
+          {/* Affaires - Page principale */}
+          <Route path="/" element={<ListeAffaires />} />
           <Route path="/affaires" element={<ListeAffaires />} />
           <Route path="/affaires/nouveau" element={<ListeAffaires />} />
           <Route path="/affaires/:id" element={<AffaireDetailWrapper />} />
@@ -418,9 +513,10 @@ const App = () => {
           
           {/* 404 */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
-    </AppLayout>
+          </Routes>
+        </Suspense>
+      </AppLayout>
+    </TabsProvider>
   );
 };
 

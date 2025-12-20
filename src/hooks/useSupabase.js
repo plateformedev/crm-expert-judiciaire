@@ -27,8 +27,15 @@ export const useSupabaseQuery = (table, options = {}) => {
   } = options;
 
   const fetchData = useCallback(async () => {
+    // Mode démo : retourner des données vides (les données sont gérées dans les hooks spécifiques)
+    if (DEMO_MODE) {
+      setLoading(false);
+      setData(single ? null : []);
+      return;
+    }
+
     if (!user) return;
-    
+
     setLoading(true);
     setError(null);
 
@@ -77,15 +84,15 @@ export const useSupabaseQuery = (table, options = {}) => {
     fetchData();
   }, [fetchData]);
 
-  // Temps réel
+  // Temps réel - désactivé en mode démo
   useEffect(() => {
-    if (!realTime || !user) return;
+    if (DEMO_MODE || !realTime || !user) return;
 
     const unsubscribe = realtime.subscribeToTable(table, (payload) => {
       if (payload.eventType === 'INSERT') {
         setData(prev => [payload.new, ...prev]);
       } else if (payload.eventType === 'UPDATE') {
-        setData(prev => prev.map(item => 
+        setData(prev => prev.map(item =>
           item.id === payload.new.id ? payload.new : item
         ));
       } else if (payload.eventType === 'DELETE') {
@@ -244,6 +251,23 @@ export const useAffaires = (options = {}) => {
 
   // Mettre à jour une affaire
   const updateAffaire = useCallback(async (id, updates) => {
+    // Mode démo
+    if (DEMO_MODE) {
+      try {
+        const currentAffaires = getStoredAffaires();
+        const updatedAffaires = currentAffaires.map(a =>
+          a.id === id ? { ...a, ...updates } : a
+        );
+        saveAffaires(updatedAffaires);
+        const updatedAffaire = updatedAffaires.find(a => a.id === id);
+        setAffaires(updatedAffaires);
+        return { success: true, affaire: updatedAffaire };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    }
+
+    // Mode Supabase
     try {
       const { data, error } = await supabase
         .from('affaires')
@@ -264,6 +288,20 @@ export const useAffaires = (options = {}) => {
 
   // Supprimer une affaire
   const deleteAffaire = useCallback(async (id) => {
+    // Mode démo
+    if (DEMO_MODE) {
+      try {
+        const currentAffaires = getStoredAffaires();
+        const updatedAffaires = currentAffaires.filter(a => a.id !== id);
+        saveAffaires(updatedAffaires);
+        setAffaires(updatedAffaires);
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    }
+
+    // Mode Supabase
     try {
       const { error } = await supabase
         .from('affaires')
@@ -282,6 +320,17 @@ export const useAffaires = (options = {}) => {
 
   // Obtenir une affaire par ID
   const getAffaire = useCallback(async (id) => {
+    // Mode démo
+    if (DEMO_MODE) {
+      const affaires = getStoredAffaires();
+      const found = affaires.find(a => a.id === id);
+      if (found) {
+        return { success: true, affaire: found };
+      }
+      return { success: false, error: 'Affaire non trouvée' };
+    }
+
+    // Mode Supabase
     try {
       const { data, error } = await supabase
         .from('affaires')
@@ -787,6 +836,29 @@ export const useStats = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Mode démo : calculer les stats depuis les données locales
+    if (DEMO_MODE) {
+      const affaires = getStoredAffaires();
+      const total = affaires.length;
+      const enCours = affaires.filter(a => a.statut === 'en-cours').length;
+      const terminees = affaires.filter(a => a.statut === 'termine').length;
+      const urgentes = affaires.filter(a => a.urgent).length;
+      const totalProvisions = affaires
+        .filter(a => a.provision_recue)
+        .reduce((acc, a) => acc + (parseFloat(a.provision_montant) || 0), 0);
+
+      setStats({
+        total,
+        enCours,
+        terminees,
+        urgentes,
+        alertes: 0, // Pas d'alertes en mode démo
+        totalProvisions
+      });
+      setLoading(false);
+      return;
+    }
+
     if (!user) return;
 
     const fetchStats = async () => {

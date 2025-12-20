@@ -13,6 +13,7 @@ import {
 import { Card, Badge, Button, ProgressBar, ModalBase } from '../ui';
 import { formatDateFr, formatMontant } from '../../utils/helpers';
 import { pdfService } from '../../services/pdf';
+import { getStoredAffaires, saveAffaires } from '../../lib/demoData';
 
 // ============================================================================
 // STRUCTURE DU RAPPORT
@@ -203,10 +204,58 @@ export const GenerateurRapport = ({
     ));
   };
 
+  // Sauvegarder le document dans l'affaire
+  const sauvegarderDocument = (type, titre) => {
+    try {
+      const affaires = getStoredAffaires();
+      const affaireIndex = affaires.findIndex(a => a.id === affaire.id);
+
+      if (affaireIndex !== -1) {
+        if (!affaires[affaireIndex].documents) {
+          affaires[affaireIndex].documents = [];
+        }
+
+        // Vérifier si un document du même type existe déjà
+        const existingIndex = affaires[affaireIndex].documents.findIndex(d => d.type === type);
+
+        const newDoc = {
+          id: `doc-${Date.now()}`,
+          type: type,
+          titre: titre,
+          created_at: new Date().toISOString(),
+          version: existingIndex !== -1 ? (affaires[affaireIndex].documents[existingIndex].version || 1) + 1 : 1
+        };
+
+        if (existingIndex !== -1) {
+          // Mettre à jour le document existant
+          affaires[affaireIndex].documents[existingIndex] = newDoc;
+        } else {
+          // Ajouter un nouveau document
+          affaires[affaireIndex].documents.push(newDoc);
+        }
+
+        // Mettre à jour le statut si c'est un rapport
+        if (type === 'note-synthese' || type === 'pre-rapport') {
+          affaires[affaireIndex].statut = 'pre-rapport';
+        } else if (type === 'rapport-final') {
+          affaires[affaireIndex].statut = 'termine';
+        }
+
+        saveAffaires(affaires);
+        console.log('Document sauvegardé:', newDoc);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Erreur sauvegarde document:', error);
+      return false;
+    }
+  };
+
   // Générer tout le rapport
-  const genererRapportComplet = async () => {
+  const genererRapportComplet = async (docType = 'note-synthese') => {
     setGenerating(true);
-    
+
     try {
       // Générer chaque section
       const sectionsGenerees = sections
@@ -218,12 +267,47 @@ export const GenerateurRapport = ({
 
       // Assembler le HTML complet
       const html = assemblerRapportHTML(sectionsGenerees, affaire, expert);
-      
-      // Générer le PDF
-      await pdfService.downloadPDF('rapport', { html }, `Rapport_${affaire.reference}.pdf`);
-      
+
+      // Déterminer le titre du document
+      const titreDoc = docType === 'note-synthese' ? 'Note de synthèse' :
+                       docType === 'pre-rapport' ? 'Pré-rapport d\'expertise' :
+                       'Rapport d\'expertise définitif';
+
+      // Sauvegarder le document dans l'affaire
+      sauvegarderDocument(docType, titreDoc);
+
+      // Ouvrir dans une nouvelle fenêtre pour impression/PDF
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      if (printWindow) {
+        printWindow.document.write(html);
+        printWindow.document.close();
+
+        // Attendre le chargement avant impression
+        printWindow.onload = () => {
+          setTimeout(() => {
+            printWindow.focus();
+            printWindow.print();
+          }, 500);
+        };
+      } else {
+        // Si popup bloquée, proposer téléchargement HTML
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${titreDoc.replace(/\s+/g, '_')}_${affaire?.reference || 'expertise'}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      // Notifier l'utilisateur
+      alert(`${titreDoc} généré et sauvegardé avec succès !`);
+
     } catch (error) {
       console.error('Erreur génération rapport:', error);
+      alert('Erreur lors de la génération du rapport. Veuillez réessayer.');
     } finally {
       setGenerating(false);
     }
@@ -238,20 +322,28 @@ export const GenerateurRapport = ({
           <p className="text-[#737373]">{affaire.reference}</p>
         </div>
         <div className="flex gap-2">
-          <Button 
-            variant="secondary" 
+          <Button
+            variant="secondary"
             icon={Eye}
             onClick={() => setPreviewMode(!previewMode)}
           >
             {previewMode ? 'Édition' : 'Prévisualiser'}
           </Button>
-          <Button 
-            variant="primary" 
+          <Button
+            variant="secondary"
+            icon={FileText}
+            loading={generating}
+            onClick={() => genererRapportComplet('note-synthese')}
+          >
+            Note de synthèse
+          </Button>
+          <Button
+            variant="primary"
             icon={Download}
             loading={generating}
-            onClick={genererRapportComplet}
+            onClick={() => genererRapportComplet('rapport-final')}
           >
-            Générer PDF
+            Rapport final
           </Button>
         </div>
       </div>

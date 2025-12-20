@@ -165,7 +165,17 @@ export const MatriceImputabilite = ({
           <p className="text-[#737373]">{affaire?.reference} — Répartition des responsabilités</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="secondary" icon={Download}>
+          <Button variant="secondary" icon={Download} onClick={() => {
+            // Export simple en JSON pour l'instant
+            const dataStr = JSON.stringify(matrice, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `matrice-imputabilite-${affaire?.reference || 'export'}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }}>
             Exporter
           </Button>
           <Button variant="primary" icon={Save} onClick={() => onSave && onSave(matrice)}>

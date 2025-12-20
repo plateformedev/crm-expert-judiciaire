@@ -351,7 +351,7 @@ export const DicteeVocale = ({ onTranscription }) => {
             >
               Copier
             </Button>
-            <Button variant="secondary" size="sm">
+            <Button variant="secondary" size="sm" onClick={() => alert('Correction IA - Fonctionnalité en cours de développement')}>
               Corriger avec IA
             </Button>
           </div>

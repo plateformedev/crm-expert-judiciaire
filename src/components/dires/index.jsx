@@ -563,10 +563,23 @@ const ModalDetailDire = ({ isOpen, onClose, dire, onReply }) => {
         {/* Actions */}
         <div className="flex justify-between pt-4 border-t border-[#e5e5e5]">
           <div className="flex gap-2">
-            <Button variant="ghost" size="sm" icon={Copy}>
+            <Button variant="ghost" size="sm" icon={Copy} onClick={() => {
+              const text = `Dire de ${dire.partie_nom || 'N/C'}\n\n${dire.contenu || ''}${dire.reponse_expert ? `\n\nRéponse:\n${dire.reponse_expert}` : ''}`;
+              navigator.clipboard.writeText(text);
+              alert('Contenu copié dans le presse-papier');
+            }}>
               Copier
             </Button>
-            <Button variant="ghost" size="sm" icon={Download}>
+            <Button variant="ghost" size="sm" icon={Download} onClick={() => {
+              const text = `DIRE - ${dire.partie_nom || 'N/C'}\nDate: ${dire.date_reception || ''}\n\nContenu:\n${dire.contenu || ''}${dire.reponse_expert ? `\n\nRéponse de l'expert:\n${dire.reponse_expert}` : ''}`;
+              const blob = new Blob([text], { type: 'text/plain' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `dire-${dire.id || 'export'}.txt`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}>
               Exporter
             </Button>
           </div>

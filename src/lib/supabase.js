@@ -8,22 +8,25 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Détection du mode démo
+export const IS_DEMO_MODE = !supabaseUrl || supabaseUrl === 'https://placeholder.supabase.co';
+
 // Vérification configuration
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    '⚠️ Supabase non configuré. Ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans .env.local'
-  );
+if (IS_DEMO_MODE) {
+  console.info('🎭 Mode démo activé - Supabase non configuré, utilisation des données locales');
+} else {
+  console.info('✓ Supabase configuré');
 }
 
-// Client Supabase
+// Client Supabase - désactiver auto-refresh en mode démo pour éviter les erreurs réseau
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
   supabaseAnonKey || 'placeholder-key',
   {
     auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true
+      autoRefreshToken: !IS_DEMO_MODE,
+      persistSession: !IS_DEMO_MODE,
+      detectSessionInUrl: !IS_DEMO_MODE
     },
     db: {
       schema: 'public'
@@ -32,7 +35,9 @@ export const supabase = createClient(
       headers: {
         'x-application-name': 'crm-expert-judiciaire'
       }
-    }
+    },
+    // Désactiver le realtime en mode démo
+    realtime: IS_DEMO_MODE ? { params: { eventsPerSecond: 0 } } : {}
   }
 );
 
