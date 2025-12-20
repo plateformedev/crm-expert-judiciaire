@@ -389,6 +389,23 @@ const ModalNouvelleAffaire = ({ onClose, onCreate }) => {
           </div>
         </div>
 
+        {/* Mission */}
+        <div className="space-y-4">
+          <h4 className="text-xs uppercase tracking-wider text-[#a3a3a3] font-medium">Mission</h4>
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
+              Texte de la mission
+            </label>
+            <textarea
+              value={data.mission}
+              onChange={(e) => handleChange('mission', e.target.value)}
+              placeholder="Nous désignons M./Mme ... en qualité d'expert avec pour mission de..."
+              rows={4}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            />
+          </div>
+        </div>
+
         {/* Provision */}
         <div className="grid grid-cols-2 gap-4">
           <Input
@@ -724,6 +741,7 @@ const TabReunions = ({ affaire, onAddReunion }) => (
         icon={Calendar}
         title="Aucune réunion"
         description="Planifiez la première réunion d'expertise"
+        action={onAddReunion}
         actionLabel="Planifier"
       />
     ) : (
@@ -763,6 +781,7 @@ const TabDesordres = ({ affaire, onAddDesordre }) => (
         icon={AlertTriangle}
         title="Aucun désordre"
         description="Ajoutez les désordres constatés"
+        action={onAddDesordre}
         actionLabel="Ajouter"
       />
     ) : (
