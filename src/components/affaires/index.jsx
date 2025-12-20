@@ -9,7 +9,7 @@ import {
   Scale, Users, Calendar, FileText, AlertCircle, Euro, Edit,
   Trash2, MoreVertical, CheckCircle, AlertTriangle, Eye,
   Building, Gavel, Phone, Mail, Save, X, Upload, Download,
-  Wand2, Calculator, BookOpen, Shield, Target
+  Wand2, Calculator, BookOpen, Shield, Target, ChevronDown, RotateCcw
 } from 'lucide-react';
 import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase } from '../ui';
 import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
@@ -25,9 +25,27 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
   const navigate = useNavigate();
   const { affaires, loading, error, createAffaire, deleteAffaire } = useAffaires();
   const [search, setSearch] = useState('');
-  const [filterStatut, setFilterStatut] = useState('all');
-  const [filterUrgent, setFilterUrgent] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // État des filtres
+  const [filters, setFilters] = useState({
+    statut: 'all',
+    urgent: 'all', // 'all', 'oui', 'non'
+    tribunal: 'all',
+    ville: 'all',
+    echeance: 'all', // 'all', 'depassee', 'semaine', 'mois', 'trimestre'
+    progression: 'all', // 'all', '0-25', '25-50', '50-75', '75-100'
+    avecParties: 'all', // 'all', 'oui', 'non'
+    avecReunions: 'all',
+    avecDesordres: 'all'
+  });
+
+  // Extraire les valeurs uniques pour les dropdowns
+  const uniqueValues = useMemo(() => ({
+    tribunaux: [...new Set(affaires.map(a => a.tribunal).filter(Boolean))].sort(),
+    villes: [...new Set(affaires.map(a => a.bien_ville).filter(Boolean))].sort()
+  }), [affaires]);
 
   // Fonction de navigation vers une affaire
   const handleSelectAffaire = useCallback((affaire) => {
@@ -38,27 +56,113 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
     }
   }, [onSelectAffaire, navigate]);
 
-  // Filtrage
+  // Mettre à jour un filtre
+  const updateFilter = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  // Réinitialiser tous les filtres
+  const resetFilters = () => {
+    setFilters({
+      statut: 'all',
+      urgent: 'all',
+      tribunal: 'all',
+      ville: 'all',
+      echeance: 'all',
+      progression: 'all',
+      avecParties: 'all',
+      avecReunions: 'all',
+      avecDesordres: 'all'
+    });
+    setSearch('');
+  };
+
+  // Compter les filtres actifs
+  const activeFiltersCount = useMemo(() => {
+    return Object.values(filters).filter(v => v !== 'all').length + (search ? 1 : 0);
+  }, [filters, search]);
+
+  // Filtrage complet
   const affairesFiltrees = useMemo(() => {
     return affaires.filter(a => {
+      // Recherche texte
       const matchSearch = search === '' ||
         a.reference?.toLowerCase().includes(search.toLowerCase()) ||
         a.rg?.toLowerCase().includes(search.toLowerCase()) ||
         a.tribunal?.toLowerCase().includes(search.toLowerCase()) ||
         a.bien_ville?.toLowerCase().includes(search.toLowerCase());
-      const matchStatut = filterStatut === 'all' || a.statut === filterStatut;
-      const matchUrgent = !filterUrgent || a.urgent;
-      return matchSearch && matchStatut && matchUrgent;
+
+      // Statut
+      const matchStatut = filters.statut === 'all' || a.statut === filters.statut;
+
+      // Urgence
+      const matchUrgent = filters.urgent === 'all' ||
+        (filters.urgent === 'oui' && a.urgent) ||
+        (filters.urgent === 'non' && !a.urgent);
+
+      // Tribunal
+      const matchTribunal = filters.tribunal === 'all' || a.tribunal === filters.tribunal;
+
+      // Ville
+      const matchVille = filters.ville === 'all' || a.bien_ville === filters.ville;
+
+      // Échéance
+      let matchEcheance = true;
+      if (filters.echeance !== 'all' && a.date_echeance) {
+        const delai = calculerDelaiRestant(a.date_echeance);
+        switch (filters.echeance) {
+          case 'depassee': matchEcheance = delai <= 0; break;
+          case 'semaine': matchEcheance = delai > 0 && delai <= 7; break;
+          case 'mois': matchEcheance = delai > 0 && delai <= 30; break;
+          case 'trimestre': matchEcheance = delai > 0 && delai <= 90; break;
+          default: matchEcheance = true;
+        }
+      } else if (filters.echeance !== 'all' && !a.date_echeance) {
+        matchEcheance = false;
+      }
+
+      // Progression
+      let matchProgression = true;
+      if (filters.progression !== 'all') {
+        const prog = calculerAvancementTunnel(a);
+        switch (filters.progression) {
+          case '0-25': matchProgression = prog >= 0 && prog < 25; break;
+          case '25-50': matchProgression = prog >= 25 && prog < 50; break;
+          case '50-75': matchProgression = prog >= 50 && prog < 75; break;
+          case '75-100': matchProgression = prog >= 75; break;
+          default: matchProgression = true;
+        }
+      }
+
+      // Avec parties
+      const matchParties = filters.avecParties === 'all' ||
+        (filters.avecParties === 'oui' && (a.parties?.length || 0) > 0) ||
+        (filters.avecParties === 'non' && (a.parties?.length || 0) === 0);
+
+      // Avec réunions
+      const matchReunions = filters.avecReunions === 'all' ||
+        (filters.avecReunions === 'oui' && (a.reunions?.length || 0) > 0) ||
+        (filters.avecReunions === 'non' && (a.reunions?.length || 0) === 0);
+
+      // Avec désordres
+      const matchDesordres = filters.avecDesordres === 'all' ||
+        (filters.avecDesordres === 'oui' && (a.pathologies?.length || 0) > 0) ||
+        (filters.avecDesordres === 'non' && (a.pathologies?.length || 0) === 0);
+
+      return matchSearch && matchStatut && matchUrgent && matchTribunal &&
+             matchVille && matchEcheance && matchProgression &&
+             matchParties && matchReunions && matchDesordres;
     });
-  }, [affaires, search, filterStatut, filterUrgent]);
+  }, [affaires, search, filters]);
 
   // Statistiques rapides
   const stats = useMemo(() => ({
     total: affaires.length,
+    filtrees: affairesFiltrees.length,
     enCours: affaires.filter(a => a.statut === 'en-cours').length,
     urgentes: affaires.filter(a => a.urgent).length,
     aDeposer: affaires.filter(a => a.statut === 'pre-rapport').length
-  }), [affaires]);
+  }), [affaires, affairesFiltrees]);
 
   const handleCreate = async (data) => {
     const result = await createAffaire(data);
@@ -99,43 +203,283 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
         </Card>
       </div>
 
-      {/* Filtres et recherche */}
-      <div className="flex gap-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#a3a3a3]" />
-          <input
-            type="text"
-            placeholder="Rechercher par référence, RG, tribunal, ville..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
-          />
+      {/* Barre de recherche et filtres */}
+      <Card className="p-4">
+        <div className="flex gap-4 items-center">
+          {/* Recherche */}
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#a3a3a3]" />
+            <input
+              type="text"
+              placeholder="Rechercher par référence, RG, tribunal, ville..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            />
+          </div>
+
+          {/* Bouton filtres */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-2 px-4 py-3 border rounded-xl transition-colors ${
+              showFilters || activeFiltersCount > 0
+                ? 'border-[#c9a227] bg-[#faf8f3] text-[#c9a227]'
+                : 'border-[#e5e5e5] text-[#525252] hover:bg-[#f5f5f5]'
+            }`}
+          >
+            <Filter className="w-5 h-5" />
+            <span>Filtres</span>
+            {activeFiltersCount > 0 && (
+              <span className="bg-[#c9a227] text-white text-xs px-2 py-0.5 rounded-full">
+                {activeFiltersCount}
+              </span>
+            )}
+            <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+          </button>
+
+          {/* Bouton reset */}
+          {activeFiltersCount > 0 && (
+            <button
+              onClick={resetFilters}
+              className="flex items-center gap-2 px-4 py-3 border border-[#e5e5e5] rounded-xl text-[#737373] hover:bg-[#f5f5f5] transition-colors"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Réinitialiser
+            </button>
+          )}
+
+          {/* Bouton nouvelle affaire */}
+          <Button variant="primary" icon={Plus} onClick={() => setShowCreateModal(true)}>
+            Nouvelle affaire
+          </Button>
         </div>
-        <select
-          value={filterStatut}
-          onChange={(e) => setFilterStatut(e.target.value)}
-          className="px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
-        >
-          <option value="all">Tous statuts</option>
-          <option value="en-cours">En cours</option>
-          <option value="pre-rapport">Pré-rapport</option>
-          <option value="termine">Terminé</option>
-          <option value="archive">Archivé</option>
-        </select>
-        <button
-          onClick={() => setFilterUrgent(!filterUrgent)}
-          className={`px-4 py-3 border rounded-xl transition-colors ${
-            filterUrgent 
-              ? 'border-red-500 bg-red-50 text-red-600' 
-              : 'border-[#e5e5e5] text-[#525252] hover:bg-[#f5f5f5]'
-          }`}
-        >
-          <AlertTriangle className="w-5 h-5" />
-        </button>
-        <Button variant="primary" icon={Plus} onClick={() => setShowCreateModal(true)}>
-          Nouvelle affaire
-        </Button>
-      </div>
+
+        {/* Panneau de filtres */}
+        {showFilters && (
+          <div className="mt-4 pt-4 border-t border-[#e5e5e5]">
+            <div className="grid grid-cols-3 gap-4">
+              {/* Statut */}
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                  Statut
+                </label>
+                <select
+                  value={filters.statut}
+                  onChange={(e) => updateFilter('statut', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                >
+                  <option value="all">Tous les statuts</option>
+                  <option value="en-cours">En cours</option>
+                  <option value="pre-rapport">Pré-rapport</option>
+                  <option value="termine">Terminé</option>
+                  <option value="archive">Archivé</option>
+                </select>
+              </div>
+
+              {/* Urgence */}
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                  Urgence
+                </label>
+                <select
+                  value={filters.urgent}
+                  onChange={(e) => updateFilter('urgent', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                >
+                  <option value="all">Toutes</option>
+                  <option value="oui">Urgentes uniquement</option>
+                  <option value="non">Non urgentes</option>
+                </select>
+              </div>
+
+              {/* Tribunal */}
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                  Tribunal
+                </label>
+                <select
+                  value={filters.tribunal}
+                  onChange={(e) => updateFilter('tribunal', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                >
+                  <option value="all">Tous les tribunaux</option>
+                  {uniqueValues.tribunaux.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Ville */}
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                  Ville
+                </label>
+                <select
+                  value={filters.ville}
+                  onChange={(e) => updateFilter('ville', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                >
+                  <option value="all">Toutes les villes</option>
+                  {uniqueValues.villes.map(v => (
+                    <option key={v} value={v}>{v}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Échéance */}
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                  Échéance
+                </label>
+                <select
+                  value={filters.echeance}
+                  onChange={(e) => updateFilter('echeance', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                >
+                  <option value="all">Toutes les échéances</option>
+                  <option value="depassee">Dépassée</option>
+                  <option value="semaine">Dans 7 jours</option>
+                  <option value="mois">Dans 30 jours</option>
+                  <option value="trimestre">Dans 90 jours</option>
+                </select>
+              </div>
+
+              {/* Progression */}
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                  Progression
+                </label>
+                <select
+                  value={filters.progression}
+                  onChange={(e) => updateFilter('progression', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                >
+                  <option value="all">Toutes</option>
+                  <option value="0-25">0% - 25%</option>
+                  <option value="25-50">25% - 50%</option>
+                  <option value="50-75">50% - 75%</option>
+                  <option value="75-100">75% - 100%</option>
+                </select>
+              </div>
+
+              {/* Avec parties */}
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                  Parties
+                </label>
+                <select
+                  value={filters.avecParties}
+                  onChange={(e) => updateFilter('avecParties', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                >
+                  <option value="all">Toutes</option>
+                  <option value="oui">Avec parties</option>
+                  <option value="non">Sans parties</option>
+                </select>
+              </div>
+
+              {/* Avec réunions */}
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                  Réunions
+                </label>
+                <select
+                  value={filters.avecReunions}
+                  onChange={(e) => updateFilter('avecReunions', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                >
+                  <option value="all">Toutes</option>
+                  <option value="oui">Avec réunions</option>
+                  <option value="non">Sans réunions</option>
+                </select>
+              </div>
+
+              {/* Avec désordres */}
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                  Désordres
+                </label>
+                <select
+                  value={filters.avecDesordres}
+                  onChange={(e) => updateFilter('avecDesordres', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                >
+                  <option value="all">Toutes</option>
+                  <option value="oui">Avec désordres</option>
+                  <option value="non">Sans désordres</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Résumé des résultats */}
+        {activeFiltersCount > 0 && (
+          <div className="mt-4 pt-4 border-t border-[#e5e5e5] flex items-center justify-between">
+            <p className="text-sm text-[#737373]">
+              <span className="font-medium text-[#1a1a1a]">{stats.filtrees}</span> affaire{stats.filtrees > 1 ? 's' : ''} sur {stats.total}
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              {search && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#f5f5f5] rounded text-xs">
+                  Recherche: "{search}"
+                  <button onClick={() => setSearch('')} className="hover:text-red-500">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {filters.statut !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#f5f5f5] rounded text-xs">
+                  Statut: {filters.statut}
+                  <button onClick={() => updateFilter('statut', 'all')} className="hover:text-red-500">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {filters.urgent !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#f5f5f5] rounded text-xs">
+                  Urgence: {filters.urgent}
+                  <button onClick={() => updateFilter('urgent', 'all')} className="hover:text-red-500">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {filters.tribunal !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#f5f5f5] rounded text-xs">
+                  Tribunal: {filters.tribunal}
+                  <button onClick={() => updateFilter('tribunal', 'all')} className="hover:text-red-500">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {filters.ville !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#f5f5f5] rounded text-xs">
+                  Ville: {filters.ville}
+                  <button onClick={() => updateFilter('ville', 'all')} className="hover:text-red-500">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {filters.echeance !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#f5f5f5] rounded text-xs">
+                  Échéance: {filters.echeance}
+                  <button onClick={() => updateFilter('echeance', 'all')} className="hover:text-red-500">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {filters.progression !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#f5f5f5] rounded text-xs">
+                  Progression: {filters.progression}
+                  <button onClick={() => updateFilter('progression', 'all')} className="hover:text-red-500">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </Card>
 
       {/* Tableau des affaires */}
       {affairesFiltrees.length === 0 ? (
