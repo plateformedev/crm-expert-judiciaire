@@ -1377,9 +1377,10 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
         />
       )}
 
-      {/* Tunnel d'avancement (12 étapes) */}
+      {/* Tunnel d'avancement (12 étapes) - Version horizontale */}
       <WorkflowTunnel
         affaire={affaire}
+        onNavigate={({ tab }) => tab && setActiveTab(tab)}
         onEtapeClick={(etape) => {
           // Ouvrir le module correspondant ou naviguer vers l'onglet
           const reunions = affaire.reunions || [];
