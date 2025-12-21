@@ -239,54 +239,54 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
 
   return (
     <div className="space-y-6">
-      {/* Stats rapides */}
+      {/* Stats rapides - Style Samsung One UI */}
       <div className="grid grid-cols-4 gap-4">
-        <Card className="p-4">
-          <p className="text-xs uppercase tracking-wider text-[#a3a3a3]">Total</p>
-          <p className="text-2xl font-light text-[#1a1a1a]">{stats.total}</p>
+        <Card className="p-5 border border-[#e0e0e0]">
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-[#757575]">Total</p>
+          <p className="text-[28px] font-bold text-[#1f1f1f] mt-1">{stats.total}</p>
         </Card>
-        <Card className="p-4">
-          <p className="text-xs uppercase tracking-wider text-[#a3a3a3]">En cours</p>
-          <p className="text-2xl font-light text-blue-600">{stats.enCours}</p>
+        <Card className="p-5 border border-[#e0e0e0] bg-[#e5f3ff]">
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-[#0066cc]">En cours</p>
+          <p className="text-[28px] font-bold text-[#0381fe] mt-1">{stats.enCours}</p>
         </Card>
-        <Card className="p-4">
-          <p className="text-xs uppercase tracking-wider text-[#a3a3a3]">Urgentes</p>
-          <p className="text-2xl font-light text-red-600">{stats.urgentes}</p>
+        <Card className="p-5 border border-[#e0e0e0] bg-[#ffebea]">
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-[#cc2f26]">Urgentes</p>
+          <p className="text-[28px] font-bold text-[#ff3b30] mt-1">{stats.urgentes}</p>
         </Card>
-        <Card className="p-4">
-          <p className="text-xs uppercase tracking-wider text-[#a3a3a3]">À déposer</p>
-          <p className="text-2xl font-light text-amber-600">{stats.aDeposer}</p>
+        <Card className="p-5 border border-[#e0e0e0] bg-[#fff5e5]">
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-[#cc7700]">À déposer</p>
+          <p className="text-[28px] font-bold text-[#ff9500] mt-1">{stats.aDeposer}</p>
         </Card>
       </div>
 
-      {/* Barre de recherche et filtres */}
-      <Card className="p-4">
-        <div className="flex gap-4 items-center">
+      {/* Barre de recherche et filtres - Style Samsung One UI */}
+      <Card className="p-5 border border-[#e0e0e0]">
+        <div className="flex gap-3 items-center">
           {/* Recherche */}
           <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#a3a3a3]" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#757575]" />
             <input
               type="text"
               placeholder="Rechercher par référence, RG, tribunal, ville..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full pl-12 pr-4 py-3.5 bg-[#f7f7f7] border-2 border-transparent rounded-xl text-[15px] text-[#1f1f1f] placeholder-[#757575] focus:outline-none focus:bg-white focus:border-[#0381fe] transition-all"
             />
           </div>
 
           {/* Bouton filtres */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-3 border rounded-xl transition-colors ${
+            className={`flex items-center gap-2 px-5 py-3.5 border-2 rounded-xl font-semibold transition-all ${
               showFilters || activeFiltersCount > 0
-                ? 'border-[#c9a227] bg-[#faf8f3] text-[#c9a227]'
-                : 'border-[#e5e5e5] text-[#525252] hover:bg-[#f5f5f5]'
+                ? 'border-[#c9a227] bg-[#fdf8e8] text-[#9a7b1c]'
+                : 'border-[#e0e0e0] text-[#555555] hover:bg-[#f7f7f7] active:bg-[#f0f0f0]'
             }`}
           >
             <Filter className="w-5 h-5" />
             <span>Filtres</span>
             {activeFiltersCount > 0 && (
-              <span className="bg-[#c9a227] text-white text-xs px-2 py-0.5 rounded-full">
+              <span className="bg-[#c9a227] text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
                 {activeFiltersCount}
               </span>
             )}
@@ -297,7 +297,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
           {activeFiltersCount > 0 && (
             <button
               onClick={resetFilters}
-              className="flex items-center gap-2 px-4 py-3 border border-[#e5e5e5] rounded-xl text-[#737373] hover:bg-[#f5f5f5] transition-colors"
+              className="flex items-center gap-2 px-5 py-3.5 border-2 border-[#e0e0e0] rounded-xl text-[#555555] font-medium hover:bg-[#f7f7f7] active:bg-[#f0f0f0] transition-colors"
             >
               <RotateCcw className="w-4 h-4" />
               Réinitialiser
@@ -310,19 +310,19 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
           </Button>
         </div>
 
-        {/* Panneau de filtres */}
+        {/* Panneau de filtres - Style Samsung One UI */}
         {showFilters && (
-          <div className="mt-4 pt-4 border-t border-[#e5e5e5]">
+          <div className="mt-5 pt-5 border-t-2 border-[#f0f0f0]">
             <div className="grid grid-cols-3 gap-4">
               {/* Statut */}
               <div>
-                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                <label className="text-[12px] font-semibold uppercase tracking-wide text-[#757575] block mb-2">
                   Statut
                 </label>
                 <select
                   value={filters.statut}
                   onChange={(e) => updateFilter('statut', e.target.value)}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-4 py-3 bg-[#f7f7f7] border-2 border-transparent rounded-xl text-[14px] text-[#1f1f1f] focus:outline-none focus:bg-white focus:border-[#0381fe] cursor-pointer transition-all"
                 >
                   <option value="all">Tous les statuts</option>
                   <option value="en-cours">En cours</option>
@@ -335,13 +335,13 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
 
               {/* Urgence */}
               <div>
-                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                <label className="text-[12px] font-semibold uppercase tracking-wide text-[#757575] block mb-2">
                   Urgence
                 </label>
                 <select
                   value={filters.urgent}
                   onChange={(e) => updateFilter('urgent', e.target.value)}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-4 py-3 bg-[#f7f7f7] border-2 border-transparent rounded-xl text-[14px] text-[#1f1f1f] focus:outline-none focus:bg-white focus:border-[#0381fe] cursor-pointer transition-all"
                 >
                   <option value="all">Toutes</option>
                   <option value="oui">Urgentes uniquement</option>
@@ -351,13 +351,13 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
 
               {/* Tribunal */}
               <div>
-                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                <label className="text-[12px] font-semibold uppercase tracking-wide text-[#757575] block mb-2">
                   Tribunal
                 </label>
                 <select
                   value={filters.tribunal}
                   onChange={(e) => updateFilter('tribunal', e.target.value)}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-4 py-3 bg-[#f7f7f7] border-2 border-transparent rounded-xl text-[14px] text-[#1f1f1f] focus:outline-none focus:bg-white focus:border-[#0381fe] cursor-pointer transition-all"
                 >
                   <option value="all">Tous les tribunaux</option>
                   {uniqueValues.tribunaux.map(t => (
@@ -368,13 +368,13 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
 
               {/* Ville */}
               <div>
-                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                <label className="text-[12px] font-semibold uppercase tracking-wide text-[#757575] block mb-2">
                   Ville
                 </label>
                 <select
                   value={filters.ville}
                   onChange={(e) => updateFilter('ville', e.target.value)}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-4 py-3 bg-[#f7f7f7] border-2 border-transparent rounded-xl text-[14px] text-[#1f1f1f] focus:outline-none focus:bg-white focus:border-[#0381fe] cursor-pointer transition-all"
                 >
                   <option value="all">Toutes les villes</option>
                   {uniqueValues.villes.map(v => (
@@ -385,13 +385,13 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
 
               {/* Échéance */}
               <div>
-                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                <label className="text-[12px] font-semibold uppercase tracking-wide text-[#757575] block mb-2">
                   Échéance
                 </label>
                 <select
                   value={filters.echeance}
                   onChange={(e) => updateFilter('echeance', e.target.value)}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-4 py-3 bg-[#f7f7f7] border-2 border-transparent rounded-xl text-[14px] text-[#1f1f1f] focus:outline-none focus:bg-white focus:border-[#0381fe] cursor-pointer transition-all"
                 >
                   <option value="all">Toutes les échéances</option>
                   <option value="depassee">Dépassée</option>
@@ -403,13 +403,13 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
 
               {/* Progression */}
               <div>
-                <label className="text-xs font-medium uppercase tracking-wider text-[#737373] block mb-2">
+                <label className="text-[12px] font-semibold uppercase tracking-wide text-[#757575] block mb-2">
                   Progression
                 </label>
                 <select
                   value={filters.progression}
                   onChange={(e) => updateFilter('progression', e.target.value)}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-4 py-3 bg-[#f7f7f7] border-2 border-transparent rounded-xl text-[14px] text-[#1f1f1f] focus:outline-none focus:bg-white focus:border-[#0381fe] cursor-pointer transition-all"
                 >
                   <option value="all">Toutes</option>
                   <option value="0-25">0% - 25%</option>
@@ -548,26 +548,26 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
           actionLabel="Créer une affaire"
         />
       ) : (
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden border border-[#e0e0e0]">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-[#1a1a1a] text-white">
+              <thead className="bg-[#f7f7f7] border-b-2 border-[#e0e0e0]">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Référence</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">N° RG</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Tribunal</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Ville</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Statut</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Échéance</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Progress.</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Parties</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Réunions</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Désordres</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider">Provision</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">Actions</th>
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Référence</th>
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">N° RG</th>
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Tribunal</th>
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Ville</th>
+                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Statut</th>
+                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Échéance</th>
+                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Progress.</th>
+                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Parties</th>
+                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Réunions</th>
+                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Désordres</th>
+                  <th className="px-4 py-4 text-right text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Provision</th>
+                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e5e5e5]">
+              <tbody className="divide-y divide-[#f0f0f0]">
                 {affairesFiltrees.map(affaire => {
                   const avancement = calculerAvancementTunnel(affaire);
                   const delaiRestant = affaire.date_echeance ? calculerDelaiRestant(affaire.date_echeance) : null;
@@ -575,7 +575,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
                   return (
                     <tr
                       key={affaire.id}
-                      className={`hover:bg-[#faf8f3] cursor-pointer transition-colors ${affaire.urgent ? 'bg-red-50' : ''}`}
+                      className={`hover:bg-[#f7f7f7] active:bg-[#f0f0f0] cursor-pointer transition-colors ${affaire.urgent ? 'bg-[#ffebea]' : 'bg-white'}`}
                       onClick={() => handleSelectAffaire(affaire)}
                     >
                       {/* Référence */}
