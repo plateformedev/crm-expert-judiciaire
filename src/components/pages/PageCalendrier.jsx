@@ -7,8 +7,9 @@ import React, { useState, useMemo } from 'react';
 import {
   Calendar, ChevronLeft, ChevronRight, Plus, Clock, MapPin,
   Users, FileText, AlertTriangle, CheckCircle, Eye, Edit,
-  Filter, List, Grid, Bell, Video, Phone, Car
+  Filter, List, Grid, Bell, Video, Phone, Car, Trash2, X, ExternalLink
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Card, Badge, Button, Input, ModalBase, useToast } from '../ui';
 import { getStoredAffaires } from '../../lib/demoData';
 import { formatDateFr } from '../../utils/helpers';
@@ -35,21 +36,23 @@ const TYPES_EVENEMENT = {
 // COMPOSANT: Événement du jour
 // ============================================================================
 
-const EventItem = ({ event, compact = false }) => {
+const EventItem = ({ event, compact = false, onClick }) => {
   const type = TYPES_EVENEMENT[event.type] || TYPES_EVENEMENT.rdv;
   const Icon = type.icon;
+  const isCustom = event.id?.startsWith('custom-');
 
   if (compact) {
     return (
       <div
-        className={`text-xs px-1.5 py-0.5 rounded truncate cursor-pointer ${
+        onClick={(e) => { e.stopPropagation(); onClick?.(event); }}
+        className={`text-xs px-1.5 py-0.5 rounded truncate cursor-pointer hover:opacity-80 transition-opacity ${
           type.color === 'blue' ? 'bg-blue-100 text-blue-700' :
           type.color === 'red' ? 'bg-red-100 text-red-700' :
           type.color === 'amber' ? 'bg-amber-100 text-amber-700' :
           type.color === 'green' ? 'bg-green-100 text-green-700' :
           'bg-purple-100 text-purple-700'
         }`}
-        title={event.titre}
+        title={`${event.titre}${isCustom ? ' (Cliquer pour modifier)' : ''}`}
       >
         {event.heure && <span className="font-medium">{event.heure} </span>}
         {event.titre}
@@ -58,9 +61,12 @@ const EventItem = ({ event, compact = false }) => {
   }
 
   return (
-    <Card className="p-3 hover:border-[#c9a227] transition-colors cursor-pointer">
+    <Card
+      onClick={() => onClick?.(event)}
+      className="p-3 hover:border-[#c9a227] transition-colors cursor-pointer"
+    >
       <div className="flex items-start gap-3">
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
           type.color === 'blue' ? 'bg-blue-100' :
           type.color === 'red' ? 'bg-red-100' :
           type.color === 'amber' ? 'bg-amber-100' :
@@ -78,12 +84,13 @@ const EventItem = ({ event, compact = false }) => {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="font-medium text-sm text-[#1a1a1a] truncate">{event.titre}</p>
-            <Badge variant={type.color} className="text-xs">{type.label}</Badge>
+            <p className="font-medium text-sm text-[#1f1f1f] truncate">{event.titre}</p>
+            <Badge variant={type.color === 'amber' ? 'warning' : type.color === 'red' ? 'error' : type.color === 'green' ? 'success' : 'default'} className="text-xs">{type.label}</Badge>
+            {isCustom && <Edit className="w-3 h-3 text-[#757575]" />}
           </div>
-          <p className="text-xs text-[#737373] mt-0.5">{event.affaire_reference}</p>
+          <p className="text-xs text-[#757575] mt-0.5">{event.affaire_reference}</p>
 
-          <div className="flex items-center gap-4 mt-2 text-xs text-[#a3a3a3]">
+          <div className="flex items-center gap-4 mt-2 text-xs text-[#757575]">
             {event.heure && (
               <span className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />
@@ -107,7 +114,7 @@ const EventItem = ({ event, compact = false }) => {
 // COMPOSANT: Cellule du calendrier
 // ============================================================================
 
-const CalendarCell = ({ date, events, isCurrentMonth, isToday, isSelected, onClick }) => {
+const CalendarCell = ({ date, events, isCurrentMonth, isToday, isSelected, onClick, onEventClick }) => {
   const dayEvents = events.filter(e => {
     const eventDate = new Date(e.date);
     return eventDate.getDate() === date.getDate() &&
@@ -118,26 +125,26 @@ const CalendarCell = ({ date, events, isCurrentMonth, isToday, isSelected, onCli
   return (
     <div
       onClick={() => onClick(date)}
-      className={`min-h-[100px] p-2 border border-[#e5e5e5] cursor-pointer transition-colors ${
-        !isCurrentMonth ? 'bg-[#fafafa] text-[#a3a3a3]' :
-        isSelected ? 'bg-[#faf8f3] border-[#c9a227]' :
-        isToday ? 'bg-blue-50 border-blue-200' :
-        'bg-white hover:bg-[#fafafa]'
+      className={`min-h-[100px] p-2 border border-[#e0e0e0] cursor-pointer transition-colors ${
+        !isCurrentMonth ? 'bg-[#f7f7f7] text-[#ababab]' :
+        isSelected ? 'bg-[#fdf8e8] border-[#c9a227] border-2' :
+        isToday ? 'bg-[#e5f3ff] border-[#0381fe]' :
+        'bg-white hover:bg-[#f7f7f7]'
       }`}
     >
-      <div className={`text-sm font-medium mb-1 ${
-        isToday ? 'text-blue-600' :
-        !isCurrentMonth ? 'text-[#a3a3a3]' : 'text-[#1a1a1a]'
+      <div className={`text-sm font-semibold mb-1 ${
+        isToday ? 'text-[#0381fe]' :
+        !isCurrentMonth ? 'text-[#ababab]' : 'text-[#1f1f1f]'
       }`}>
         {date.getDate()}
       </div>
 
       <div className="space-y-1">
         {dayEvents.slice(0, 3).map((event, idx) => (
-          <EventItem key={idx} event={event} compact />
+          <EventItem key={idx} event={event} compact onClick={onEventClick} />
         ))}
         {dayEvents.length > 3 && (
-          <div className="text-xs text-[#737373] pl-1">
+          <div className="text-xs text-[#757575] pl-1 font-medium">
             +{dayEvents.length - 3} autre(s)
           </div>
         )}
@@ -152,11 +159,14 @@ const CalendarCell = ({ date, events, isCurrentMonth, isToday, isSelected, onCli
 
 export const PageCalendrier = () => {
   const toast = useToast();
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState('mois'); // 'mois', 'semaine', 'liste'
   const [filterType, setFilterType] = useState('tous');
   const [showNewEventModal, setShowNewEventModal] = useState(false);
+  const [showEventDetail, setShowEventDetail] = useState(null);
+  const [editingEvent, setEditingEvent] = useState(null);
   const [customEvents, setCustomEvents] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('calendar_custom_events') || '[]');
@@ -202,6 +212,43 @@ export const PageCalendrier = () => {
       description: ''
     });
     setShowNewEventModal(false);
+  };
+
+  // Modifier un événement personnalisé
+  const handleUpdateEvent = () => {
+    if (!editingEvent || !editingEvent.titre.trim()) {
+      toast.error('Erreur', 'Veuillez saisir un titre pour l\'événement');
+      return;
+    }
+
+    const updatedEvents = customEvents.map(e =>
+      e.id === editingEvent.id ? editingEvent : e
+    );
+    setCustomEvents(updatedEvents);
+    localStorage.setItem('calendar_custom_events', JSON.stringify(updatedEvents));
+
+    toast.success('Événement modifié', `"${editingEvent.titre}" a été mis à jour`);
+    setEditingEvent(null);
+  };
+
+  // Supprimer un événement personnalisé
+  const handleDeleteEvent = (eventId) => {
+    const event = customEvents.find(e => e.id === eventId);
+    const updatedEvents = customEvents.filter(e => e.id !== eventId);
+    setCustomEvents(updatedEvents);
+    localStorage.setItem('calendar_custom_events', JSON.stringify(updatedEvents));
+
+    toast.success('Événement supprimé', `"${event?.titre}" a été supprimé du calendrier`);
+    setShowEventDetail(null);
+  };
+
+  // Ouvrir l'édition d'un événement
+  const handleEventClick = (event) => {
+    if (event.id.startsWith('custom-')) {
+      setEditingEvent({ ...event });
+    } else {
+      setShowEventDetail(event);
+    }
   };
 
   // Générer tous les événements
@@ -433,6 +480,7 @@ export const PageCalendrier = () => {
                     date.getFullYear() === selectedDate.getFullYear()
                   }
                   onClick={setSelectedDate}
+                  onEventClick={handleEventClick}
                 />
               ))}
             </div>
@@ -453,13 +501,13 @@ export const PageCalendrier = () => {
 
             {selectedDayEvents.length === 0 ? (
               <div className="text-center py-6">
-                <Calendar className="w-10 h-10 text-[#e5e5e5] mx-auto mb-2" />
-                <p className="text-sm text-[#a3a3a3]">Aucun événement</p>
+                <Calendar className="w-10 h-10 text-[#e0e0e0] mx-auto mb-2" />
+                <p className="text-sm text-[#757575]">Aucun événement</p>
               </div>
             ) : (
               <div className="space-y-2">
                 {selectedDayEvents.map(event => (
-                  <EventItem key={event.id} event={event} />
+                  <EventItem key={event.id} event={event} onClick={handleEventClick} />
                 ))}
               </div>
             )}
@@ -638,6 +686,191 @@ export const PageCalendrier = () => {
                 Créer l'événement
               </Button>
             </div>
+          </div>
+        </ModalBase>
+      )}
+
+      {/* Modal édition événement personnalisé */}
+      {editingEvent && (
+        <ModalBase
+          title="Modifier l'événement"
+          onClose={() => setEditingEvent(null)}
+          size="md"
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-medium uppercase tracking-wider text-[#757575] block mb-2">
+                Type d'événement
+              </label>
+              <select
+                value={editingEvent.type}
+                onChange={(e) => setEditingEvent({ ...editingEvent, type: e.target.value })}
+                className="w-full px-4 py-3 border-2 border-[#e0e0e0] rounded-xl focus:outline-none focus:border-[#0381fe]"
+              >
+                {Object.entries(TYPES_EVENEMENT).map(([key, value]) => (
+                  <option key={key} value={key}>{value.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-medium uppercase tracking-wider text-[#757575] block mb-2">
+                Titre *
+              </label>
+              <input
+                type="text"
+                value={editingEvent.titre}
+                onChange={(e) => setEditingEvent({ ...editingEvent, titre: e.target.value })}
+                className="w-full px-4 py-3 border-2 border-[#e0e0e0] rounded-xl focus:outline-none focus:border-[#0381fe]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#757575] block mb-2">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value={editingEvent.date}
+                  onChange={(e) => setEditingEvent({ ...editingEvent, date: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-[#e0e0e0] rounded-xl focus:outline-none focus:border-[#0381fe]"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#757575] block mb-2">
+                  Heure
+                </label>
+                <input
+                  type="time"
+                  value={editingEvent.heure}
+                  onChange={(e) => setEditingEvent({ ...editingEvent, heure: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-[#e0e0e0] rounded-xl focus:outline-none focus:border-[#0381fe]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-medium uppercase tracking-wider text-[#757575] block mb-2">
+                Lieu
+              </label>
+              <input
+                type="text"
+                value={editingEvent.lieu || ''}
+                onChange={(e) => setEditingEvent({ ...editingEvent, lieu: e.target.value })}
+                className="w-full px-4 py-3 border-2 border-[#e0e0e0] rounded-xl focus:outline-none focus:border-[#0381fe]"
+              />
+            </div>
+
+            <div className="flex gap-3 pt-4 border-t border-[#e0e0e0]">
+              <Button
+                variant="secondary"
+                onClick={() => handleDeleteEvent(editingEvent.id)}
+                className="text-[#ff3b30]"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Supprimer
+              </Button>
+              <div className="flex-1" />
+              <Button
+                variant="secondary"
+                onClick={() => setEditingEvent(null)}
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleUpdateEvent}
+              >
+                Enregistrer
+              </Button>
+            </div>
+          </div>
+        </ModalBase>
+      )}
+
+      {/* Modal détail événement (non modifiable - lié à une affaire) */}
+      {showEventDetail && (
+        <ModalBase
+          title="Détail de l'événement"
+          onClose={() => setShowEventDetail(null)}
+          size="md"
+        >
+          <div className="space-y-4">
+            {(() => {
+              const type = TYPES_EVENEMENT[showEventDetail.type] || TYPES_EVENEMENT.rdv;
+              const Icon = type.icon;
+              return (
+                <>
+                  <div className="flex items-center gap-4 p-4 bg-[#f7f7f7] rounded-2xl">
+                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
+                      type.color === 'blue' ? 'bg-blue-100' :
+                      type.color === 'red' ? 'bg-red-100' :
+                      type.color === 'amber' ? 'bg-amber-100' :
+                      type.color === 'green' ? 'bg-green-100' :
+                      'bg-purple-100'
+                    }`}>
+                      <Icon className={`w-7 h-7 ${
+                        type.color === 'blue' ? 'text-blue-600' :
+                        type.color === 'red' ? 'text-red-600' :
+                        type.color === 'amber' ? 'text-amber-600' :
+                        type.color === 'green' ? 'text-green-600' :
+                        'text-purple-600'
+                      }`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg text-[#1f1f1f]">{showEventDetail.titre}</h3>
+                      <Badge variant={type.color === 'amber' ? 'warning' : type.color === 'red' ? 'error' : type.color === 'green' ? 'success' : 'default'}>
+                        {type.label}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 text-[#1f1f1f]">
+                      <Calendar className="w-5 h-5 text-[#757575]" />
+                      <span>{formatDateFr(showEventDetail.date)}</span>
+                      {showEventDetail.heure && (
+                        <>
+                          <Clock className="w-5 h-5 text-[#757575] ml-2" />
+                          <span>{showEventDetail.heure}</span>
+                        </>
+                      )}
+                    </div>
+
+                    {showEventDetail.lieu && (
+                      <div className="flex items-center gap-3 text-[#1f1f1f]">
+                        <MapPin className="w-5 h-5 text-[#757575]" />
+                        <span>{showEventDetail.lieu}</span>
+                      </div>
+                    )}
+
+                    {showEventDetail.affaire_reference && (
+                      <div className="flex items-center gap-3 text-[#1f1f1f]">
+                        <FileText className="w-5 h-5 text-[#757575]" />
+                        <span>Affaire : {showEventDetail.affaire_reference}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {showEventDetail.affaire_id && (
+                    <div className="pt-4 border-t border-[#e0e0e0]">
+                      <Button
+                        variant="primary"
+                        onClick={() => {
+                          setShowEventDetail(null);
+                          navigate(`/affaires/${showEventDetail.affaire_id}`);
+                        }}
+                        className="w-full"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Voir l'affaire
+                      </Button>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </ModalBase>
       )}

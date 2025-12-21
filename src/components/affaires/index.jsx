@@ -11,12 +11,13 @@ import {
   Building, Gavel, Phone, Mail, Save, X, Upload, Download,
   Wand2, Calculator, BookOpen, Shield, Target, ChevronDown, RotateCcw,
   Timer, Play, Square, Banknote, CircleDot, ArrowRight,
-  Archive, PauseCircle, MoreHorizontal
+  Archive, PauseCircle, MoreHorizontal, Mic, StopCircle,
+  FlaskConical, FileCheck
 } from 'lucide-react';
 import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase, useToast } from '../ui';
 import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
 import { useAutoTimer } from '../../hooks';
-import { ETAPES_TUNNEL, GARANTIES, STATUTS_REUNION } from '../../data';
+import { ETAPES_TUNNEL, GARANTIES, STATUTS_REUNION, JURISPRUDENCE, QUALIFICATION_DESORDRES, OPALEXE_CHECKLIST, BASE_DTU } from '../../data';
 import { getStoredAffaires, saveAffaires } from '../../lib/demoData';
 import { formatDateFr, calculerDelaiRestant, calculerAvancementTunnel } from '../../utils/helpers';
 
@@ -2051,12 +2052,35 @@ const TabFinancier = ({ affaire }) => {
 };
 
 // ============================================================================
-// TAB OUTILS - Outils contextuels liés à l'affaire
+// TAB OUTILS - Outils Excellence contextuels liés à l'affaire
 // ============================================================================
 
 const TabOutils = ({ affaire }) => {
   const [activeTool, setActiveTool] = useState(null);
+  const [searchJuris, setSearchJuris] = useState('');
+  const [opalexeChecks, setOpalexeChecks] = useState({});
+  const [chronoRunning, setChronoRunning] = useState(false);
+  const [chronoTime, setChronoTime] = useState(0);
   const navigate = useNavigate();
+  const toast = useToast();
+
+  // Chronomètre
+  React.useEffect(() => {
+    let interval = null;
+    if (chronoRunning) {
+      interval = setInterval(() => {
+        setChronoTime(t => t + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [chronoRunning]);
+
+  const formatTime = (seconds) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
 
   // Calcul de garantie basé sur la date de réception
   const calculerGaranties = useCallback(() => {
@@ -2086,84 +2110,172 @@ const TabOutils = ({ affaire }) => {
 
   const garanties = calculerGaranties();
 
-  const outils = [
+  // Jurisprudence filtrée
+  const jurisprudenceFiltered = useMemo(() => {
+    if (!searchJuris) return JURISPRUDENCE?.slice(0, 5) || [];
+    return (JURISPRUDENCE || []).filter(j =>
+      j.titre?.toLowerCase().includes(searchJuris.toLowerCase()) ||
+      j.resume?.toLowerCase().includes(searchJuris.toLowerCase())
+    ).slice(0, 10);
+  }, [searchJuris]);
+
+  // Catégories d'outils
+  const categoriesOutils = [
     {
-      id: 'garanties',
-      label: 'Calculateur Garanties',
-      icon: Scale,
-      description: 'Calculer les garanties applicables selon la date de réception',
-      disabled: !affaire.date_reception_ouvrage,
-      color: 'bg-blue-500'
+      titre: 'Analyse & Calculs',
+      outils: [
+        {
+          id: 'garanties',
+          label: 'Garanties',
+          icon: Scale,
+          description: 'GPA, Biennale, Décennale',
+          disabled: !affaire.date_reception_ouvrage,
+          color: '#0381fe'
+        },
+        {
+          id: 'imputabilite',
+          label: 'Imputabilité',
+          icon: Target,
+          description: `${affaire.pathologies?.length || 0} désordres`,
+          disabled: !affaire.pathologies?.length,
+          color: '#9333ea',
+          action: () => navigate(`/affaires/${affaire.id}/imputabilite`)
+        },
+        {
+          id: 'chiffrage',
+          label: 'Chiffrage',
+          icon: Calculator,
+          description: 'Estimation travaux',
+          disabled: !affaire.pathologies?.length,
+          color: '#00a65a',
+          action: () => navigate(`/affaires/${affaire.id}/chiffrage`)
+        },
+        {
+          id: 'qualification',
+          label: 'Qualification',
+          icon: FlaskConical,
+          description: 'Nature des désordres',
+          disabled: false,
+          color: '#f59e0b'
+        }
+      ]
     },
     {
-      id: 'imputabilite',
-      label: 'Matrice Imputabilité',
-      icon: Target,
-      description: `Attribuer les responsabilités (${affaire.pathologies?.length || 0} désordres)`,
-      disabled: !affaire.pathologies?.length,
-      color: 'bg-purple-500',
-      action: () => navigate(`/affaires/${affaire.id}/imputabilite`)
+      titre: 'Références',
+      outils: [
+        {
+          id: 'dtu',
+          label: 'Base DTU',
+          icon: BookOpen,
+          description: 'Normes techniques',
+          disabled: false,
+          color: '#06b6d4'
+        },
+        {
+          id: 'jurisprudence',
+          label: 'Jurisprudence',
+          icon: Gavel,
+          description: 'Décisions de référence',
+          disabled: false,
+          color: '#8b5cf6'
+        }
+      ]
     },
     {
-      id: 'chiffrage',
-      label: 'Chiffrage Travaux',
-      icon: Calculator,
-      description: 'Estimer le coût des travaux de reprise',
-      disabled: !affaire.pathologies?.length,
-      color: 'bg-green-500',
-      action: () => navigate(`/affaires/${affaire.id}/chiffrage`)
+      titre: 'Conformité',
+      outils: [
+        {
+          id: 'conformite',
+          label: 'Check-list CPC',
+          icon: CheckCircle,
+          description: 'Procédure civile',
+          disabled: false,
+          color: '#10b981'
+        },
+        {
+          id: 'opalexe',
+          label: 'OPALEXE',
+          icon: Upload,
+          description: 'Dépôt dématérialisé',
+          disabled: false,
+          color: '#0ea5e9'
+        }
+      ]
     },
     {
-      id: 'rapport',
-      label: 'Générateur Rapport',
-      icon: FileText,
-      description: 'Générer le rapport d\'expertise',
-      disabled: false,
-      color: 'bg-amber-500',
-      action: () => navigate(`/affaires/${affaire.id}/rapport`)
-    },
-    {
-      id: 'dtu',
-      label: 'Références DTU',
-      icon: BookOpen,
-      description: 'Consulter les normes applicables',
-      disabled: false,
-      color: 'bg-cyan-500'
-    },
-    {
-      id: 'conformite',
-      label: 'Check-list CPC',
-      icon: CheckCircle,
-      description: 'Vérifier la conformité au Code de procédure',
-      disabled: false,
-      color: 'bg-emerald-500'
+      titre: 'Production',
+      outils: [
+        {
+          id: 'rapport',
+          label: 'Rapport',
+          icon: FileText,
+          description: 'Générer le rapport',
+          disabled: false,
+          color: '#c9a227',
+          action: () => navigate(`/affaires/${affaire.id}/rapport`)
+        },
+        {
+          id: 'courriers',
+          label: 'Courriers',
+          icon: Mail,
+          description: 'Générer des courriers',
+          disabled: false,
+          color: '#6366f1',
+          action: () => navigate(`/affaires/${affaire.id}/courriers`)
+        },
+        {
+          id: 'chronometre',
+          label: 'Chronomètre',
+          icon: Timer,
+          description: 'Suivi du temps',
+          disabled: false,
+          color: '#ef4444'
+        },
+        {
+          id: 'dictee',
+          label: 'Dictée vocale',
+          icon: Mic,
+          description: 'Transcription',
+          disabled: false,
+          color: '#ec4899',
+          action: () => navigate('/outils/dictee')
+        }
+      ]
     }
   ];
 
   return (
     <div className="space-y-6">
-      {/* Grille d'outils */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {outils.map(outil => (
-          <Card
-            key={outil.id}
-            onClick={() => outil.action ? outil.action() : setActiveTool(outil.id)}
-            className={`p-5 cursor-pointer transition-all hover:shadow-lg hover:border-[#c9a227] ${
-              outil.disabled ? 'opacity-50 cursor-not-allowed' : ''
-            } ${activeTool === outil.id ? 'border-[#c9a227] bg-[#faf8f3]' : ''}`}
-          >
-            <div className="flex items-start gap-4">
-              <div className={`w-12 h-12 ${outil.color} bg-opacity-10 rounded-xl flex items-center justify-center`}>
-                <outil.icon className={`w-6 h-6 ${outil.color.replace('bg-', 'text-')}`} />
-              </div>
-              <div className="flex-1">
-                <h4 className="font-medium text-[#1a1a1a]">{outil.label}</h4>
-                <p className="text-xs text-[#737373] mt-1">{outil.description}</p>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+      {/* Catégories d'outils */}
+      {categoriesOutils.map((categorie) => (
+        <div key={categorie.titre}>
+          <h3 className="text-sm font-semibold text-[#757575] uppercase tracking-wider mb-3">{categorie.titre}</h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {categorie.outils.map(outil => (
+              <Card
+                key={outil.id}
+                onClick={() => outil.disabled ? null : (outil.action ? outil.action() : setActiveTool(activeTool === outil.id ? null : outil.id))}
+                className={`p-4 cursor-pointer transition-all border-2 ${
+                  outil.disabled ? 'opacity-40 cursor-not-allowed' : 'hover:shadow-md'
+                } ${activeTool === outil.id ? 'border-[#c9a227] bg-[#fdf8e8]' : 'border-transparent hover:border-[#e0e0e0]'}`}
+              >
+                <div className="flex flex-col items-center text-center gap-2">
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center"
+                    style={{ backgroundColor: `${outil.color}15` }}
+                  >
+                    <outil.icon className="w-6 h-6" style={{ color: outil.color }} />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-[#1f1f1f] text-sm">{outil.label}</h4>
+                    <p className="text-xs text-[#757575] mt-0.5">{outil.description}</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      ))}
 
       {/* Panneau détail outil - Garanties */}
       {activeTool === 'garanties' && (
@@ -2296,6 +2408,204 @@ const TabOutils = ({ affaire }) => {
                 <span className={item.check ? 'text-[#1a1a1a]' : 'text-[#737373]'}>{item.label}</span>
               </div>
             ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Panneau Jurisprudence */}
+      {activeTool === 'jurisprudence' && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-medium text-[#1f1f1f] flex items-center gap-2">
+              <Gavel className="w-5 h-5 text-[#c9a227]" />
+              Jurisprudence de référence
+            </h3>
+            <button onClick={() => setActiveTool(null)} className="text-[#757575] hover:text-[#1f1f1f]">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="mb-4">
+            <Input
+              placeholder="Rechercher une décision..."
+              value={searchJuris}
+              onChange={(e) => setSearchJuris(e.target.value)}
+              icon={Search}
+            />
+          </div>
+
+          <div className="space-y-3 max-h-80 overflow-y-auto">
+            {jurisprudenceFiltered.length > 0 ? jurisprudenceFiltered.map((juris, i) => (
+              <div key={i} className="p-4 bg-[#f7f7f7] rounded-xl hover:bg-[#f0f0f0] cursor-pointer transition-colors">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium text-[#1f1f1f]">{juris.titre || juris.reference}</p>
+                    <p className="text-xs text-[#0381fe] mt-1">{juris.juridiction} - {juris.date}</p>
+                    <p className="text-sm text-[#757575] mt-2 line-clamp-2">{juris.resume || juris.principe}</p>
+                  </div>
+                  <Badge variant="default" className="ml-3">{juris.domaine}</Badge>
+                </div>
+              </div>
+            )) : (
+              <p className="text-center text-[#757575] py-8">Aucune jurisprudence trouvée</p>
+            )}
+          </div>
+        </Card>
+      )}
+
+      {/* Panneau Qualification des désordres */}
+      {activeTool === 'qualification' && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-medium text-[#1f1f1f] flex items-center gap-2">
+              <FlaskConical className="w-5 h-5 text-[#c9a227]" />
+              Qualification des désordres
+            </h3>
+            <button onClick={() => setActiveTool(null)} className="text-[#757575] hover:text-[#1f1f1f]">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {(QUALIFICATION_DESORDRES || [
+              { type: 'Malfaçon', description: 'Défaut d\'exécution des règles de l\'art', garantie: 'Décennale si impropriété' },
+              { type: 'Vice caché', description: 'Défaut non apparent lors de la réception', garantie: 'GPA ou Décennale' },
+              { type: 'Non-conformité', description: 'Écart avec les documents contractuels', garantie: 'Droit commun' },
+              { type: 'Désordre évolutif', description: 'Aggravation progressive dans le temps', garantie: 'Décennale' }
+            ]).map((qual, i) => (
+              <div key={i} className="p-4 border border-[#e0e0e0] rounded-xl hover:border-[#c9a227] transition-colors">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-semibold text-[#1f1f1f]">{qual.type}</p>
+                    <p className="text-sm text-[#757575] mt-1">{qual.description}</p>
+                  </div>
+                  <Badge variant="warning">{qual.garantie}</Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Panneau OPALEXE */}
+      {activeTool === 'opalexe' && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-medium text-[#1f1f1f] flex items-center gap-2">
+              <Upload className="w-5 h-5 text-[#c9a227]" />
+              Check-list OPALEXE
+            </h3>
+            <button onClick={() => setActiveTool(null)} className="text-[#757575] hover:text-[#1f1f1f]">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <p className="text-sm text-[#757575] mb-4">
+            Vérifiez ces éléments avant le dépôt sur la plateforme OPALEXE.
+          </p>
+
+          <div className="space-y-2">
+            {(OPALEXE_CHECKLIST || [
+              { id: 'rapport', label: 'Rapport d\'expertise signé (PDF/A)' },
+              { id: 'annexes', label: 'Annexes numérotées et référencées' },
+              { id: 'photos', label: 'Planche photographique avec légendes' },
+              { id: 'plans', label: 'Plans et schémas techniques' },
+              { id: 'devis', label: 'Devis et chiffrages joints' },
+              { id: 'pv', label: 'PV de réunions signés' },
+              { id: 'dires', label: 'Dires des parties et réponses' },
+              { id: 'sommaire', label: 'Sommaire des pièces' }
+            ]).map((item) => (
+              <label
+                key={item.id}
+                className="flex items-center gap-3 p-3 bg-[#f7f7f7] rounded-xl cursor-pointer hover:bg-[#f0f0f0] transition-colors"
+              >
+                <input
+                  type="checkbox"
+                  checked={opalexeChecks[item.id] || false}
+                  onChange={(e) => setOpalexeChecks(prev => ({ ...prev, [item.id]: e.target.checked }))}
+                  className="w-5 h-5 rounded border-[#d1d1d1] text-[#c9a227] focus:ring-[#c9a227]"
+                />
+                <span className={opalexeChecks[item.id] ? 'text-[#1f1f1f]' : 'text-[#757575]'}>
+                  {item.label}
+                </span>
+              </label>
+            ))}
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-[#e0e0e0]">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-[#757575]">Progression</span>
+              <span className="font-medium text-[#1f1f1f]">
+                {Object.values(opalexeChecks).filter(Boolean).length} / {(OPALEXE_CHECKLIST || [{ id: 'rapport' }, { id: 'annexes' }, { id: 'photos' }, { id: 'plans' }, { id: 'devis' }, { id: 'pv' }, { id: 'dires' }, { id: 'sommaire' }]).length}
+              </span>
+            </div>
+            <ProgressBar
+              value={(Object.values(opalexeChecks).filter(Boolean).length / 8) * 100}
+              color="blue"
+              className="mt-2"
+            />
+          </div>
+        </Card>
+      )}
+
+      {/* Panneau Chronomètre */}
+      {activeTool === 'chronometre' && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-medium text-[#1f1f1f] flex items-center gap-2">
+              <Timer className="w-5 h-5 text-[#c9a227]" />
+              Chronomètre - {affaire.reference}
+            </h3>
+            <button onClick={() => setActiveTool(null)} className="text-[#757575] hover:text-[#1f1f1f]">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="text-center py-8">
+            <div className="text-5xl font-mono font-bold text-[#1f1f1f] mb-8">
+              {formatTime(chronoTime)}
+            </div>
+
+            <div className="flex items-center justify-center gap-4">
+              {!chronoRunning ? (
+                <Button
+                  onClick={() => setChronoRunning(true)}
+                  className="bg-[#00a65a] hover:bg-[#008f4c] text-white px-8"
+                >
+                  <Play className="w-5 h-5 mr-2" />
+                  Démarrer
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => setChronoRunning(false)}
+                  className="bg-[#ff9500] hover:bg-[#e68600] text-white px-8"
+                >
+                  <StopCircle className="w-5 h-5 mr-2" />
+                  Pause
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                onClick={() => { setChronoTime(0); setChronoRunning(false); }}
+              >
+                <RotateCcw className="w-5 h-5 mr-2" />
+                Réinitialiser
+              </Button>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-[#e0e0e0]">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const heures = (chronoTime / 3600).toFixed(2);
+                  toast.success(`${heures}h enregistrées`, 'Temps ajouté à l\'affaire');
+                }}
+                className="text-[#c9a227] border-[#c9a227]"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Enregistrer le temps ({(chronoTime / 3600).toFixed(2)}h)
+              </Button>
+            </div>
           </div>
         </Card>
       )}

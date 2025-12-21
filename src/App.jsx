@@ -41,6 +41,7 @@ import { ModuleChiffrage } from './components/chiffrage';
 import { CarnetSapiteurs } from './components/sapiteurs';
 import { MatriceImputabilite } from './components/imputabilite';
 import { DicteeVocale } from './components/dictee';
+import { GenerateurCourriers } from './components/courriers';
 import ChatbotIA from './components/ia/ChatbotIA';
 
 // Module Excellence
@@ -73,27 +74,29 @@ import { ETAPES_TUNNEL, DS } from './data';
 // CONFIGURATION MODULES (Navigation)
 // ============================================================================
 
-// Navigation complète - Tous les modules accessibles
+// Navigation simplifiée - Modules essentiels uniquement
+// Excellence et Outils sont intégrés dans la fiche affaire
 const MODULES = [
-  { id: 'affaires', path: '/', label: 'Affaires', icon: Folder },
+  { id: 'dashboard', path: '/dashboard', label: 'Tableau de bord', icon: Home },
+  { id: 'affaires', path: '/affaires', label: 'Affaires', icon: Folder },
   { id: 'alertes', path: '/alertes', label: 'Alertes', icon: AlertCircle },
   { id: 'calendrier', path: '/calendrier', label: 'Calendrier', icon: Calendar },
-  { id: 'documents', path: '/documents', label: 'Documents', icon: FileText },
-  { id: 'contacts', path: '/contacts', label: 'Contacts', icon: Users },
+  { id: 'carnet', path: '/carnet', label: 'Carnet d\'adresses', icon: Users },
   { id: 'facturation', path: '/facturation', label: 'Facturation', icon: Euro },
   { id: 'statistiques', path: '/statistiques', label: 'Statistiques', icon: BarChart3 },
-  { id: 'excellence', path: '/excellence', label: 'Excellence', icon: Award },
-  { id: 'outils', path: '/outils', label: 'Outils', icon: Wand2 },
   { id: 'parametres', path: '/parametres', label: 'Paramètres', icon: Settings }
 ];
 
 // ============================================================================
-// PAGE: Contacts (avec CarnetSapiteurs)
+// PAGE: Carnet d'adresses (Sapiteurs, Avocats, Juges, etc.)
 // ============================================================================
 
-const PageContacts = () => (
+const PageCarnetAdresses = () => (
   <div className="space-y-6">
-    <h1 className="text-2xl font-semibold text-[#1a1a1a]">Contacts & Sapiteurs</h1>
+    <div>
+      <h1 className="text-2xl font-semibold text-[#1f1f1f]">Carnet d'adresses</h1>
+      <p className="text-[#757575] mt-1">Sapiteurs, avocats, experts, juridictions et contacts professionnels</p>
+    </div>
     <CarnetSapiteurs />
   </div>
 );
@@ -256,6 +259,21 @@ const MatriceImputabiliteWrapper = () => {
   const { affaires } = useAffaires();
   const affaire = affaires.find(a => a.id === id);
   return <MatriceImputabilite affaireId={id} pathologies={affaire?.pathologies || []} parties={affaire?.parties || []} />;
+};
+
+const GenerateurCourriersWrapper = () => {
+  const { id } = useParams();
+  const { affaires } = useAffaires();
+  const { expert } = useAuth();
+  const affaire = affaires.find(a => a.id === id);
+  const toast = useToast();
+
+  const handleSave = (courrier) => {
+    // Sauvegarder le courrier dans les documents de l'affaire
+    toast.success('Courrier enregistré', `${courrier.titre} a été sauvegardé`);
+  };
+
+  return <GenerateurCourriers affaire={affaire} expert={expert} onSave={handleSave} />;
 };
 
 const CentreAlertesWrapper = () => {
@@ -463,8 +481,11 @@ const App = () => {
           <AppLayout>
             <Suspense fallback={<LoadingSpinner size="lg" />}>
               <Routes>
-          {/* Affaires - Page principale */}
-          <Route path="/" element={<ListeAffaires />} />
+          {/* Dashboard - Page d'accueil */}
+          <Route path="/" element={<DashboardWrapper />} />
+          <Route path="/dashboard" element={<DashboardWrapper />} />
+
+          {/* Affaires */}
           <Route path="/affaires" element={<ListeAffaires />} />
           <Route path="/affaires/nouveau" element={<ListeAffaires />} />
           <Route path="/affaires/:id" element={<AffaireDetailWrapper />} />
@@ -473,17 +494,21 @@ const App = () => {
           <Route path="/affaires/:id/chiffrage" element={<ModuleChiffrageWrapper />} />
           <Route path="/affaires/:id/rapport" element={<GenerateurRapportWrapper />} />
           <Route path="/affaires/:id/imputabilite" element={<MatriceImputabiliteWrapper />} />
-          
+          <Route path="/affaires/:id/courriers" element={<GenerateurCourriersWrapper />} />
+
           {/* Alertes */}
           <Route path="/alertes" element={<CentreAlertesWrapper />} />
-          
+
           {/* Pages principales */}
           <Route path="/calendrier" element={<PageCalendrier />} />
-          <Route path="/contacts" element={<PageContacts />} />
-          <Route path="/documents" element={<PageDocuments />} />
+          <Route path="/carnet" element={<PageCarnetAdresses />} />
           <Route path="/facturation" element={<PageFacturation />} />
           <Route path="/statistiques" element={<PageStatistiques />} />
           <Route path="/parametres" element={<PageParametres />} />
+
+          {/* Redirections pour anciennes URLs */}
+          <Route path="/contacts" element={<Navigate to="/carnet" replace />} />
+          <Route path="/documents" element={<Navigate to="/affaires" replace />} />
           
           {/* Module Excellence */}
           <Route path="/excellence" element={<PageExcellence />} />
