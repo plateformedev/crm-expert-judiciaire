@@ -4,13 +4,13 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  base: '/crm-expert-judiciaire/',
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? '/crm-expert-judiciaire/' : '/',
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      scope: '/crm-expert-judiciaire/',
+      scope: mode === 'production' ? '/crm-expert-judiciaire/' : '/',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
         name: 'CRM Expert Judiciaire',
@@ -20,8 +20,8 @@ export default defineConfig({
         background_color: '#1a1a1a',
         display: 'standalone',
         orientation: 'any',
-        scope: '/crm-expert-judiciaire/',
-        start_url: '/crm-expert-judiciaire/',
+        scope: mode === 'production' ? '/crm-expert-judiciaire/' : '/',
+        start_url: mode === 'production' ? '/crm-expert-judiciaire/' : '/',
         icons: [
           {
             src: 'icons/icon-72.png',
@@ -137,4 +137,4 @@ export default defineConfig({
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', '@supabase/supabase-js']
   }
-});
+}));
