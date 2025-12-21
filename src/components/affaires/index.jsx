@@ -12,7 +12,7 @@ import {
   Wand2, Calculator, BookOpen, Shield, Target, ChevronDown, RotateCcw,
   Timer, Play, Square, Banknote, CircleDot, ArrowRight,
   Archive, PauseCircle, MoreHorizontal, Mic, StopCircle,
-  FlaskConical, FileCheck
+  FlaskConical, FileCheck, MessageSquare
 } from 'lucide-react';
 import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase, useToast } from '../ui';
 import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
@@ -23,6 +23,7 @@ import { formatDateFr, calculerDelaiRestant, calculerAvancementTunnel } from '..
 
 // Nouveaux composants Phase 1
 import { WorkflowTunnel } from './WorkflowTunnel';
+import { DashboardAffaire } from './DashboardAffaire';
 import { ReponseJuge } from './ReponseJuge';
 import { GestionReunions } from './GestionReunions';
 import { GestionDires } from './GestionDires';
@@ -968,16 +969,19 @@ const AffaireCard = ({ affaire, onClick }) => {
 };
 
 // ============================================================================
-// MODAL NOUVELLE AFFAIRE
+// MODAL NOUVELLE AFFAIRE - VERSION SIMPLIFIÉE
+// Création rapide : seules les infos essentielles sont demandées
+// Le reste sera complété dans la fiche détaillée
 // ============================================================================
 
 const ModalNouvelleAffaire = ({ onClose, onCreate }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [mode, setMode] = useState('simple'); // 'simple' ou 'complet'
   const [data, setData] = useState({
     tribunal: '',
     rg: '',
-    date_ordonnance: '',
+    date_ordonnance: new Date().toISOString().split('T')[0],
     date_echeance: '',
     bien_adresse: '',
     bien_code_postal: '',
@@ -998,20 +1002,20 @@ const ModalNouvelleAffaire = ({ onClose, onCreate }) => {
     setError(null);
 
     const result = await onCreate(data);
-    
+
     if (!result.success) {
       setError(result.error);
     }
-    
+
     setLoading(false);
   };
 
   return (
-    <ModalBase 
-      isOpen={true} 
-      onClose={onClose} 
+    <ModalBase
+      isOpen={true}
+      onClose={onClose}
       title="Nouvelle affaire"
-      size="lg"
+      size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
@@ -1020,12 +1024,19 @@ const ModalNouvelleAffaire = ({ onClose, onCreate }) => {
           </div>
         )}
 
-        {/* Juridiction */}
+        {/* Message d'aide */}
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <p className="text-sm text-blue-700">
+            <strong>Création rapide :</strong> Renseignez uniquement le tribunal et le numéro RG.
+            Vous pourrez compléter les détails dans la fiche affaire.
+          </p>
+        </div>
+
+        {/* Champs essentiels */}
         <div className="space-y-4">
-          <h4 className="text-xs uppercase tracking-wider text-[#a3a3a3] font-medium">Juridiction</h4>
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Tribunal"
+              label="Tribunal *"
               value={data.tribunal}
               onChange={(e) => handleChange('tribunal', e.target.value)}
               placeholder="TJ Paris"
@@ -1038,97 +1049,90 @@ const ModalNouvelleAffaire = ({ onClose, onCreate }) => {
               placeholder="24/12345"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Date ordonnance"
-              type="date"
-              value={data.date_ordonnance}
-              onChange={(e) => handleChange('date_ordonnance', e.target.value)}
-            />
-            <Input
-              label="Date échéance"
-              type="date"
-              value={data.date_echeance}
-              onChange={(e) => handleChange('date_echeance', e.target.value)}
-            />
-          </div>
-        </div>
 
-        {/* Bien */}
-        <div className="space-y-4">
-          <h4 className="text-xs uppercase tracking-wider text-[#a3a3a3] font-medium">Bien expertisé</h4>
           <Input
-            label="Adresse"
-            value={data.bien_adresse}
-            onChange={(e) => handleChange('bien_adresse', e.target.value)}
-            placeholder="12 rue de la Paix"
+            label="Date de l'ordonnance"
+            type="date"
+            value={data.date_ordonnance}
+            onChange={(e) => handleChange('date_ordonnance', e.target.value)}
           />
-          <div className="grid grid-cols-3 gap-4">
-            <Input
-              label="Code postal"
-              value={data.bien_code_postal}
-              onChange={(e) => handleChange('bien_code_postal', e.target.value)}
-              placeholder="75001"
-            />
-            <Input
-              label="Ville"
-              value={data.bien_ville}
-              onChange={(e) => handleChange('bien_ville', e.target.value)}
-              placeholder="Paris"
-            />
-            <Select
-              label="Type de bien"
-              value={data.bien_type}
-              onChange={(e) => handleChange('bien_type', e.target.value)}
-              options={[
-                { value: 'Maison', label: 'Maison individuelle' },
-                { value: 'Appartement', label: 'Appartement' },
-                { value: 'Immeuble', label: 'Immeuble collectif' },
-                { value: 'Local commercial', label: 'Local commercial' },
-                { value: 'Autre', label: 'Autre' }
-              ]}
-            />
-          </div>
+
+          {/* Toggle pour afficher plus d'options */}
+          <button
+            type="button"
+            onClick={() => setMode(mode === 'simple' ? 'complet' : 'simple')}
+            className="text-sm text-[#c9a227] hover:text-[#9a7b1c] font-medium flex items-center gap-1"
+          >
+            {mode === 'simple' ? '+ Ajouter plus de détails' : '− Masquer les détails'}
+          </button>
         </div>
 
-        {/* Mission */}
-        <div className="space-y-4">
-          <h4 className="text-xs uppercase tracking-wider text-[#a3a3a3] font-medium">Mission</h4>
-          <div>
-            <label className="text-xs font-medium uppercase tracking-wider text-[#a3a3a3] block mb-2">
-              Texte de la mission
-            </label>
-            <textarea
-              value={data.mission}
-              onChange={(e) => handleChange('mission', e.target.value)}
-              placeholder="Nous désignons M./Mme ... en qualité d'expert avec pour mission de..."
-              rows={4}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
-            />
-          </div>
-        </div>
+        {/* Champs optionnels (mode complet) */}
+        {mode === 'complet' && (
+          <>
+            {/* Échéance et urgence */}
+            <div className="space-y-4 pt-4 border-t border-[#e5e5e5]">
+              <h4 className="text-xs uppercase tracking-wider text-[#a3a3a3] font-medium">Délais</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Date échéance"
+                  type="date"
+                  value={data.date_echeance}
+                  onChange={(e) => handleChange('date_echeance', e.target.value)}
+                />
+                <div className="flex items-center gap-3 pt-6">
+                  <input
+                    type="checkbox"
+                    id="urgent"
+                    checked={data.urgent}
+                    onChange={(e) => handleChange('urgent', e.target.checked)}
+                    className="w-5 h-5 rounded accent-[#c9a227]"
+                  />
+                  <label htmlFor="urgent" className="text-sm text-[#525252]">
+                    Marquer comme urgent
+                  </label>
+                </div>
+              </div>
+            </div>
 
-        {/* Provision */}
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Provision (€)"
-            type="number"
-            value={data.provision_montant}
-            onChange={(e) => handleChange('provision_montant', e.target.value)}
-            placeholder="3000"
-          />
-          <div className="flex items-end">
-            <label className="flex items-center gap-3 p-3 bg-[#fafafa] rounded-xl cursor-pointer">
-              <input
-                type="checkbox"
-                checked={data.urgent}
-                onChange={(e) => handleChange('urgent', e.target.checked)}
-                className="w-5 h-5 rounded border-[#d4d4d4] text-red-500 focus:ring-red-500"
+            {/* Bien */}
+            <div className="space-y-4 pt-4 border-t border-[#e5e5e5]">
+              <h4 className="text-xs uppercase tracking-wider text-[#a3a3a3] font-medium">Bien expertisé</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Ville"
+                  value={data.bien_ville}
+                  onChange={(e) => handleChange('bien_ville', e.target.value)}
+                  placeholder="Paris"
+                />
+                <Select
+                  label="Type de bien"
+                  value={data.bien_type}
+                  onChange={(e) => handleChange('bien_type', e.target.value)}
+                  options={[
+                    { value: 'Maison', label: 'Maison individuelle' },
+                    { value: 'Appartement', label: 'Appartement' },
+                    { value: 'Immeuble', label: 'Immeuble collectif' },
+                    { value: 'Local commercial', label: 'Local commercial' },
+                    { value: 'Autre', label: 'Autre' }
+                  ]}
+                />
+              </div>
+            </div>
+
+            {/* Provision */}
+            <div className="space-y-4 pt-4 border-t border-[#e5e5e5]">
+              <h4 className="text-xs uppercase tracking-wider text-[#a3a3a3] font-medium">Provision</h4>
+              <Input
+                label="Montant (€)"
+                type="number"
+                value={data.provision_montant}
+                onChange={(e) => handleChange('provision_montant', e.target.value)}
+                placeholder="3000"
               />
-              <span className="text-sm text-[#525252]">Marquer comme urgent</span>
-            </label>
-          </div>
-        </div>
+            </div>
+          </>
+        )}
 
         {/* Actions */}
         <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
@@ -1259,17 +1263,43 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
     );
   }
 
+  // ONGLETS SIMPLIFIÉS : 5 au lieu de 10 pour réduire la charge cognitive
   const tabs = [
-    { id: 'general', label: 'Général', icon: FileText },
-    { id: 'parties', label: `Parties (${affaire.parties?.length || 0})`, icon: Users },
-    { id: 'reunions', label: `Réunions (${affaire.reunions?.length || 0})`, icon: Calendar },
-    { id: 'desordres', label: `Désordres (${affaire.pathologies?.length || 0})`, icon: AlertTriangle },
-    { id: 'dires', label: `Dires (${affaire.dires?.length || 0})`, icon: FileText },
-    { id: 'documents', label: `Documents (${affaire.documents?.length || 0})`, icon: Folder },
-    { id: 'rapports', label: 'Rapports', icon: BookOpen },
-    { id: 'financier', label: 'Financier', icon: Euro },
-    { id: 'timeline', label: 'Historique', icon: Clock },
-    { id: 'outils', label: 'Outils', icon: Wand2 }
+    {
+      id: 'dossier',
+      label: 'Dossier',
+      icon: FileText,
+      description: 'Informations générales et parties',
+      count: affaire.parties?.length || 0
+    },
+    {
+      id: 'operations',
+      label: 'Opérations',
+      icon: Calendar,
+      description: 'Réunions et désordres constatés',
+      count: (affaire.reunions?.length || 0) + (affaire.pathologies?.length || 0)
+    },
+    {
+      id: 'echanges',
+      label: 'Échanges',
+      icon: MessageSquare,
+      description: 'Dires et documents',
+      count: (affaire.dires?.length || 0) + (affaire.documents?.length || 0)
+    },
+    {
+      id: 'production',
+      label: 'Production',
+      icon: BookOpen,
+      description: 'Rapports et outils',
+      count: null
+    },
+    {
+      id: 'finances',
+      label: 'Finances',
+      icon: Euro,
+      description: 'Provisions et état de frais',
+      count: null
+    }
   ];
 
   return (
@@ -1367,10 +1397,33 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          NOUVEAU WORKFLOW - PHASE 1
+          DASHBOARD INTELLIGENT - Refonte UX 10/10
           ═══════════════════════════════════════════════════════════════════════ */}
 
-      {/* Réponse au juge (si pas encore répondu) */}
+      {/* Dashboard contextuel avec prochaine action et KPIs */}
+      <DashboardAffaire
+        affaire={affaire}
+        onNavigate={({ tab }) => tab && setActiveTab(tab)}
+        onAction={(action) => {
+          const reunions = affaire.reunions || [];
+          const reunionR1 = reunions.find(r => r.numero === 1) || reunions[0];
+
+          if (action === 'reponse-juge') {
+            // Ouvrir le modal de réponse au juge (déjà géré par ReponseJuge)
+          } else if (action === 'convocation') {
+            setSelectedReunion(reunionR1 || { numero: 1, type: 'contradictoire', statut: 'planifiee' });
+            setActiveModule('convocation');
+          } else if (action === 'reunion') {
+            setSelectedReunion(reunionR1 || { numero: 1, type: 'contradictoire', statut: 'planifiee' });
+            setActiveModule('reunion');
+          } else if (action === 'compte-rendu') {
+            setSelectedReunion(reunionR1 || { numero: 1, type: 'contradictoire', statut: 'terminee' });
+            setActiveModule('compte-rendu');
+          }
+        }}
+      />
+
+      {/* Réponse au juge (si pas encore répondu) - Modal contextuel */}
       {affaire.date_ordonnance && !affaire.reponse_juge && (
         <ReponseJuge
           affaire={affaire}
@@ -1378,94 +1431,103 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
         />
       )}
 
-      {/* Tunnel d'avancement (12 étapes) - Version horizontale */}
-      <WorkflowTunnel
-        affaire={affaire}
-        onNavigate={({ tab }) => tab && setActiveTab(tab)}
-        onEtapeClick={(etape) => {
-          // Ouvrir le module correspondant ou naviguer vers l'onglet
-          const reunions = affaire.reunions || [];
-          const reunionR1 = reunions.find(r => r.numero === 1) || reunions[0];
+      {/* ═══════════════════════════════════════════════════════════════════════
+          ONGLETS SIMPLIFIÉS - 5 onglets au lieu de 10
+          ═══════════════════════════════════════════════════════════════════════ */}
 
-          if (etape.id === 'convocation-r1') {
-            // Ouvrir le module Convocation R1
-            setSelectedReunion(reunionR1 || { numero: 1, type: 'contradictoire', statut: 'planifiee' });
-            setActiveModule('convocation');
-          } else if (etape.id === 'reunion-r1') {
-            // Ouvrir le module Réunion R1
-            setSelectedReunion(reunionR1 || { numero: 1, type: 'contradictoire', statut: 'planifiee' });
-            setActiveModule('reunion');
-          } else if (etape.id === 'compte-rendu-r1') {
-            // Ouvrir le module Compte-rendu R1
-            setSelectedReunion(reunionR1 || { numero: 1, type: 'contradictoire', statut: 'terminee' });
-            setActiveModule('compte-rendu');
-          } else if (etape.id === 'reunions-supplementaires') {
-            // Pour les réunions supplémentaires, on peut naviguer vers l'onglet réunions
-            setActiveTab('reunions');
-          } else if (etape.id === 'saisie-dossier') {
-            setActiveTab('general');
-          } else if (etape.id === 'dires') {
-            setActiveTab('dires');
-          } else if (etape.id === 'provision') {
-            setActiveTab('financier');
-          }
-        }}
-      />
-
-      {/* Panneaux Timer + Provision (version compacte) */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* ⏱️ Chronomètre automatique */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`w-3 h-3 rounded-full ${timer.isRunning ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
-              <div>
-                <p className="text-xs text-[#a3a3a3]">Session</p>
-                <p className="text-xl font-light text-[#1a1a1a] font-mono">{timer.sessionFormatted}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-[#a3a3a3]">Total: {timer.totalFormatted}</p>
-              <p className="text-lg font-medium text-[#c9a227]">{timer.totalMontant.toFixed(2)} €</p>
-            </div>
-          </div>
-        </Card>
-
-        {/* 💰 Provision */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {affaire.provision_recue ? (
-                <CheckCircle className="w-5 h-5 text-green-500" />
-              ) : (
-                <Clock className="w-5 h-5 text-amber-500" />
-              )}
-              <div>
-                <p className="text-xs text-[#a3a3a3]">Provision</p>
-                <p className="text-xl font-light text-[#1a1a1a]">
-                  {affaire.provision_montant ? `${parseFloat(affaire.provision_montant).toLocaleString('fr-FR')} €` : '— €'}
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <span className={`text-sm font-medium ${affaire.provision_recue ? 'text-green-600' : 'text-amber-600'}`}>
-                {affaire.provision_recue ? 'Reçue' : 'En attente'}
-              </span>
-              {affaire.provision_montant && timer.totalMontant > 0 && (
-                <p className={`text-xs ${(affaire.provision_montant - timer.totalMontant) < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                  Reste: {(affaire.provision_montant - timer.totalMontant).toFixed(2)} €
-                </p>
-              )}
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Tabs */}
+      {/* Tabs avec compteurs */}
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-      {/* Contenu des tabs */}
+      {/* Contenu des tabs - STRUCTURE SIMPLIFIÉE */}
       <div className="min-h-[400px]">
+
+        {/* ═══════════════════ ONGLET DOSSIER ═══════════════════ */}
+        {activeTab === 'dossier' && (
+          <div className="space-y-6">
+            {/* Infos générales */}
+            <TabGeneral affaire={affaire} />
+
+            {/* Parties (intégré) */}
+            <div className="pt-6 border-t border-[#e5e5e5]">
+              <h3 className="text-lg font-medium text-[#1a1a1a] mb-4">Parties au dossier</h3>
+              <TabParties affaire={affaire} onAddPartie={() => setShowAddPartie(true)} />
+            </div>
+          </div>
+        )}
+
+        {/* ═══════════════════ ONGLET OPÉRATIONS ═══════════════════ */}
+        {activeTab === 'operations' && (
+          <div className="space-y-6">
+            {/* Réunions */}
+            <GestionReunions
+              affaire={affaire}
+              onUpdate={(updates) => update(updates)}
+            />
+
+            {/* Désordres (intégré) */}
+            <div className="pt-6 border-t border-[#e5e5e5]">
+              <h3 className="text-lg font-medium text-[#1a1a1a] mb-4">Désordres constatés</h3>
+              <TabDesordres affaire={affaire} onAddDesordre={() => setShowAddDesordre(true)} />
+            </div>
+          </div>
+        )}
+
+        {/* ═══════════════════ ONGLET ÉCHANGES ═══════════════════ */}
+        {activeTab === 'echanges' && (
+          <div className="space-y-6">
+            {/* Dires */}
+            <GestionDires
+              affaire={affaire}
+              onUpdate={(updates) => update(updates)}
+            />
+
+            {/* Documents (intégré) */}
+            <div className="pt-6 border-t border-[#e5e5e5]">
+              <h3 className="text-lg font-medium text-[#1a1a1a] mb-4">Documents échangés</h3>
+              <GestionDocuments
+                affaire={affaire}
+                onUpdate={(updates) => update(updates)}
+                onDownload={handleDownloadDocument}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ═══════════════════ ONGLET PRODUCTION ═══════════════════ */}
+        {activeTab === 'production' && (
+          <div className="space-y-6">
+            {/* Rapports */}
+            <TabRapports
+              affaire={affaire}
+              onOpenNoteSynthese={() => setShowNoteSynthese(true)}
+              onOpenRapportFinal={() => setShowRapportFinal(true)}
+            />
+
+            {/* Outils d'excellence (intégré) */}
+            <div className="pt-6 border-t border-[#e5e5e5]">
+              <h3 className="text-lg font-medium text-[#1a1a1a] mb-4">Outils d'expertise</h3>
+              <TabOutils affaire={affaire} navigate={navigate} />
+            </div>
+
+            {/* Timeline */}
+            <div className="pt-6 border-t border-[#e5e5e5]">
+              <h3 className="text-lg font-medium text-[#1a1a1a] mb-4">Historique du dossier</h3>
+              <TimelineDossier affaire={affaire} />
+            </div>
+          </div>
+        )}
+
+        {/* ═══════════════════ ONGLET FINANCES ═══════════════════ */}
+        {activeTab === 'finances' && (
+          <TabFinancier
+            affaire={affaire}
+            timer={timer}
+            onUpdate={(updates) => update(updates)}
+            onOpenEtatFrais={() => setShowEtatFrais(true)}
+          />
+        )}
+
+        {/* ═══════════════════ ANCIENS ONGLETS (COMPATIBILITÉ) ═══════════════════ */}
         {activeTab === 'general' && <TabGeneral affaire={affaire} />}
         {activeTab === 'parties' && <TabParties affaire={affaire} onAddPartie={() => setShowAddPartie(true)} />}
         {activeTab === 'reunions' && (
