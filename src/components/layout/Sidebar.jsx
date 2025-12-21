@@ -1,5 +1,5 @@
 // ============================================================================
-// CRM EXPERT JUDICIAIRE - SIDEBAR Style Google
+// CRM EXPERT JUDICIAIRE - SIDEBAR Style Samsung One UI
 // ============================================================================
 
 import React, { useState, useMemo } from 'react';
@@ -78,28 +78,28 @@ const Sidebar = ({
 
   return (
     <div className={`
-      bg-white border-r border-[#dadce0] flex flex-col transition-all duration-300
+      bg-white border-r border-[#e0e0e0] flex flex-col transition-all duration-300
       ${collapsed ? 'w-20' : 'w-72'}
     `}>
       {/* Logo */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-[#dadce0]">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-[#e0e0e0]">
         {!collapsed && (
           <div
             className="flex items-center gap-3 cursor-pointer"
             onClick={() => navigate('/')}
           >
-            <div className="w-10 h-10 bg-[#fef9e7] rounded-2xl flex items-center justify-center">
+            <div className="w-11 h-11 bg-[#fdf8e8] rounded-2xl flex items-center justify-center border-2 border-[#c9a227]">
               <Scale className="w-6 h-6 text-[#c9a227]" />
             </div>
             <div>
-              <span className="font-medium text-lg text-[#202124]">Expert</span>
-              <span className="text-[#c9a227] text-lg font-medium">.CRM</span>
+              <span className="font-bold text-lg text-[#1f1f1f]">Expert</span>
+              <span className="text-[#c9a227] text-lg font-bold">.CRM</span>
             </div>
           </div>
         )}
         {collapsed && (
           <div
-            className="w-10 h-10 bg-[#fef9e7] rounded-2xl flex items-center justify-center mx-auto cursor-pointer"
+            className="w-11 h-11 bg-[#fdf8e8] rounded-2xl flex items-center justify-center mx-auto cursor-pointer border-2 border-[#c9a227]"
             onClick={() => navigate('/')}
           >
             <Scale className="w-6 h-6 text-[#c9a227]" />
@@ -107,14 +107,14 @@ const Sidebar = ({
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-2 hover:bg-[#f1f3f4] rounded-full transition-colors"
+          className="p-2.5 hover:bg-[#f0f0f0] active:bg-[#e4e4e4] rounded-xl transition-colors"
         >
-          <Menu className="w-5 h-5 text-[#5f6368]" />
+          <Menu className="w-5 h-5 text-[#555555]" />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-2 px-3">
+      <nav className="flex-1 overflow-y-auto py-3 px-3">
         {modules.map(module => {
           const Icon = module.icon || ICONS[module.iconName] || Folder;
           const isActive = moduleActif === module.id;
@@ -127,26 +127,29 @@ const Sidebar = ({
               <button
                 onClick={() => handleModuleClick(module)}
                 className={`
-                  w-full flex items-center justify-between px-3 py-2.5 rounded-full transition-all duration-200
+                  w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-200
                   ${isActive
-                    ? 'bg-[#fef9e7] text-[#a68618]'
-                    : 'text-[#5f6368] hover:bg-[#f1f3f4]'
+                    ? 'bg-[#fdf8e8] border-2 border-[#c9a227]'
+                    : 'border-2 border-transparent hover:bg-[#f7f7f7] active:bg-[#f0f0f0]'
                   }
                 `}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className={`w-5 h-5 flex-shrink-0 ${
-                    isActive ? 'text-[#c9a227]' : 'text-[#5f6368]'
-                  }`} />
+                  <div className={`
+                    w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0
+                    ${isActive ? 'bg-[#c9a227]' : 'bg-[#f0f0f0]'}
+                  `}>
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-[#555555]'}`} />
+                  </div>
                   {!collapsed && (
                     <>
-                      <span className={`text-sm font-medium ${
-                        isActive ? 'text-[#a68618]' : 'text-[#3c4043]'
+                      <span className={`text-[15px] font-semibold ${
+                        isActive ? 'text-[#9a7b1c]' : 'text-[#1f1f1f]'
                       }`}>
                         {module.label}
                       </span>
                       {badge > 0 && (
-                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-[#ea4335] text-white">
+                        <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-[#ff3b30] text-white">
                           {badge}
                         </span>
                       )}
@@ -155,14 +158,14 @@ const Sidebar = ({
                 </div>
                 {!collapsed && hasSubModules && (
                   isExpanded
-                    ? <ChevronDown className="w-4 h-4 text-[#5f6368]" />
-                    : <ChevronRight className="w-4 h-4 text-[#5f6368]" />
+                    ? <ChevronDown className="w-5 h-5 text-[#757575]" />
+                    : <ChevronRight className="w-5 h-5 text-[#757575]" />
                 )}
               </button>
 
               {/* Sous-modules */}
               {!collapsed && hasSubModules && isExpanded && (
-                <div className="ml-4 mt-1 border-l-2 border-[#e8eaed]">
+                <div className="ml-6 mt-2 space-y-1">
                   {module.sousModules.map(sub => {
                     const SubIcon = sub.icon || ICONS[sub.iconName] || Folder;
                     const isSubActive = sousModuleActif === sub.id;
@@ -172,15 +175,17 @@ const Sidebar = ({
                         key={sub.id}
                         onClick={() => handleSubModuleClick(sub)}
                         className={`
-                          w-full flex items-center gap-3 px-3 py-2 ml-2 rounded-full transition-colors
+                          w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors
                           ${isSubActive
-                            ? 'bg-[#fef9e7] text-[#a68618]'
-                            : 'text-[#5f6368] hover:bg-[#f1f3f4]'
+                            ? 'bg-[#fdf8e8] text-[#9a7b1c]'
+                            : 'text-[#555555] hover:bg-[#f7f7f7] active:bg-[#f0f0f0]'
                           }
                         `}
                       >
-                        <SubIcon className={`w-4 h-4 ${isSubActive ? 'text-[#c9a227]' : ''}`} />
-                        <span className="text-sm">{sub.label}</span>
+                        <SubIcon className={`w-4 h-4 ${isSubActive ? 'text-[#c9a227]' : 'text-[#757575]'}`} />
+                        <span className={`text-[14px] ${isSubActive ? 'font-semibold' : 'font-medium'}`}>
+                          {sub.label}
+                        </span>
                       </button>
                     );
                   })}
@@ -193,19 +198,28 @@ const Sidebar = ({
 
       {/* Footer */}
       {!collapsed && (
-        <div className="p-3 border-t border-[#dadce0]">
+        <div className="p-3 border-t border-[#e0e0e0]">
           <button
             onClick={() => navigate('/parametres')}
             className={`
-              w-full flex items-center gap-3 px-3 py-2.5 rounded-full transition-colors
+              w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-colors
               ${location.pathname === '/parametres'
-                ? 'bg-[#fef9e7] text-[#a68618]'
-                : 'text-[#5f6368] hover:bg-[#f1f3f4]'
+                ? 'bg-[#fdf8e8] border-2 border-[#c9a227]'
+                : 'border-2 border-transparent hover:bg-[#f7f7f7] active:bg-[#f0f0f0]'
               }
             `}
           >
-            <Settings className={`w-5 h-5 ${location.pathname === '/parametres' ? 'text-[#c9a227]' : ''}`} />
-            <span className="text-sm font-medium">Paramètres</span>
+            <div className={`
+              w-9 h-9 rounded-xl flex items-center justify-center
+              ${location.pathname === '/parametres' ? 'bg-[#c9a227]' : 'bg-[#f0f0f0]'}
+            `}>
+              <Settings className={`w-5 h-5 ${location.pathname === '/parametres' ? 'text-white' : 'text-[#555555]'}`} />
+            </div>
+            <span className={`text-[15px] font-semibold ${
+              location.pathname === '/parametres' ? 'text-[#9a7b1c]' : 'text-[#1f1f1f]'
+            }`}>
+              Paramètres
+            </span>
           </button>
         </div>
       )}

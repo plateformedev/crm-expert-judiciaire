@@ -2,73 +2,93 @@
 // CRM EXPERT JUDICIAIRE - CONSTANTES ET DONNÉES DE RÉFÉRENCE
 // ============================================================================
 
-// Design System - Style Google/Material Design 3
+// Design System - Style Samsung One UI
 export const DS = {
   colors: {
-    // Fond principal blanc
+    // Fond principal - Samsung utilise blanc pur et gris très clair
     background: '#ffffff',
-    backgroundAlt: '#f8f9fa',
+    backgroundAlt: '#f7f7f7',
     surface: '#ffffff',
-    surfaceHover: '#f1f3f4',
+    surfaceHover: '#f0f0f0',
+    surfacePressed: '#e4e4e4',
 
-    // Texte
-    textPrimary: '#202124',
-    textSecondary: '#5f6368',
-    textTertiary: '#80868b',
-    textDisabled: '#bdc1c6',
+    // Texte - Contraste élevé Samsung
+    textPrimary: '#1f1f1f',      // Noir profond pour lisibilité maximale
+    textSecondary: '#757575',    // Gris moyen
+    textTertiary: '#ababab',     // Gris clair
+    textDisabled: '#cccccc',
 
-    // Accent or (identité Expert Judiciaire)
+    // Accent principal - Or Expert Judiciaire
     primary: '#c9a227',
-    primaryLight: '#e8d48a',
-    primaryDark: '#a68618',
-    primarySurface: '#fef9e7',
+    primaryLight: '#f5e6b3',
+    primaryDark: '#9a7b1c',
+    primarySurface: '#fdf8e8',
 
-    // Couleurs sémantiques (style Google)
-    success: '#34a853',
-    successLight: '#e6f4ea',
-    warning: '#fbbc04',
-    warningLight: '#fef7e0',
-    error: '#ea4335',
-    errorLight: '#fce8e6',
-    info: '#4285f4',
-    infoLight: '#e8f0fe',
+    // Bleu Samsung pour actions secondaires
+    samsungBlue: '#0381fe',
+    samsungBlueLight: '#e5f3ff',
 
-    // Gris Google
+    // Couleurs sémantiques - Style Samsung (vives et contrastées)
+    success: '#00a65a',          // Vert Samsung
+    successLight: '#e5f7ed',
+    warning: '#ff9500',          // Orange Samsung
+    warningLight: '#fff5e5',
+    error: '#ff3b30',            // Rouge Samsung
+    errorLight: '#ffebea',
+    info: '#0381fe',             // Bleu Samsung
+    infoLight: '#e5f3ff',
+
+    // Gris Samsung - Échelle simplifiée et contrastée
     gris: {
-      50: '#f8f9fa', 100: '#f1f3f4', 200: '#e8eaed', 300: '#dadce0',
-      400: '#bdc1c6', 500: '#9aa0a6', 600: '#80868b', 700: '#5f6368',
-      800: '#3c4043', 900: '#202124'
+      50: '#f7f7f7',   // Fond alternatif
+      100: '#f0f0f0',  // Hover
+      200: '#e4e4e4',  // Pressed / Séparateurs
+      300: '#d1d1d1',  // Bordures
+      400: '#ababab',  // Texte tertiaire
+      500: '#757575',  // Texte secondaire
+      600: '#555555',  // Icônes
+      700: '#333333',  // Texte fort
+      800: '#1f1f1f',  // Texte principal
+      900: '#000000'   // Noir pur
     },
 
+    // Bordures Samsung
+    border: '#e0e0e0',
+    borderLight: '#f0f0f0',
+    borderDark: '#d1d1d1',
+
     // Legacy (compatibilité)
-    noir: '#202124',
-    noirProfond: '#0d0d0d',
+    noir: '#1f1f1f',
+    noirProfond: '#000000',
     blanc: '#ffffff',
-    blancCasse: '#f8f9fa',
+    blancCasse: '#f7f7f7',
     or: '#c9a227',
-    orClair: '#e8d48a',
-    orPale: '#fef9e7'
+    orClair: '#f5e6b3',
+    orPale: '#fdf8e8'
   },
 
-  // Ombres style Google (douces, pas de bordures)
+  // Ombres Samsung - Très subtiles, préférence pour les bordures
   shadows: {
-    sm: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
-    md: '0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15)',
-    lg: '0 2px 6px 2px rgba(60,64,67,0.15), 0 1px 2px 0 rgba(60,64,67,0.3)',
-    xl: '0 4px 8px 3px rgba(60,64,67,0.15), 0 1px 3px rgba(60,64,67,0.3)',
-    hover: '0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15)'
+    none: 'none',
+    sm: '0 1px 3px rgba(0,0,0,0.08)',
+    md: '0 2px 8px rgba(0,0,0,0.1)',
+    lg: '0 4px 16px rgba(0,0,0,0.12)',
+    xl: '0 8px 24px rgba(0,0,0,0.15)',
+    card: '0 1px 4px rgba(0,0,0,0.08)'
   },
 
-  // Border radius Google (très arrondis)
+  // Border radius Samsung One UI - Arrondis modérés
   radius: {
+    xs: '4px',
     sm: '8px',
     md: '12px',
     lg: '16px',
-    xl: '24px',
-    full: '9999px'
+    xl: '20px',
+    xxl: '26px',    // Pour les cartes principales
+    full: '9999px'  // Pour les badges/avatars seulement
   },
 
-  // Espacement
+  // Espacement Samsung - Généreux pour la lisibilité
   spacing: {
     xs: '4px',
     sm: '8px',

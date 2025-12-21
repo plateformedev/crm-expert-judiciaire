@@ -1,42 +1,42 @@
 // ============================================================================
 // CRM EXPERT JUDICIAIRE - COMPOSANTS UI DE BASE
-// Style Google / Material Design 3
+// Style Samsung One UI - Simple, Contrasté, Lisible
 // ============================================================================
 
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, ChevronRight } from 'lucide-react';
 import { DS } from '../../data';
 
 // ============================================================================
-// CARD - Style Google (ombres douces, pas de bordures, très arrondi)
+// CARD - Style Samsung (bordures légères, coins arrondis modérés)
 // ============================================================================
 
 export const Card = ({
   children,
   className = '',
-  variant = 'elevated', // elevated, outlined, filled
+  variant = 'default', // default, outlined, filled
   premium = false,
   onClick = null,
   hover = true,
   ...props
 }) => {
   const variants = {
-    elevated: `bg-white shadow-[0_1px_2px_0_rgba(60,64,67,0.3),0_1px_3px_1px_rgba(60,64,67,0.15)]
-               ${hover && onClick ? 'hover:shadow-[0_1px_3px_0_rgba(60,64,67,0.3),0_4px_8px_3px_rgba(60,64,67,0.15)]' : ''}`,
-    outlined: 'bg-white border border-[#dadce0]',
-    filled: 'bg-[#f1f3f4]'
+    default: `bg-white border border-[#e0e0e0] ${hover && onClick ? 'hover:bg-[#f7f7f7] active:bg-[#f0f0f0]' : ''}`,
+    outlined: 'bg-white border-2 border-[#e0e0e0]',
+    filled: 'bg-[#f7f7f7] border border-[#e0e0e0]',
+    elevated: `bg-white shadow-[0_1px_4px_rgba(0,0,0,0.08)] ${hover && onClick ? 'hover:shadow-[0_2px_8px_rgba(0,0,0,0.1)]' : ''}`
   };
 
   const premiumStyle = premium
-    ? 'ring-1 ring-[#c9a227]/30 shadow-[0_1px_3px_0_rgba(201,162,39,0.2),0_4px_8px_3px_rgba(201,162,39,0.1)]'
+    ? 'border-[#c9a227] border-2 bg-[#fdf8e8]'
     : '';
 
-  const clickableClasses = onClick ? 'cursor-pointer' : '';
+  const clickableClasses = onClick ? 'cursor-pointer transition-all duration-200' : '';
 
   return (
     <div
       className={`
-        rounded-3xl transition-all duration-200
+        rounded-2xl
         ${variants[variant]}
         ${premiumStyle}
         ${clickableClasses}
@@ -51,7 +51,77 @@ export const Card = ({
 };
 
 // ============================================================================
-// BADGE - Style Google (couleurs douces, très arrondi)
+// LIST ITEM - Style Samsung (séparateurs, chevrons, espacement généreux)
+// ============================================================================
+
+export const ListItem = ({
+  children,
+  icon: Icon,
+  title,
+  subtitle,
+  value,
+  onClick,
+  showChevron = true,
+  divider = true,
+  className = ''
+}) => {
+  return (
+    <div
+      onClick={onClick}
+      className={`
+        flex items-center gap-4 px-5 py-4 bg-white
+        ${onClick ? 'cursor-pointer hover:bg-[#f7f7f7] active:bg-[#f0f0f0]' : ''}
+        ${divider ? 'border-b border-[#f0f0f0]' : ''}
+        transition-colors duration-150
+        ${className}
+      `}
+    >
+      {Icon && (
+        <div className="w-10 h-10 rounded-full bg-[#f7f7f7] flex items-center justify-center flex-shrink-0">
+          <Icon className="w-5 h-5 text-[#555555]" />
+        </div>
+      )}
+
+      <div className="flex-1 min-w-0">
+        {title && <div className="text-[15px] font-medium text-[#1f1f1f] truncate">{title}</div>}
+        {subtitle && <div className="text-[13px] text-[#757575] mt-0.5 truncate">{subtitle}</div>}
+        {children}
+      </div>
+
+      {value && <div className="text-[14px] text-[#757575] flex-shrink-0">{value}</div>}
+
+      {onClick && showChevron && (
+        <ChevronRight className="w-5 h-5 text-[#ababab] flex-shrink-0" />
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
+// LIST GROUP - Style Samsung (titre de section, fond groupé)
+// ============================================================================
+
+export const ListGroup = ({
+  children,
+  title,
+  className = ''
+}) => {
+  return (
+    <div className={className}>
+      {title && (
+        <div className="px-5 py-3 text-[13px] font-medium text-[#757575] uppercase tracking-wide">
+          {title}
+        </div>
+      )}
+      <div className="bg-white rounded-2xl border border-[#e0e0e0] overflow-hidden">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+// ============================================================================
+// BADGE - Style Samsung (couleurs vives, contraste élevé)
 // ============================================================================
 
 export const Badge = ({
@@ -61,24 +131,24 @@ export const Badge = ({
   className = ''
 }) => {
   const variants = {
-    default: 'bg-[#e8eaed] text-[#3c4043]',
-    gold: 'bg-[#fef9e7] text-[#a68618]',
-    success: 'bg-[#e6f4ea] text-[#1e8e3e]',
-    warning: 'bg-[#fef7e0] text-[#f29900]',
-    error: 'bg-[#fce8e6] text-[#d93025]',
-    info: 'bg-[#e8f0fe] text-[#1967d2]',
-    purple: 'bg-[#f3e8fd] text-[#8430ce]'
+    default: 'bg-[#f0f0f0] text-[#555555]',
+    gold: 'bg-[#fdf8e8] text-[#9a7b1c] border border-[#c9a227]',
+    success: 'bg-[#e5f7ed] text-[#007a3d] border border-[#00a65a]',
+    warning: 'bg-[#fff5e5] text-[#cc7700] border border-[#ff9500]',
+    error: 'bg-[#ffebea] text-[#cc2f26] border border-[#ff3b30]',
+    info: 'bg-[#e5f3ff] text-[#0066cc] border border-[#0381fe]',
+    purple: 'bg-[#f3e8ff] text-[#7c3aed] border border-[#a855f7]'
   };
 
   const sizes = {
-    sm: 'px-2 py-0.5 text-xs',
-    md: 'px-3 py-1 text-xs',
-    lg: 'px-4 py-1.5 text-sm'
+    sm: 'px-2 py-0.5 text-[11px]',
+    md: 'px-3 py-1 text-[12px]',
+    lg: 'px-4 py-1.5 text-[13px]'
   };
 
   return (
     <span className={`
-      inline-flex items-center font-medium rounded-full
+      inline-flex items-center font-semibold rounded-full
       ${variants[variant]}
       ${sizes[size]}
       ${className}
@@ -89,7 +159,7 @@ export const Badge = ({
 };
 
 // ============================================================================
-// BUTTON - Style Google (coins arrondis, ombres au hover)
+// BUTTON - Style Samsung (rectangulaire arrondi, pas pilule)
 // ============================================================================
 
 export const Button = ({
@@ -100,33 +170,42 @@ export const Button = ({
   iconPosition = 'left',
   disabled = false,
   loading = false,
+  fullWidth = false,
   className = '',
   ...props
 }) => {
   const variants = {
-    primary: `bg-[#c9a227] text-white hover:bg-[#a68618] hover:shadow-[0_1px_3px_0_rgba(60,64,67,0.3),0_4px_8px_3px_rgba(60,64,67,0.15)]
-              active:bg-[#8b7019] disabled:bg-[#e8eaed] disabled:text-[#9aa0a6]`,
-    secondary: `bg-white border border-[#dadce0] text-[#3c4043] hover:bg-[#f1f3f4] hover:border-[#dadce0]
-                active:bg-[#e8eaed] disabled:bg-[#f1f3f4] disabled:text-[#9aa0a6]`,
-    filled: `bg-[#e8f0fe] text-[#1967d2] hover:bg-[#d2e3fc] active:bg-[#aecbfa]`,
-    ghost: `bg-transparent text-[#5f6368] hover:bg-[#f1f3f4] active:bg-[#e8eaed]`,
-    danger: `bg-[#ea4335] text-white hover:bg-[#d93025] active:bg-[#c5221f]`,
-    text: `bg-transparent text-[#c9a227] hover:bg-[#fef9e7] active:bg-[#fef3d1]`
+    primary: `bg-[#c9a227] text-white font-semibold
+              hover:bg-[#b8921f] active:bg-[#9a7b1c]
+              disabled:bg-[#e4e4e4] disabled:text-[#ababab]`,
+    secondary: `bg-white border-2 border-[#e0e0e0] text-[#1f1f1f] font-medium
+                hover:bg-[#f7f7f7] active:bg-[#f0f0f0]
+                disabled:bg-[#f7f7f7] disabled:text-[#ababab] disabled:border-[#e4e4e4]`,
+    samsung: `bg-[#0381fe] text-white font-semibold
+              hover:bg-[#0070e0] active:bg-[#005bc4]
+              disabled:bg-[#e4e4e4] disabled:text-[#ababab]`,
+    ghost: `bg-transparent text-[#555555] font-medium
+            hover:bg-[#f0f0f0] active:bg-[#e4e4e4]`,
+    danger: `bg-[#ff3b30] text-white font-semibold
+             hover:bg-[#e6342b] active:bg-[#cc2f26]`,
+    text: `bg-transparent text-[#c9a227] font-semibold
+           hover:bg-[#fdf8e8] active:bg-[#f5e6b3]`
   };
 
   const sizes = {
-    sm: 'px-3 py-1.5 text-sm gap-1.5',
-    md: 'px-4 py-2.5 text-sm gap-2',
-    lg: 'px-6 py-3 text-base gap-2'
+    sm: 'px-4 py-2 text-[13px] gap-1.5 rounded-lg',
+    md: 'px-5 py-3 text-[14px] gap-2 rounded-xl',
+    lg: 'px-6 py-4 text-[15px] gap-2 rounded-xl'
   };
 
   return (
     <button
       className={`
-        inline-flex items-center justify-center font-medium rounded-full transition-all duration-200
+        inline-flex items-center justify-center transition-all duration-200
         ${variants[variant]}
         ${sizes[size]}
-        ${disabled || loading ? 'cursor-not-allowed opacity-60' : ''}
+        ${fullWidth ? 'w-full' : ''}
+        ${disabled || loading ? 'cursor-not-allowed' : ''}
         ${className}
       `}
       disabled={disabled || loading}
@@ -138,20 +217,21 @@ export const Button = ({
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
         </svg>
       )}
-      {Icon && iconPosition === 'left' && !loading && <Icon className="w-4 h-4" />}
+      {Icon && iconPosition === 'left' && !loading && <Icon className="w-5 h-5" />}
       {children}
-      {Icon && iconPosition === 'right' && !loading && <Icon className="w-4 h-4" />}
+      {Icon && iconPosition === 'right' && !loading && <Icon className="w-5 h-5" />}
     </button>
   );
 };
 
 // ============================================================================
-// INPUT - Style Google (focus avec accent, coins arrondis)
+// INPUT - Style Samsung (bordure visible, focus bleu Samsung)
 // ============================================================================
 
 export const Input = ({
   label,
   error,
+  helper,
   icon: Icon,
   className = '',
   ...props
@@ -159,74 +239,89 @@ export const Input = ({
   return (
     <div className={className}>
       {label && (
-        <label className="text-sm font-medium text-[#3c4043] block mb-2">
+        <label className="text-[14px] font-semibold text-[#1f1f1f] block mb-2">
           {label}
         </label>
       )}
       <div className="relative">
         {Icon && (
-          <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9aa0a6]" />
+          <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#ababab]" />
         )}
         <input
           className={`
-            w-full px-4 py-3 bg-white border rounded-2xl transition-all duration-200
-            text-[#202124] placeholder-[#9aa0a6]
-            focus:outline-none focus:border-[#c9a227] focus:ring-2 focus:ring-[#c9a227]/20
+            w-full px-4 py-3.5 bg-white border-2 rounded-xl transition-all duration-200
+            text-[15px] text-[#1f1f1f] placeholder-[#ababab]
+            focus:outline-none focus:border-[#0381fe] focus:bg-white
             ${Icon ? 'pl-12' : ''}
-            ${error ? 'border-[#ea4335] focus:border-[#ea4335] focus:ring-[#ea4335]/20' : 'border-[#dadce0]'}
+            ${error
+              ? 'border-[#ff3b30] focus:border-[#ff3b30]'
+              : 'border-[#e0e0e0] hover:border-[#d1d1d1]'
+            }
           `}
           {...props}
         />
       </div>
-      {error && <p className="mt-2 text-sm text-[#ea4335]">{error}</p>}
+      {error && <p className="mt-2 text-[13px] text-[#ff3b30] font-medium">{error}</p>}
+      {helper && !error && <p className="mt-2 text-[13px] text-[#757575]">{helper}</p>}
     </div>
   );
 };
 
 // ============================================================================
-// SELECT - Style Google
+// SELECT - Style Samsung
 // ============================================================================
 
 export const Select = ({
   label,
   options = [],
   error,
+  helper,
   className = '',
   ...props
 }) => {
   return (
     <div className={className}>
       {label && (
-        <label className="text-sm font-medium text-[#3c4043] block mb-2">
+        <label className="text-[14px] font-semibold text-[#1f1f1f] block mb-2">
           {label}
         </label>
       )}
       <select
         className={`
-          w-full px-4 py-3 bg-white border rounded-2xl transition-all duration-200
-          text-[#202124] appearance-none cursor-pointer
-          focus:outline-none focus:border-[#c9a227] focus:ring-2 focus:ring-[#c9a227]/20
-          ${error ? 'border-[#ea4335] focus:border-[#ea4335] focus:ring-[#ea4335]/20' : 'border-[#dadce0]'}
+          w-full px-4 py-3.5 bg-white border-2 rounded-xl transition-all duration-200
+          text-[15px] text-[#1f1f1f] appearance-none cursor-pointer
+          focus:outline-none focus:border-[#0381fe]
+          ${error
+            ? 'border-[#ff3b30] focus:border-[#ff3b30]'
+            : 'border-[#e0e0e0] hover:border-[#d1d1d1]'
+          }
         `}
-        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239aa0a6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '20px' }}
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23757575' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'right 12px center',
+          backgroundSize: '20px'
+        }}
         {...props}
       >
         {options.map(opt => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>
         ))}
       </select>
-      {error && <p className="mt-2 text-sm text-[#ea4335]">{error}</p>}
+      {error && <p className="mt-2 text-[13px] text-[#ff3b30] font-medium">{error}</p>}
+      {helper && !error && <p className="mt-2 text-[13px] text-[#757575]">{helper}</p>}
     </div>
   );
 };
 
 // ============================================================================
-// TEXTAREA - Style Google
+// TEXTAREA - Style Samsung
 // ============================================================================
 
 export const Textarea = ({
   label,
   error,
+  helper,
   rows = 4,
   className = '',
   ...props
@@ -234,27 +329,68 @@ export const Textarea = ({
   return (
     <div className={className}>
       {label && (
-        <label className="text-sm font-medium text-[#3c4043] block mb-2">
+        <label className="text-[14px] font-semibold text-[#1f1f1f] block mb-2">
           {label}
         </label>
       )}
       <textarea
         rows={rows}
         className={`
-          w-full px-4 py-3 bg-white border rounded-2xl transition-all duration-200 resize-none
-          text-[#202124] placeholder-[#9aa0a6]
-          focus:outline-none focus:border-[#c9a227] focus:ring-2 focus:ring-[#c9a227]/20
-          ${error ? 'border-[#ea4335] focus:border-[#ea4335] focus:ring-[#ea4335]/20' : 'border-[#dadce0]'}
+          w-full px-4 py-3.5 bg-white border-2 rounded-xl transition-all duration-200 resize-none
+          text-[15px] text-[#1f1f1f] placeholder-[#ababab]
+          focus:outline-none focus:border-[#0381fe]
+          ${error
+            ? 'border-[#ff3b30] focus:border-[#ff3b30]'
+            : 'border-[#e0e0e0] hover:border-[#d1d1d1]'
+          }
         `}
         {...props}
       />
-      {error && <p className="mt-2 text-sm text-[#ea4335]">{error}</p>}
+      {error && <p className="mt-2 text-[13px] text-[#ff3b30] font-medium">{error}</p>}
+      {helper && !error && <p className="mt-2 text-[13px] text-[#757575]">{helper}</p>}
     </div>
   );
 };
 
 // ============================================================================
-// MODAL BASE - Style Google (très arrondi, ombre douce)
+// SWITCH - Style Samsung (toggle switch)
+// ============================================================================
+
+export const Switch = ({
+  checked = false,
+  onChange,
+  label,
+  disabled = false,
+  className = ''
+}) => {
+  return (
+    <label className={`flex items-center gap-3 cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}>
+      <div className="relative">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={onChange}
+          disabled={disabled}
+          className="sr-only"
+        />
+        <div className={`
+          w-[52px] h-[32px] rounded-full transition-colors duration-200
+          ${checked ? 'bg-[#c9a227]' : 'bg-[#e0e0e0]'}
+        `}>
+          <div className={`
+            absolute top-1 w-[24px] h-[24px] bg-white rounded-full shadow-md
+            transition-transform duration-200
+            ${checked ? 'translate-x-[22px]' : 'translate-x-1'}
+          `} />
+        </div>
+      </div>
+      {label && <span className="text-[15px] text-[#1f1f1f]">{label}</span>}
+    </label>
+  );
+};
+
+// ============================================================================
+// MODAL BASE - Style Samsung (coins arrondis, animation fluide)
 // ============================================================================
 
 export const ModalBase = ({
@@ -273,30 +409,31 @@ export const ModalBase = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div
-        className="absolute inset-0 bg-[#202124]/60"
+        className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
       <div className={`
-        relative bg-white rounded-[28px] w-full ${sizes[size]} max-h-[90vh] overflow-hidden
-        shadow-[0_24px_38px_3px_rgba(0,0,0,0.14),0_9px_46px_8px_rgba(0,0,0,0.12),0_11px_15px_-7px_rgba(0,0,0,0.2)]
-        animate-[modalIn_0.2s_ease-out]
+        relative bg-white w-full ${sizes[size]} max-h-[90vh] overflow-hidden
+        rounded-t-3xl sm:rounded-2xl
+        shadow-[0_8px_24px_rgba(0,0,0,0.15)]
+        animate-[slideUp_0.3s_ease-out]
         ${className}
       `}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5">
-          <h2 className="text-xl font-normal text-[#202124]">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#f0f0f0]">
+          <h2 className="text-[18px] font-semibold text-[#1f1f1f]">{title}</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-[#f1f3f4] rounded-full transition-colors"
+            className="w-10 h-10 flex items-center justify-center hover:bg-[#f0f0f0] active:bg-[#e4e4e4] rounded-full transition-colors"
           >
-            <X className="w-5 h-5 text-[#5f6368]" />
+            <X className="w-5 h-5 text-[#555555]" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="px-6 pb-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div className="px-6 py-5 overflow-y-auto max-h-[calc(90vh-80px)]">
           {children}
         </div>
       </div>
@@ -305,26 +442,49 @@ export const ModalBase = ({
 };
 
 // ============================================================================
-// TABS - Style Google (underline actif, pas de fond)
+// TABS - Style Samsung (segmented control ou underline)
 // ============================================================================
 
 export const Tabs = ({
   tabs,
   activeTab,
   onChange,
+  variant = 'underline', // underline ou segmented
   className = ''
 }) => {
+  if (variant === 'segmented') {
+    return (
+      <div className={`inline-flex bg-[#f0f0f0] rounded-xl p-1 ${className}`}>
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => onChange(tab.id)}
+            className={`
+              px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200
+              ${activeTab === tab.id
+                ? 'bg-white text-[#1f1f1f] shadow-sm'
+                : 'text-[#757575] hover:text-[#1f1f1f]'
+              }
+            `}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className={`flex gap-0 border-b border-[#dadce0] ${className}`}>
+    <div className={`flex border-b-2 border-[#f0f0f0] ${className}`}>
       {tabs.map(tab => (
         <button
           key={tab.id}
           onClick={() => onChange(tab.id)}
           className={`
-            px-4 py-3 text-sm font-medium transition-all relative
+            px-5 py-4 text-[14px] font-semibold transition-all relative
             ${activeTab === tab.id
               ? 'text-[#c9a227]'
-              : 'text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4]'
+              : 'text-[#757575] hover:text-[#1f1f1f]'
             }
           `}
         >
@@ -339,7 +499,7 @@ export const Tabs = ({
 };
 
 // ============================================================================
-// PROGRESS BAR - Style Google (coins arrondis, couleurs douces)
+// PROGRESS BAR - Style Samsung (couleurs vives, contraste)
 // ============================================================================
 
 export const ProgressBar = ({
@@ -354,31 +514,31 @@ export const ProgressBar = ({
 
   const colors = {
     gold: 'bg-[#c9a227]',
-    green: 'bg-[#34a853]',
-    red: 'bg-[#ea4335]',
-    blue: 'bg-[#4285f4]',
-    amber: 'bg-[#fbbc04]'
+    green: 'bg-[#00a65a]',
+    red: 'bg-[#ff3b30]',
+    blue: 'bg-[#0381fe]',
+    orange: 'bg-[#ff9500]'
   };
 
   const trackColors = {
-    gold: 'bg-[#fef9e7]',
-    green: 'bg-[#e6f4ea]',
-    red: 'bg-[#fce8e6]',
-    blue: 'bg-[#e8f0fe]',
-    amber: 'bg-[#fef7e0]'
+    gold: 'bg-[#f5e6b3]',
+    green: 'bg-[#b3e6c9]',
+    red: 'bg-[#ffb3b0]',
+    blue: 'bg-[#b3d9ff]',
+    orange: 'bg-[#ffd9a3]'
   };
 
   const heights = {
-    sm: 'h-1',
-    md: 'h-2',
-    lg: 'h-3'
+    sm: 'h-1.5',
+    md: 'h-2.5',
+    lg: 'h-4'
   };
 
   return (
     <div className={className}>
       {showLabel && (
         <div className="flex justify-between mb-2">
-          <span className="text-sm text-[#5f6368]">{Math.round(percentage)}%</span>
+          <span className="text-[13px] font-semibold text-[#1f1f1f]">{Math.round(percentage)}%</span>
         </div>
       )}
       <div className={`w-full ${trackColors[color]} rounded-full overflow-hidden ${heights[size]}`}>
@@ -392,7 +552,7 @@ export const ProgressBar = ({
 };
 
 // ============================================================================
-// TOOLTIP - Style Google
+// TOOLTIP - Style Samsung
 // ============================================================================
 
 export const Tooltip = ({
@@ -411,10 +571,10 @@ export const Tooltip = ({
     <div className="relative group">
       {children}
       <div className={`
-        absolute ${positions[position]} px-3 py-2 bg-[#3c4043] text-white text-xs rounded-lg
+        absolute ${positions[position]} px-3 py-2 bg-[#1f1f1f] text-white text-[12px] font-medium rounded-lg
         opacity-0 invisible group-hover:opacity-100 group-hover:visible
         transition-all duration-200 whitespace-nowrap z-50
-        shadow-[0_1px_3px_0_rgba(60,64,67,0.3),0_4px_8px_3px_rgba(60,64,67,0.15)]
+        shadow-lg
       `}>
         {content}
       </div>
@@ -423,7 +583,7 @@ export const Tooltip = ({
 };
 
 // ============================================================================
-// EMPTY STATE - Style Google
+// EMPTY STATE - Style Samsung
 // ============================================================================
 
 export const EmptyState = ({
@@ -435,14 +595,14 @@ export const EmptyState = ({
   className = ''
 }) => {
   return (
-    <div className={`text-center py-16 ${className}`}>
+    <div className={`text-center py-16 px-6 ${className}`}>
       {Icon && (
-        <div className="w-20 h-20 bg-[#f1f3f4] rounded-full flex items-center justify-center mx-auto mb-6">
-          <Icon className="w-10 h-10 text-[#9aa0a6]" />
+        <div className="w-20 h-20 bg-[#f7f7f7] border-2 border-[#e0e0e0] rounded-full flex items-center justify-center mx-auto mb-6">
+          <Icon className="w-10 h-10 text-[#ababab]" />
         </div>
       )}
-      <h3 className="text-lg font-normal text-[#202124] mb-2">{title}</h3>
-      {description && <p className="text-[#5f6368] mb-6 max-w-md mx-auto">{description}</p>}
+      <h3 className="text-[17px] font-semibold text-[#1f1f1f] mb-2">{title}</h3>
+      {description && <p className="text-[14px] text-[#757575] mb-6 max-w-md mx-auto leading-relaxed">{description}</p>}
       {action && (
         <Button variant="primary" onClick={action}>
           {actionLabel}
@@ -453,7 +613,7 @@ export const EmptyState = ({
 };
 
 // ============================================================================
-// LOADING SPINNER - Style Google (cercle simple)
+// LOADING SPINNER - Style Samsung
 // ============================================================================
 
 export const LoadingSpinner = ({ size = 'md', className = '' }) => {
@@ -473,7 +633,7 @@ export const LoadingSpinner = ({ size = 'md', className = '' }) => {
         <circle
           className="opacity-25"
           cx="12" cy="12" r="10"
-          stroke="#dadce0"
+          stroke="#e0e0e0"
           strokeWidth="3"
         />
         <path
@@ -490,20 +650,56 @@ export const LoadingSpinner = ({ size = 'md', className = '' }) => {
 };
 
 // ============================================================================
+// DIVIDER - Style Samsung
+// ============================================================================
+
+export const Divider = ({ className = '' }) => (
+  <div className={`h-[1px] bg-[#f0f0f0] ${className}`} />
+);
+
+// ============================================================================
+// SECTION HEADER - Style Samsung (titre de section avec action optionnelle)
+// ============================================================================
+
+export const SectionHeader = ({
+  title,
+  action,
+  actionLabel,
+  className = ''
+}) => (
+  <div className={`flex items-center justify-between px-5 py-3 ${className}`}>
+    <h3 className="text-[13px] font-semibold text-[#757575] uppercase tracking-wide">{title}</h3>
+    {action && (
+      <button
+        onClick={action}
+        className="text-[13px] font-semibold text-[#0381fe] hover:text-[#0070e0]"
+      >
+        {actionLabel}
+      </button>
+    )}
+  </div>
+);
+
+// ============================================================================
 // INDEX EXPORT
 // ============================================================================
 
 export default {
   Card,
+  ListItem,
+  ListGroup,
   Badge,
   Button,
   Input,
   Select,
   Textarea,
+  Switch,
   ModalBase,
   Tabs,
   ProgressBar,
   Tooltip,
   EmptyState,
-  LoadingSpinner
+  LoadingSpinner,
+  Divider,
+  SectionHeader
 };
