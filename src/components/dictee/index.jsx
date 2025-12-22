@@ -1,16 +1,27 @@
 // ============================================================================
 // CRM EXPERT JUDICIAIRE - MODULE DICTÉE VOCALE
-// Transcription temps réel avec Whisper API pour prise de notes terrain
+// Transcription temps réel avec Web Speech API (gratuit) + Whisper API (IA)
 // ============================================================================
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   Mic, MicOff, Square, Play, Pause, Trash2, Save, Copy,
   Volume2, VolumeX, Settings, Download, FileText, Clock,
-  CheckCircle, AlertCircle, Loader2, RefreshCw, Wand2
+  CheckCircle, AlertCircle, Loader2, RefreshCw, Wand2,
+  Radio, Zap, Globe, Cpu
 } from 'lucide-react';
 import { Card, Badge, Button, ModalBase } from '../ui';
 import { formatDuree } from '../../utils/helpers';
+
+// ============================================================================
+// MODES DE TRANSCRIPTION
+// ============================================================================
+
+export const TRANSCRIPTION_MODES = {
+  NATIVE: 'native',      // Web Speech API (gratuit, temps réel)
+  WHISPER: 'whisper',    // OpenAI Whisper (payant, haute qualité)
+  HYBRID: 'hybrid'       // Natif en temps réel + Whisper pour correction
+};
 
 // ============================================================================
 // CONFIGURATION WHISPER
@@ -104,6 +115,180 @@ class WhisperService {
 }
 
 export const whisperService = new WhisperService();
+
+// ============================================================================
+// SERVICE WEB SPEECH API (GRATUIT - TEMPS RÉEL)
+// ============================================================================
+
+class WebSpeechService {
+  constructor() {
+    this.recognition = null;
+    this.isSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+  }
+
+  isAvailable() {
+    return this.isSupported;
+  }
+
+  createRecognition(options = {}) {
+    if (!this.isSupported) {
+      throw new Error('Web Speech API non supportée par ce navigateur');
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.recognition = new SpeechRecognition();
+
+    // Configuration
+    this.recognition.continuous = options.continuous ?? true;
+    this.recognition.interimResults = options.interimResults ?? true;
+    this.recognition.lang = options.lang || 'fr-FR';
+    this.recognition.maxAlternatives = 1;
+
+    return this.recognition;
+  }
+
+  start(callbacks = {}) {
+    if (!this.recognition) {
+      this.createRecognition();
+    }
+
+    const { onResult, onInterim, onError, onEnd, onStart } = callbacks;
+
+    this.recognition.onstart = () => {
+      console.log('[WebSpeech] Reconnaissance démarrée');
+      onStart?.();
+    };
+
+    this.recognition.onresult = (event) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      if (finalTranscript) {
+        onResult?.(finalTranscript.trim());
+      }
+      if (interimTranscript) {
+        onInterim?.(interimTranscript);
+      }
+    };
+
+    this.recognition.onerror = (event) => {
+      console.error('[WebSpeech] Erreur:', event.error);
+      onError?.(event.error);
+    };
+
+    this.recognition.onend = () => {
+      console.log('[WebSpeech] Reconnaissance terminée');
+      onEnd?.();
+    };
+
+    this.recognition.start();
+  }
+
+  stop() {
+    if (this.recognition) {
+      this.recognition.stop();
+    }
+  }
+
+  abort() {
+    if (this.recognition) {
+      this.recognition.abort();
+    }
+  }
+}
+
+export const webSpeechService = new WebSpeechService();
+
+// ============================================================================
+// HOOK TRANSCRIPTION TEMPS RÉEL (WEB SPEECH API)
+// ============================================================================
+
+export const useRealtimeTranscription = (options = {}) => {
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const [error, setError] = useState(null);
+  const recognitionRef = useRef(null);
+
+  const start = useCallback(() => {
+    if (!webSpeechService.isAvailable()) {
+      setError('Web Speech API non disponible');
+      return;
+    }
+
+    setError(null);
+    setTranscript('');
+    setInterimTranscript('');
+
+    try {
+      recognitionRef.current = webSpeechService.createRecognition({
+        lang: options.lang || 'fr-FR',
+        continuous: true,
+        interimResults: true
+      });
+
+      webSpeechService.start({
+        onStart: () => setIsListening(true),
+        onResult: (text) => {
+          setTranscript(prev => prev + (prev ? ' ' : '') + text);
+          setInterimTranscript('');
+          options.onResult?.(text);
+        },
+        onInterim: (text) => {
+          setInterimTranscript(text);
+        },
+        onError: (err) => {
+          setError(err);
+          setIsListening(false);
+        },
+        onEnd: () => {
+          setIsListening(false);
+          setInterimTranscript('');
+        }
+      });
+    } catch (err) {
+      setError(err.message);
+    }
+  }, [options]);
+
+  const stop = useCallback(() => {
+    webSpeechService.stop();
+    setIsListening(false);
+  }, []);
+
+  const reset = useCallback(() => {
+    setTranscript('');
+    setInterimTranscript('');
+    setError(null);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      webSpeechService.abort();
+    };
+  }, []);
+
+  return {
+    isListening,
+    transcript,
+    interimTranscript,
+    fullTranscript: transcript + (interimTranscript ? ' ' + interimTranscript : ''),
+    error,
+    start,
+    stop,
+    reset,
+    isSupported: webSpeechService.isAvailable()
+  };
+};
 
 // ============================================================================
 // HOOK ENREGISTREMENT AUDIO
@@ -634,8 +819,345 @@ export const DicteeWidget = ({ onResult }) => {
 };
 
 // ============================================================================
+// DICTÉE TERRAIN - MODE COMBINÉ (WEB SPEECH + WHISPER)
+// ============================================================================
+
+export const DicteeTerrain = ({
+  onTranscription,
+  affaireReference = '',
+  reunionNumero = null,
+  context = ''
+}) => {
+  const [mode, setMode] = useState(TRANSCRIPTION_MODES.NATIVE);
+  const [transcription, setTranscription] = useState('');
+  const [notes, setNotes] = useState([]);
+  const [isActive, setIsActive] = useState(false);
+
+  // Web Speech API (temps réel, gratuit)
+  const realtimeTranscription = useRealtimeTranscription({
+    lang: 'fr-FR',
+    onResult: (text) => {
+      const timestamp = new Date().toISOString();
+      const newNote = {
+        id: Date.now(),
+        text,
+        timestamp,
+        mode: 'native',
+        reunion: reunionNumero
+      };
+      setNotes(prev => [...prev, newNote]);
+      onTranscription?.(text, newNote);
+    }
+  });
+
+  // Whisper (enregistrement audio + transcription IA)
+  const recorder = useAudioRecorder();
+  const [isTranscribing, setIsTranscribing] = useState(false);
+
+  const handleStart = () => {
+    if (mode === TRANSCRIPTION_MODES.NATIVE || mode === TRANSCRIPTION_MODES.HYBRID) {
+      realtimeTranscription.start();
+    }
+    if (mode === TRANSCRIPTION_MODES.WHISPER || mode === TRANSCRIPTION_MODES.HYBRID) {
+      recorder.startRecording();
+    }
+    setIsActive(true);
+  };
+
+  const handleStop = async () => {
+    setIsActive(false);
+
+    if (mode === TRANSCRIPTION_MODES.NATIVE || mode === TRANSCRIPTION_MODES.HYBRID) {
+      realtimeTranscription.stop();
+    }
+
+    if (mode === TRANSCRIPTION_MODES.WHISPER || mode === TRANSCRIPTION_MODES.HYBRID) {
+      recorder.stopRecording();
+
+      // Attendre le blob et transcrire avec Whisper
+      setTimeout(async () => {
+        if (recorder.audioBlob) {
+          setIsTranscribing(true);
+
+          const result = whisperService.isConfigured()
+            ? await whisperService.transcribe(recorder.audioBlob, {
+                prompt: `Contexte: expertise judiciaire BTP. Affaire: ${affaireReference}. ${context}`
+              })
+            : await whisperService.simulateTranscribe(recorder.duration);
+
+          setIsTranscribing(false);
+
+          if (result.success) {
+            const newNote = {
+              id: Date.now(),
+              text: result.text,
+              timestamp: new Date().toISOString(),
+              mode: 'whisper',
+              duration: recorder.duration,
+              reunion: reunionNumero
+            };
+            setNotes(prev => [...prev, newNote]);
+            onTranscription?.(result.text, newNote);
+          }
+
+          recorder.resetRecording();
+        }
+      }, 500);
+    }
+  };
+
+  const handleClearNotes = () => {
+    setNotes([]);
+    setTranscription('');
+    realtimeTranscription.reset();
+  };
+
+  const handleCopyAll = () => {
+    const allText = notes.map(n => n.text).join('\n\n');
+    navigator.clipboard.writeText(allText);
+  };
+
+  const handleExportNotes = () => {
+    const data = {
+      affaire: affaireReference,
+      reunion: reunionNumero,
+      date: new Date().toISOString(),
+      notes: notes
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `notes_${affaireReference}_R${reunionNumero || 'X'}_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Sélection du mode */}
+      <Card className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-medium text-[#1a1a1a] flex items-center gap-2">
+            <Mic className="w-5 h-5 text-[#c9a227]" />
+            Dictée Terrain
+          </h3>
+          {affaireReference && (
+            <Badge variant="default">{affaireReference}</Badge>
+          )}
+        </div>
+
+        {/* Modes de transcription */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={() => setMode(TRANSCRIPTION_MODES.NATIVE)}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
+              mode === TRANSCRIPTION_MODES.NATIVE
+                ? 'border-[#c9a227] bg-[#fdf8e8] text-[#c9a227]'
+                : 'border-[#e5e5e5] hover:bg-[#f5f5f5]'
+            }`}
+          >
+            <Globe className="w-4 h-4" />
+            <span className="text-sm font-medium">Temps réel</span>
+            <Badge variant="success" className="text-xs">Gratuit</Badge>
+          </button>
+
+          <button
+            onClick={() => setMode(TRANSCRIPTION_MODES.WHISPER)}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
+              mode === TRANSCRIPTION_MODES.WHISPER
+                ? 'border-[#c9a227] bg-[#fdf8e8] text-[#c9a227]'
+                : 'border-[#e5e5e5] hover:bg-[#f5f5f5]'
+            }`}
+          >
+            <Cpu className="w-4 h-4" />
+            <span className="text-sm font-medium">Whisper IA</span>
+            <Badge variant="default" className="text-xs">Précis</Badge>
+          </button>
+
+          <button
+            onClick={() => setMode(TRANSCRIPTION_MODES.HYBRID)}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
+              mode === TRANSCRIPTION_MODES.HYBRID
+                ? 'border-[#c9a227] bg-[#fdf8e8] text-[#c9a227]'
+                : 'border-[#e5e5e5] hover:bg-[#f5f5f5]'
+            }`}
+          >
+            <Zap className="w-4 h-4" />
+            <span className="text-sm font-medium">Hybride</span>
+            <Badge variant="warning" className="text-xs">Pro</Badge>
+          </button>
+        </div>
+
+        {/* Description du mode */}
+        <p className="text-xs text-[#737373] mb-4">
+          {mode === TRANSCRIPTION_MODES.NATIVE && (
+            <>Transcription en temps réel via le navigateur. Gratuit et instantané.</>
+          )}
+          {mode === TRANSCRIPTION_MODES.WHISPER && (
+            <>Enregistrement audio puis transcription IA haute qualité. ~0.006€/minute.</>
+          )}
+          {mode === TRANSCRIPTION_MODES.HYBRID && (
+            <>Temps réel + correction IA à la fin. Meilleure qualité.</>
+          )}
+        </p>
+
+        {/* Transcription temps réel (visible si natif ou hybride) */}
+        {(mode === TRANSCRIPTION_MODES.NATIVE || mode === TRANSCRIPTION_MODES.HYBRID) &&
+          realtimeTranscription.isListening && (
+          <div className="p-4 bg-[#fafafa] rounded-xl mb-4">
+            <p className="text-sm text-[#1a1a1a]">
+              {realtimeTranscription.fullTranscript || 'En écoute...'}
+            </p>
+            {realtimeTranscription.interimTranscript && (
+              <p className="text-sm text-[#a3a3a3] italic mt-1">
+                {realtimeTranscription.interimTranscript}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Boutons de contrôle */}
+        <div className="flex items-center justify-center gap-4">
+          {!isActive ? (
+            <button
+              onClick={handleStart}
+              disabled={!realtimeTranscription.isSupported && mode !== TRANSCRIPTION_MODES.WHISPER}
+              className="w-20 h-20 bg-red-500 hover:bg-red-600 disabled:bg-[#e5e5e5] rounded-full flex items-center justify-center text-white shadow-lg transition-all hover:scale-105"
+            >
+              <Mic className="w-10 h-10" />
+            </button>
+          ) : (
+            <button
+              onClick={handleStop}
+              className="w-20 h-20 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white shadow-lg animate-pulse"
+            >
+              <Square className="w-10 h-10" />
+            </button>
+          )}
+        </div>
+
+        {/* Statut */}
+        <div className="flex items-center justify-center gap-4 mt-4">
+          {isActive && (
+            <div className="flex items-center gap-2 text-red-600">
+              <Radio className="w-4 h-4 animate-pulse" />
+              <span className="text-sm font-medium">Enregistrement en cours</span>
+              {recorder.isRecording && (
+                <span className="text-sm">{formatDuree(recorder.duration)}</span>
+              )}
+            </div>
+          )}
+          {isTranscribing && (
+            <div className="flex items-center gap-2 text-[#c9a227]">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-sm">Transcription IA en cours...</span>
+            </div>
+          )}
+        </div>
+
+        {!realtimeTranscription.isSupported && mode !== TRANSCRIPTION_MODES.WHISPER && (
+          <div className="mt-4 p-3 bg-amber-50 text-amber-700 rounded-xl text-sm flex items-center gap-2">
+            <AlertCircle className="w-4 h-4" />
+            Web Speech API non supportée. Utilisez le mode Whisper.
+          </div>
+        )}
+      </Card>
+
+      {/* Notes transcrites */}
+      {notes.length > 0 && (
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="font-medium text-[#1a1a1a] flex items-center gap-2">
+              <FileText className="w-4 h-4 text-[#c9a227]" />
+              Notes ({notes.length})
+            </h4>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" icon={Copy} onClick={handleCopyAll}>
+                Copier
+              </Button>
+              <Button variant="ghost" size="sm" icon={Download} onClick={handleExportNotes}>
+                Exporter
+              </Button>
+              <Button variant="ghost" size="sm" icon={Trash2} onClick={handleClearNotes}>
+                Effacer
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {notes.map((note, index) => (
+              <div key={note.id} className="p-3 bg-[#fafafa] rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-[#a3a3a3]">Note {index + 1}</span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={note.mode === 'whisper' ? 'default' : 'success'} className="text-xs">
+                      {note.mode === 'whisper' ? 'IA' : 'Temps réel'}
+                    </Badge>
+                    <span className="text-xs text-[#a3a3a3]">
+                      {new Date(note.timestamp).toLocaleTimeString('fr-FR')}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-sm text-[#1a1a1a]">{note.text}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
+// WIDGET DICTÉE TEMPS RÉEL (COMPACT)
+// ============================================================================
+
+export const DicteeRealtimeWidget = ({ onResult, placeholder = 'Dictez ici...' }) => {
+  const { isListening, fullTranscript, start, stop, isSupported, error } = useRealtimeTranscription({
+    onResult
+  });
+
+  if (!isSupported) {
+    return (
+      <div className="text-xs text-amber-600 flex items-center gap-1">
+        <AlertCircle className="w-3 h-3" />
+        Non supporté
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={isListening ? stop : start}
+        className={`p-2 rounded-lg transition-colors ${
+          isListening
+            ? 'bg-red-500 text-white animate-pulse'
+            : 'bg-red-100 text-red-600 hover:bg-red-200'
+        }`}
+        title={isListening ? 'Arrêter' : 'Dicter'}
+      >
+        {isListening ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+      </button>
+
+      {isListening && (
+        <span className="text-xs text-[#737373] max-w-32 truncate">
+          {fullTranscript || placeholder}
+        </span>
+      )}
+
+      {error && (
+        <span className="text-xs text-red-600">{error}</span>
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
 // EXPORT
 // ============================================================================
 
 export default DicteeVocale;
-// whisperService déjà exporté en haut du fichier
+// Note: TRANSCRIPTION_MODES, webSpeechService, whisperService sont déjà exportés en haut du fichier

@@ -3,8 +3,9 @@
 // Cache intelligent, stratégies offline, sync en arrière-plan
 // ============================================================================
 
-const CACHE_NAME = 'crm-expert-v1';
+const CACHE_NAME = 'crm-expert-v2';
 const RUNTIME_CACHE = 'crm-expert-runtime';
+const PHOTOS_CACHE = 'crm-expert-photos';
 
 // Ressources à mettre en cache immédiatement
 const PRECACHE_URLS = [
@@ -12,6 +13,12 @@ const PRECACHE_URLS = [
   '/index.html',
   '/manifest.json',
   '/offline.html'
+];
+
+// Ressources statiques à mettre en cache
+const STATIC_ASSETS = [
+  '/assets/',
+  '/icons/'
 ];
 
 // Domaines à toujours chercher en réseau
@@ -296,6 +303,64 @@ self.addEventListener('message', (event) => {
       cache.addAll(urls);
     });
   }
+
+  // Cache une photo pour utilisation hors-ligne
+  if (event.data.type === 'CACHE_PHOTO') {
+    const { url, photoData } = event.data.payload;
+    caches.open(PHOTOS_CACHE).then((cache) => {
+      const response = new Response(photoData, {
+        headers: { 'Content-Type': 'image/jpeg' }
+      });
+      cache.put(url, response);
+    });
+  }
+
+  // Nettoyer le cache des photos
+  if (event.data.type === 'CLEAR_PHOTOS_CACHE') {
+    caches.delete(PHOTOS_CACHE);
+  }
 });
 
-console.log('[SW] Service Worker chargé');
+// ============================================================================
+// INDEXEDDB SYNC HELPER
+// ============================================================================
+
+// Cette fonction est appelée lors d'un sync pour synchroniser les données IndexedDB
+async function processIndexedDBSync() {
+  const clients = await self.clients.matchAll();
+  clients.forEach(client => {
+    client.postMessage({
+      type: 'TRIGGER_INDEXEDDB_SYNC',
+      payload: { timestamp: Date.now() }
+    });
+  });
+}
+
+// ============================================================================
+// NOTIFICATION D'ÉTAT HORS-LIGNE
+// ============================================================================
+
+// Afficher une notification quand on passe hors-ligne
+self.addEventListener('offline', () => {
+  self.registration.showNotification('CRM Expert', {
+    body: 'Vous êtes maintenant hors-ligne. Vos données seront synchronisées automatiquement.',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/badge-72x72.png',
+    tag: 'offline-notification'
+  });
+});
+
+// Afficher une notification quand on revient en ligne
+self.addEventListener('online', () => {
+  self.registration.showNotification('CRM Expert', {
+    body: 'Connexion rétablie. Synchronisation en cours...',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/badge-72x72.png',
+    tag: 'online-notification'
+  });
+
+  // Déclencher la sync
+  self.registration.sync.register('sync-pending-data');
+});
+
+console.log('[SW] Service Worker v2 chargé - Mode terrain activé');
