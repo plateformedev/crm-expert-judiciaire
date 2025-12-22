@@ -12,7 +12,7 @@ import {
   Wand2, Calculator, BookOpen, Shield, Target, ChevronDown, RotateCcw,
   Timer, Play, Square, Banknote, CircleDot, ArrowRight,
   Archive, PauseCircle, MoreHorizontal, Mic, StopCircle,
-  FlaskConical, FileCheck, MessageSquare
+  FlaskConical, FileCheck, MessageSquare, Bell
 } from 'lucide-react';
 import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase, useToast } from '../ui';
 import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
@@ -39,6 +39,11 @@ import { TimelineDossier } from './TimelineDossier';
 import { ModuleConvocation } from './ModuleConvocation';
 import { ModuleReunion } from './ModuleReunion';
 import { ModuleCompteRendu } from './ModuleCompteRendu';
+
+// Nouveaux composants Refonte UX (Phase 1 Notice Développement)
+import { AlertesDelais } from './AlertesDelais';
+import { TableauContradictoire } from './TableauContradictoire';
+import { CycleReunion } from './CycleReunion';
 
 // ============================================================================
 // LISTE DES AFFAIRES
@@ -1263,41 +1268,44 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
     );
   }
 
-  // ONGLETS SIMPLIFIÉS : 5 au lieu de 10 pour réduire la charge cognitive
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ONGLETS MÉTIER - Refonte UX selon Notice de Développement
+  // 5 onglets alignés sur le workflow réel de l'expert judiciaire
+  // ═══════════════════════════════════════════════════════════════════════════
   const tabs = [
     {
       id: 'dossier',
       label: 'Dossier',
       icon: FileText,
-      description: 'Informations générales et parties',
+      description: 'Ordonnance, mission, parties, bien',
       count: affaire.parties?.length || 0
     },
     {
       id: 'operations',
       label: 'Opérations',
       icon: Calendar,
-      description: 'Réunions et désordres constatés',
-      count: (affaire.reunions?.length || 0) + (affaire.pathologies?.length || 0)
+      description: 'Cycle complet par réunion (R1, R2...)',
+      count: affaire.reunions?.length || 0
     },
     {
-      id: 'echanges',
-      label: 'Échanges',
-      icon: MessageSquare,
-      description: 'Dires et documents',
-      count: (affaire.dires?.length || 0) + (affaire.documents?.length || 0)
+      id: 'contradictoire',
+      label: 'Contradictoire',
+      icon: Scale,
+      description: 'Suivi échanges, dires, preuves',
+      count: affaire.dires?.length || 0
     },
     {
-      id: 'production',
-      label: 'Production',
+      id: 'rapports',
+      label: 'Rapports',
       icon: BookOpen,
-      description: 'Rapports et outils',
+      description: 'Pré-rapport et rapport final',
       count: null
     },
     {
       id: 'finances',
       label: 'Finances',
       icon: Euro,
-      description: 'Provisions et état de frais',
+      description: 'Provisions, vacations, état de frais',
       count: null
     }
   ];
@@ -1397,6 +1405,33 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════════
+          ALERTES DÉLAIS - Affichage des alertes critiques et urgentes
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <AlertesDelais
+        affaire={affaire}
+        compact={true}
+        onAction={(action, data) => {
+          if (action === 'reponse-juge') {
+            // Géré par ReponseJuge ci-dessous
+          } else if (action === 'convocation' && data?.numero) {
+            const reunion = affaire.reunions?.find(r => r.numero === data.numero);
+            if (reunion) {
+              setSelectedReunion(reunion);
+              setActiveModule('convocation');
+            }
+          } else if (action === 'compte-rendu' && data?.numero) {
+            const reunion = affaire.reunions?.find(r => r.numero === data.numero);
+            if (reunion) {
+              setSelectedReunion(reunion);
+              setActiveModule('compte-rendu');
+            }
+          } else if (action === 'voir-toutes-alertes') {
+            // TODO: Ouvrir modal avec toutes les alertes
+          }
+        }}
+      />
+
+      {/* ═══════════════════════════════════════════════════════════════════════
           DASHBOARD INTELLIGENT - Refonte UX 10/10
           ═══════════════════════════════════════════════════════════════════════ */}
 
@@ -1456,32 +1491,85 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
         )}
 
         {/* ═══════════════════ ONGLET OPÉRATIONS ═══════════════════ */}
+        {/* Cycle complet par réunion : Convocation → Réunion → Notes/Photos → CR → Désordres */}
         {activeTab === 'operations' && (
           <div className="space-y-6">
-            {/* Réunions */}
-            <GestionReunions
+            {/* Alertes délais (mode compact) */}
+            <AlertesDelais
               affaire={affaire}
-              onUpdate={(updates) => update(updates)}
+              compact={true}
+              onAction={(action, data) => {
+                if (action === 'convocation' && data?.numero) {
+                  const reunion = affaire.reunions?.find(r => r.numero === data.numero);
+                  if (reunion) {
+                    setSelectedReunion(reunion);
+                    setActiveModule('convocation');
+                  }
+                } else if (action === 'compte-rendu' && data?.numero) {
+                  const reunion = affaire.reunions?.find(r => r.numero === data.numero);
+                  if (reunion) {
+                    setSelectedReunion(reunion);
+                    setActiveModule('compte-rendu');
+                  }
+                }
+              }}
             />
 
-            {/* Désordres (intégré) */}
-            <div className="pt-6 border-t border-[#e5e5e5]">
-              <h3 className="text-lg font-medium text-[#1a1a1a] mb-4">Désordres constatés</h3>
-              <TabDesordres affaire={affaire} onAddDesordre={() => setShowAddDesordre(true)} />
-            </div>
+            {/* Cycle des réunions */}
+            <CycleReunion
+              affaire={affaire}
+              onConvoquer={(reunion) => {
+                setSelectedReunion(reunion);
+                setActiveModule('convocation');
+              }}
+              onDemarrerReunion={(reunion) => {
+                setSelectedReunion(reunion);
+                setActiveModule('reunion');
+              }}
+              onPrendreNotes={(reunion) => {
+                setSelectedReunion(reunion);
+                setActiveModule('reunion');
+              }}
+              onRedigerCR={(reunion) => {
+                setSelectedReunion(reunion);
+                setActiveModule('compte-rendu');
+              }}
+              onVoirDesordres={(desordre) => {
+                // TODO: Ouvrir modal désordre
+              }}
+              onAjouterDesordre={(reunionNumero) => {
+                setShowAddDesordre(true);
+                // TODO: Pré-remplir le numéro de réunion
+              }}
+              onAjouterReunion={() => setShowAddReunion(true)}
+            />
           </div>
         )}
 
-        {/* ═══════════════════ ONGLET ÉCHANGES ═══════════════════ */}
-        {activeTab === 'echanges' && (
+        {/* ═══════════════════ ONGLET CONTRADICTOIRE ═══════════════════ */}
+        {/* Suivi du contradictoire : qui a reçu quoi, dires, documents */}
+        {activeTab === 'contradictoire' && (
           <div className="space-y-6">
-            {/* Dires */}
-            <GestionDires
+            {/* Tableau de suivi contradictoire */}
+            <TableauContradictoire
               affaire={affaire}
-              onUpdate={(updates) => update(updates)}
+              onRelance={(partieId, docType) => {
+                // TODO: Envoyer relance
+              }}
+              onEnvoyer={(docType) => {
+                // TODO: Envoyer document
+              }}
             />
 
-            {/* Documents (intégré) */}
+            {/* Dires des parties */}
+            <div className="pt-6 border-t border-[#e5e5e5]">
+              <GestionDires
+                affaire={affaire}
+                onUpdate={(updates) => update(updates)}
+              />
+            </div>
+
+            {/* Documents échangés */}
             <div className="pt-6 border-t border-[#e5e5e5]">
               <h3 className="text-lg font-medium text-[#1a1a1a] mb-4">Documents échangés</h3>
               <GestionDocuments
@@ -1493,8 +1581,18 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
           </div>
         )}
 
-        {/* ═══════════════════ ONGLET PRODUCTION ═══════════════════ */}
-        {activeTab === 'production' && (
+        {/* Compatibilité ancienne route "echanges" */}
+        {activeTab === 'echanges' && (
+          <div className="space-y-6">
+            <TableauContradictoire affaire={affaire} />
+            <GestionDires affaire={affaire} onUpdate={(updates) => update(updates)} />
+            <GestionDocuments affaire={affaire} onUpdate={(updates) => update(updates)} onDownload={handleDownloadDocument} />
+          </div>
+        )}
+
+        {/* ═══════════════════ ONGLET RAPPORTS ═══════════════════ */}
+        {/* Production documentaire : Pré-rapport et Rapport final */}
+        {activeTab === 'rapports' && (
           <div className="space-y-6">
             {/* Rapports */}
             <TabRapports
@@ -1503,17 +1601,24 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
               onOpenRapportFinal={() => setShowRapportFinal(true)}
             />
 
-            {/* Outils d'excellence (intégré) */}
+            {/* Outils d'expertise */}
             <div className="pt-6 border-t border-[#e5e5e5]">
               <h3 className="text-lg font-medium text-[#1a1a1a] mb-4">Outils d'expertise</h3>
               <TabOutils affaire={affaire} navigate={navigate} />
             </div>
+          </div>
+        )}
 
-            {/* Timeline */}
-            <div className="pt-6 border-t border-[#e5e5e5]">
-              <h3 className="text-lg font-medium text-[#1a1a1a] mb-4">Historique du dossier</h3>
-              <TimelineDossier affaire={affaire} />
-            </div>
+        {/* Compatibilité ancienne route "production" */}
+        {activeTab === 'production' && (
+          <div className="space-y-6">
+            <TabRapports
+              affaire={affaire}
+              onOpenNoteSynthese={() => setShowNoteSynthese(true)}
+              onOpenRapportFinal={() => setShowRapportFinal(true)}
+            />
+            <TabOutils affaire={affaire} navigate={navigate} />
+            <TimelineDossier affaire={affaire} />
           </div>
         )}
 
