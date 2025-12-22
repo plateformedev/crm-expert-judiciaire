@@ -55,6 +55,15 @@ export const formatDureeHeures = (heures) => {
   return `${h}h${m > 0 ? m.toString().padStart(2, '0') : '00'}`;
 };
 
+// Formater taille fichier en octets vers Ko/Mo/Go
+export const formatTailleFichier = (bytes) => {
+  if (!bytes || bytes === 0) return '0 o';
+  const units = ['o', 'Ko', 'Mo', 'Go'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  const size = (bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0);
+  return `${size} ${units[i]}`;
+};
+
 // ============================================================================
 // CALCULS DATES ET DÉLAIS
 // ============================================================================
