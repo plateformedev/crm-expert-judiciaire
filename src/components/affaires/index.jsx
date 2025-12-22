@@ -1485,7 +1485,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
             {/* Parties (intégré) */}
             <div className="pt-6 border-t border-[#e5e5e5]">
               <h3 className="text-lg font-medium text-[#1a1a1a] mb-4">Parties au dossier</h3>
-              <TabParties affaire={affaire} onAddPartie={() => setShowAddPartie(true)} />
+              <TabParties affaire={affaire} onAddPartie={() => setShowAddPartie(true)} onUpdate={(updates) => update(updates)} />
             </div>
           </div>
         )}
@@ -1634,14 +1634,14 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
 
         {/* ═══════════════════ ANCIENS ONGLETS (COMPATIBILITÉ) ═══════════════════ */}
         {activeTab === 'general' && <TabGeneral affaire={affaire} />}
-        {activeTab === 'parties' && <TabParties affaire={affaire} onAddPartie={() => setShowAddPartie(true)} />}
+        {activeTab === 'parties' && <TabParties affaire={affaire} onAddPartie={() => setShowAddPartie(true)} onUpdate={(updates) => update(updates)} />}
         {activeTab === 'reunions' && (
           <GestionReunions
             affaire={affaire}
             onUpdate={(updates) => update(updates)}
           />
         )}
-        {activeTab === 'desordres' && <TabDesordres affaire={affaire} onAddDesordre={() => setShowAddDesordre(true)} />}
+        {activeTab === 'desordres' && <TabDesordres affaire={affaire} onAddDesordre={() => setShowAddDesordre(true)} onUpdate={(updates) => update(updates)} />}
         {activeTab === 'dires' && (
           <GestionDires
             affaire={affaire}
@@ -1935,7 +1935,12 @@ const TabGeneral = ({ affaire }) => (
   </div>
 );
 
-const TabParties = ({ affaire, onAddPartie }) => {
+const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
+  const [editingPartie, setEditingPartie] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editFormData, setEditFormData] = useState({});
+  const toast = useToast();
+
   const parties = affaire.parties || [];
 
   const partiesByType = {
@@ -1943,6 +1948,40 @@ const TabParties = ({ affaire, onAddPartie }) => {
     defenseur: parties.filter(p => p.type === 'defenseur'),
     intervenant: parties.filter(p => p.type === 'intervenant'),
     assureur: parties.filter(p => p.type === 'assureur')
+  };
+
+  // Ouvrir modal d'édition
+  const handleEdit = (partie) => {
+    setEditingPartie(partie);
+    setEditFormData({ ...partie });
+    setShowEditModal(true);
+  };
+
+  // Sauvegarder modifications
+  const handleSaveEdit = async () => {
+    try {
+      const updatedParties = parties.map(p =>
+        p.id === editingPartie.id ? { ...p, ...editFormData } : p
+      );
+      await onUpdate({ parties: updatedParties });
+      setShowEditModal(false);
+      setEditingPartie(null);
+      toast.success('Partie modifiée avec succès');
+    } catch (error) {
+      toast.error('Erreur lors de la modification');
+    }
+  };
+
+  // Supprimer une partie
+  const handleDelete = async (partie) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer "${partie.raison_sociale || partie.nom}" ?`)) return;
+    try {
+      const updatedParties = parties.filter(p => p.id !== partie.id);
+      await onUpdate({ parties: updatedParties });
+      toast.success('Partie supprimée');
+    } catch (error) {
+      toast.error('Erreur lors de la suppression');
+    }
   };
 
   return (
@@ -1957,9 +1996,9 @@ const TabParties = ({ affaire, onAddPartie }) => {
             </h4>
             <div className="grid gap-4">
               {list.map(partie => (
-                <Card key={partie.id} className="p-4">
+                <Card key={partie.id} className="p-4 hover:border-[#c9a227] transition-colors">
                   <div className="flex items-start justify-between">
-                    <div>
+                    <div className="flex-1">
                       <p className="font-medium text-[#1a1a1a]">
                         {partie.raison_sociale || `${partie.prenom || ''} ${partie.nom}`}
                       </p>
@@ -1969,18 +2008,45 @@ const TabParties = ({ affaire, onAddPartie }) => {
                           Représenté par Me {partie.avocat_nom}
                         </p>
                       )}
+                      {partie.adresse && (
+                        <p className="text-xs text-[#a3a3a3] mt-1">
+                          {partie.adresse}, {partie.code_postal} {partie.ville}
+                        </p>
+                      )}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1">
                       {partie.email && (
-                        <button className="p-2 text-[#a3a3a3] hover:text-[#c9a227]">
+                        <button
+                          className="p-2 text-[#a3a3a3] hover:text-[#c9a227] hover:bg-[#f5f5f5] rounded-lg"
+                          onClick={() => window.location.href = `mailto:${partie.email}`}
+                          title={partie.email}
+                        >
                           <Mail className="w-4 h-4" />
                         </button>
                       )}
                       {partie.telephone && (
-                        <button className="p-2 text-[#a3a3a3] hover:text-[#c9a227]">
+                        <button
+                          className="p-2 text-[#a3a3a3] hover:text-[#c9a227] hover:bg-[#f5f5f5] rounded-lg"
+                          onClick={() => window.location.href = `tel:${partie.telephone}`}
+                          title={partie.telephone}
+                        >
                           <Phone className="w-4 h-4" />
                         </button>
                       )}
+                      <button
+                        className="p-2 text-[#a3a3a3] hover:text-[#0381fe] hover:bg-blue-50 rounded-lg"
+                        onClick={() => handleEdit(partie)}
+                        title="Modifier"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="p-2 text-[#a3a3a3] hover:text-red-500 hover:bg-red-50 rounded-lg"
+                        onClick={() => handleDelete(partie)}
+                        title="Supprimer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 </Card>
@@ -1989,93 +2055,529 @@ const TabParties = ({ affaire, onAddPartie }) => {
           </div>
         )
       ))}
-      
+
       <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddPartie}>
         Ajouter une partie
       </Button>
+
+      {/* Modal d'édition */}
+      <ModalBase
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title="Modifier la partie"
+        size="lg"
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Nom *</label>
+              <input
+                type="text"
+                value={editFormData.nom || ''}
+                onChange={(e) => setEditFormData({ ...editFormData, nom: e.target.value })}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Prénom</label>
+              <input
+                type="text"
+                value={editFormData.prenom || ''}
+                onChange={(e) => setEditFormData({ ...editFormData, prenom: e.target.value })}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Raison sociale</label>
+            <input
+              type="text"
+              value={editFormData.raison_sociale || ''}
+              onChange={(e) => setEditFormData({ ...editFormData, raison_sociale: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Email</label>
+              <input
+                type="email"
+                value={editFormData.email || ''}
+                onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Téléphone</label>
+              <input
+                type="tel"
+                value={editFormData.telephone || ''}
+                onChange={(e) => setEditFormData({ ...editFormData, telephone: e.target.value })}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Adresse</label>
+            <input
+              type="text"
+              value={editFormData.adresse || ''}
+              onChange={(e) => setEditFormData({ ...editFormData, adresse: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            />
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Code postal</label>
+              <input
+                type="text"
+                value={editFormData.code_postal || ''}
+                onChange={(e) => setEditFormData({ ...editFormData, code_postal: e.target.value })}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Ville</label>
+              <input
+                type="text"
+                value={editFormData.ville || ''}
+                onChange={(e) => setEditFormData({ ...editFormData, ville: e.target.value })}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Avocat</label>
+            <input
+              type="text"
+              value={editFormData.avocat_nom || ''}
+              onChange={(e) => setEditFormData({ ...editFormData, avocat_nom: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              placeholder="Me ..."
+            />
+          </div>
+          <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+            <Button variant="secondary" onClick={() => setShowEditModal(false)} className="flex-1">
+              Annuler
+            </Button>
+            <Button variant="primary" icon={Save} onClick={handleSaveEdit} className="flex-1">
+              Enregistrer
+            </Button>
+          </div>
+        </div>
+      </ModalBase>
     </div>
   );
 };
 
-const TabReunions = ({ affaire, onAddReunion }) => (
-  <div className="space-y-4">
-    {(affaire.reunions || []).length === 0 ? (
-      <EmptyState
-        icon={Calendar}
-        title="Aucune réunion"
-        description="Planifiez la première réunion d'expertise"
-        action={onAddReunion}
-        actionLabel="Planifier"
-      />
-    ) : (
-      affaire.reunions.map(reunion => (
-        <Card key={reunion.id} className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
-                <span className="font-medium text-[#c9a227]">{reunion.numero}</span>
-              </div>
-              <div>
-                <p className="font-medium text-[#1a1a1a]">
-                  Réunion n°{reunion.numero}
-                </p>
-                <p className="text-sm text-[#737373]">
-                  {reunion.date_reunion ? formatDateFr(reunion.date_reunion) : 'Date à définir'}
-                </p>
-              </div>
-            </div>
-            <Badge variant={reunion.statut === 'terminee' ? 'success' : 'info'}>
-              {reunion.statut || 'Planifiée'}
-            </Badge>
-          </div>
-        </Card>
-      ))
-    )}
-    <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddReunion}>
-      Planifier une réunion
-    </Button>
-  </div>
-);
+const TabReunions = ({ affaire, onAddReunion, onUpdate }) => {
+  const [editingReunion, setEditingReunion] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editFormData, setEditFormData] = useState({});
+  const toast = useToast();
 
-const TabDesordres = ({ affaire, onAddDesordre }) => (
-  <div className="space-y-4">
-    {(affaire.pathologies || []).length === 0 ? (
-      <EmptyState
-        icon={AlertTriangle}
-        title="Aucun désordre"
-        description="Ajoutez les désordres constatés"
-        action={onAddDesordre}
-        actionLabel="Ajouter"
-      />
-    ) : (
-      affaire.pathologies.map(pathologie => (
-        <Card key={pathologie.id} className="p-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs px-2 py-0.5 bg-[#1a1a1a] text-white rounded">
-                  D{pathologie.numero}
-                </span>
-                <span className="font-medium text-[#1a1a1a]">{pathologie.intitule}</span>
+  const reunions = affaire.reunions || [];
+
+  // Ouvrir modal d'édition
+  const handleEdit = (reunion) => {
+    setEditingReunion(reunion);
+    setEditFormData({ ...reunion });
+    setShowEditModal(true);
+  };
+
+  // Sauvegarder modifications
+  const handleSaveEdit = async () => {
+    try {
+      const updatedReunions = reunions.map(r =>
+        r.id === editingReunion.id ? { ...r, ...editFormData } : r
+      );
+      await onUpdate({ reunions: updatedReunions });
+      setShowEditModal(false);
+      setEditingReunion(null);
+      toast.success('Réunion modifiée avec succès');
+    } catch (error) {
+      toast.error('Erreur lors de la modification');
+    }
+  };
+
+  // Supprimer une réunion
+  const handleDelete = async (reunion) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer la réunion n°${reunion.numero} ?`)) return;
+    try {
+      const updatedReunions = reunions.filter(r => r.id !== reunion.id);
+      await onUpdate({ reunions: updatedReunions });
+      toast.success('Réunion supprimée');
+    } catch (error) {
+      toast.error('Erreur lors de la suppression');
+    }
+  };
+
+  // Annuler une réunion (marquer comme annulée sans supprimer)
+  const handleCancel = async (reunion) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir annuler la réunion n°${reunion.numero} ?`)) return;
+    try {
+      const updatedReunions = reunions.map(r =>
+        r.id === reunion.id ? { ...r, statut: 'annulee' } : r
+      );
+      await onUpdate({ reunions: updatedReunions });
+      toast.success('Réunion annulée');
+    } catch (error) {
+      toast.error('Erreur lors de l\'annulation');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {reunions.length === 0 ? (
+        <EmptyState
+          icon={Calendar}
+          title="Aucune réunion"
+          description="Planifiez la première réunion d'expertise"
+          action={onAddReunion}
+          actionLabel="Planifier"
+        />
+      ) : (
+        reunions.map(reunion => (
+          <Card key={reunion.id} className={`p-4 hover:border-[#c9a227] transition-colors ${reunion.statut === 'annulee' ? 'opacity-50' : ''}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  reunion.statut === 'terminee' ? 'bg-green-100' :
+                  reunion.statut === 'annulee' ? 'bg-red-100' :
+                  'bg-[#f5e6c8]'
+                }`}>
+                  <span className={`font-medium ${
+                    reunion.statut === 'terminee' ? 'text-green-600' :
+                    reunion.statut === 'annulee' ? 'text-red-600' :
+                    'text-[#c9a227]'
+                  }`}>{reunion.numero}</span>
+                </div>
+                <div>
+                  <p className="font-medium text-[#1a1a1a]">
+                    Réunion n°{reunion.numero}
+                  </p>
+                  <p className="text-sm text-[#737373]">
+                    {reunion.date_reunion ? formatDateFr(reunion.date_reunion) : 'Date à définir'}
+                    {reunion.heure_reunion && ` à ${reunion.heure_reunion}`}
+                  </p>
+                  {reunion.lieu && (
+                    <p className="text-xs text-[#a3a3a3]">{reunion.lieu}</p>
+                  )}
+                </div>
               </div>
-              <p className="text-sm text-[#737373]">{pathologie.localisation}</p>
+              <div className="flex items-center gap-2">
+                <Badge variant={
+                  reunion.statut === 'terminee' ? 'success' :
+                  reunion.statut === 'annulee' ? 'error' :
+                  reunion.statut === 'en_cours' ? 'warning' :
+                  'info'
+                }>
+                  {reunion.statut === 'terminee' ? 'Terminée' :
+                   reunion.statut === 'annulee' ? 'Annulée' :
+                   reunion.statut === 'en_cours' ? 'En cours' :
+                   'Planifiée'}
+                </Badge>
+                {reunion.statut !== 'annulee' && (
+                  <>
+                    <button
+                      className="p-2 text-[#a3a3a3] hover:text-[#0381fe] hover:bg-blue-50 rounded-lg"
+                      onClick={() => handleEdit(reunion)}
+                      title="Modifier"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    {reunion.statut !== 'terminee' && (
+                      <button
+                        className="p-2 text-[#a3a3a3] hover:text-amber-500 hover:bg-amber-50 rounded-lg"
+                        onClick={() => handleCancel(reunion)}
+                        title="Annuler la réunion"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </>
+                )}
+                <button
+                  className="p-2 text-[#a3a3a3] hover:text-red-500 hover:bg-red-50 rounded-lg"
+                  onClick={() => handleDelete(reunion)}
+                  title="Supprimer"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-            <Badge variant={
-              pathologie.garantie === 'decennale' ? 'error' :
-              pathologie.garantie === 'biennale' ? 'warning' :
-              pathologie.garantie === 'gpa' ? 'info' : 'default'
-            }>
-              {pathologie.garantie || 'À qualifier'}
-            </Badge>
+          </Card>
+        ))
+      )}
+      <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddReunion}>
+        Planifier une réunion
+      </Button>
+
+      {/* Modal d'édition */}
+      <ModalBase
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title={`Modifier la réunion n°${editingReunion?.numero}`}
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Date</label>
+              <input
+                type="date"
+                value={editFormData.date_reunion || ''}
+                onChange={(e) => setEditFormData({ ...editFormData, date_reunion: e.target.value })}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Heure</label>
+              <input
+                type="time"
+                value={editFormData.heure_reunion || ''}
+                onChange={(e) => setEditFormData({ ...editFormData, heure_reunion: e.target.value })}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              />
+            </div>
           </div>
-        </Card>
-      ))
-    )}
-    <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddDesordre}>
-      Ajouter un désordre
-    </Button>
-  </div>
-);
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Lieu</label>
+            <input
+              type="text"
+              value={editFormData.lieu || ''}
+              onChange={(e) => setEditFormData({ ...editFormData, lieu: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              placeholder="Adresse de la réunion"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Statut</label>
+            <select
+              value={editFormData.statut || 'planifiee'}
+              onChange={(e) => setEditFormData({ ...editFormData, statut: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            >
+              <option value="planifiee">Planifiée</option>
+              <option value="en_cours">En cours</option>
+              <option value="terminee">Terminée</option>
+              <option value="annulee">Annulée</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Notes</label>
+            <textarea
+              value={editFormData.notes || ''}
+              onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+              rows={3}
+              placeholder="Notes sur cette réunion..."
+            />
+          </div>
+          <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+            <Button variant="secondary" onClick={() => setShowEditModal(false)} className="flex-1">
+              Annuler
+            </Button>
+            <Button variant="primary" icon={Save} onClick={handleSaveEdit} className="flex-1">
+              Enregistrer
+            </Button>
+          </div>
+        </div>
+      </ModalBase>
+    </div>
+  );
+};
+
+const TabDesordres = ({ affaire, onAddDesordre, onUpdate }) => {
+  const [editingDesordre, setEditingDesordre] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editFormData, setEditFormData] = useState({});
+  const toast = useToast();
+
+  const pathologies = affaire.pathologies || [];
+
+  // Ouvrir modal d'édition
+  const handleEdit = (desordre) => {
+    setEditingDesordre(desordre);
+    setEditFormData({ ...desordre });
+    setShowEditModal(true);
+  };
+
+  // Sauvegarder modifications
+  const handleSaveEdit = async () => {
+    try {
+      const updatedPathologies = pathologies.map(p =>
+        p.id === editingDesordre.id ? { ...p, ...editFormData } : p
+      );
+      await onUpdate({ pathologies: updatedPathologies });
+      setShowEditModal(false);
+      setEditingDesordre(null);
+      toast.success('Désordre modifié avec succès');
+    } catch (error) {
+      toast.error('Erreur lors de la modification');
+    }
+  };
+
+  // Supprimer un désordre
+  const handleDelete = async (desordre) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer le désordre D${desordre.numero} ?`)) return;
+    try {
+      const updatedPathologies = pathologies.filter(p => p.id !== desordre.id);
+      await onUpdate({ pathologies: updatedPathologies });
+      toast.success('Désordre supprimé');
+    } catch (error) {
+      toast.error('Erreur lors de la suppression');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {pathologies.length === 0 ? (
+        <EmptyState
+          icon={AlertTriangle}
+          title="Aucun désordre"
+          description="Ajoutez les désordres constatés"
+          action={onAddDesordre}
+          actionLabel="Ajouter"
+        />
+      ) : (
+        pathologies.map(pathologie => (
+          <Card key={pathologie.id} className="p-4 hover:border-[#c9a227] transition-colors">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs px-2 py-0.5 bg-[#1a1a1a] text-white rounded">
+                    D{pathologie.numero}
+                  </span>
+                  <span className="font-medium text-[#1a1a1a]">{pathologie.intitule}</span>
+                </div>
+                <p className="text-sm text-[#737373]">{pathologie.localisation}</p>
+                {pathologie.description && (
+                  <p className="text-xs text-[#a3a3a3] mt-1 line-clamp-2">{pathologie.description}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2 ml-4">
+                <Badge variant={
+                  pathologie.garantie === 'decennale' ? 'error' :
+                  pathologie.garantie === 'biennale' ? 'warning' :
+                  pathologie.garantie === 'gpa' ? 'info' : 'default'
+                }>
+                  {pathologie.garantie || 'À qualifier'}
+                </Badge>
+                <button
+                  className="p-2 text-[#a3a3a3] hover:text-[#0381fe] hover:bg-blue-50 rounded-lg"
+                  onClick={() => handleEdit(pathologie)}
+                  title="Modifier"
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button
+                  className="p-2 text-[#a3a3a3] hover:text-red-500 hover:bg-red-50 rounded-lg"
+                  onClick={() => handleDelete(pathologie)}
+                  title="Supprimer"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </Card>
+        ))
+      )}
+      <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddDesordre}>
+        Ajouter un désordre
+      </Button>
+
+      {/* Modal d'édition */}
+      <ModalBase
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title={`Modifier le désordre D${editingDesordre?.numero}`}
+        size="lg"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Intitulé *</label>
+            <input
+              type="text"
+              value={editFormData.intitule || ''}
+              onChange={(e) => setEditFormData({ ...editFormData, intitule: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              placeholder="Ex: Fissures en façade"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Localisation</label>
+            <input
+              type="text"
+              value={editFormData.localisation || ''}
+              onChange={(e) => setEditFormData({ ...editFormData, localisation: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              placeholder="Ex: Façade nord, niveau RDC"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Garantie applicable</label>
+            <select
+              value={editFormData.garantie || ''}
+              onChange={(e) => setEditFormData({ ...editFormData, garantie: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            >
+              <option value="">À qualifier</option>
+              <option value="gpa">GPA (Garantie de Parfait Achèvement)</option>
+              <option value="biennale">Garantie Biennale</option>
+              <option value="decennale">Garantie Décennale</option>
+              <option value="contractuelle">Responsabilité Contractuelle</option>
+              <option value="aucune">Aucune garantie applicable</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Description</label>
+            <textarea
+              value={editFormData.description || ''}
+              onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+              rows={4}
+              placeholder="Description détaillée du désordre..."
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Gravité</label>
+              <select
+                value={editFormData.gravite || ''}
+                onChange={(e) => setEditFormData({ ...editFormData, gravite: e.target.value })}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              >
+                <option value="">Non définie</option>
+                <option value="mineure">Mineure</option>
+                <option value="moyenne">Moyenne</option>
+                <option value="majeure">Majeure</option>
+                <option value="critique">Critique</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Estimation coût réparation (€)</label>
+              <input
+                type="number"
+                value={editFormData.cout_estimation || ''}
+                onChange={(e) => setEditFormData({ ...editFormData, cout_estimation: e.target.value })}
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                placeholder="5000"
+              />
+            </div>
+          </div>
+          <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+            <Button variant="secondary" onClick={() => setShowEditModal(false)} className="flex-1">
+              Annuler
+            </Button>
+            <Button variant="primary" icon={Save} onClick={handleSaveEdit} className="flex-1">
+              Enregistrer
+            </Button>
+          </div>
+        </div>
+      </ModalBase>
+    </div>
+  );
+};
 
 const TabDocuments = ({ affaire, onDownload }) => (
   <div className="space-y-4">
@@ -2188,32 +2690,183 @@ const TabRapports = ({ affaire, onUpdate }) => {
   );
 };
 
-const TabFinancier = ({ affaire }) => {
+const TabFinancier = ({ affaire, onUpdate }) => {
+  const [showProvisionModal, setShowProvisionModal] = useState(false);
+  const [provisionData, setProvisionData] = useState({
+    montant: affaire.provision_montant || '',
+    date_reception: affaire.provision_date_reception || '',
+    mode_paiement: affaire.provision_mode_paiement || 'virement'
+  });
+  const [loading, setLoading] = useState(false);
+  const toast = useToast();
+
   const totalVacations = (affaire.vacations || []).reduce((acc, v) => acc + (parseFloat(v.montant) || 0), 0);
   const totalFrais = (affaire.frais || []).reduce((acc, f) => acc + (parseFloat(f.montant) || 0), 0);
   const provision = parseFloat(affaire.provision_montant) || 0;
 
+  // Valider la réception de la provision
+  const handleValidateProvision = async () => {
+    setLoading(true);
+    try {
+      await onUpdate({
+        provision_recue: true,
+        provision_date_reception: provisionData.date_reception || new Date().toISOString().split('T')[0],
+        provision_montant: provisionData.montant,
+        provision_mode_paiement: provisionData.mode_paiement
+      });
+      setShowProvisionModal(false);
+      toast.success('Provision validée avec succès');
+    } catch (error) {
+      toast.error('Erreur lors de la validation');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Annuler la validation de la provision
+  const handleCancelProvision = async () => {
+    if (!window.confirm('Êtes-vous sûr de vouloir annuler la validation de cette provision ?')) return;
+    setLoading(true);
+    try {
+      await onUpdate({
+        provision_recue: false,
+        provision_date_reception: null
+      });
+      toast.success('Validation annulée');
+    } catch (error) {
+      toast.error('Erreur lors de l\'annulation');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="grid grid-cols-2 gap-6">
-      <Card className="p-6">
-        <h4 className="font-medium text-[#1a1a1a] mb-4">Provision</h4>
-        <p className="text-3xl font-light text-[#c9a227]">
-          {provision.toLocaleString('fr-FR')} €
-        </p>
-        <p className="text-sm text-[#737373] mt-1">
-          {affaire.provision_recue ? 'Reçue' : 'En attente'}
-        </p>
-      </Card>
-      
-      <Card className="p-6">
-        <h4 className="font-medium text-[#1a1a1a] mb-4">Honoraires à ce jour</h4>
-        <p className="text-3xl font-light text-[#1a1a1a]">
-          {(totalVacations + totalFrais).toLocaleString('fr-FR')} €
-        </p>
-        <p className="text-sm text-[#737373] mt-1">
-          Vacations: {totalVacations.toLocaleString('fr-FR')} € • Frais: {totalFrais.toLocaleString('fr-FR')} €
-        </p>
-      </Card>
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-6">
+        {/* Carte Provision avec actions */}
+        <Card className={`p-6 ${affaire.provision_recue ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
+          <div className="flex items-start justify-between mb-4">
+            <h4 className="font-medium text-[#1a1a1a]">Provision / Consignation</h4>
+            {affaire.provision_recue ? (
+              <Badge variant="success">Reçue ✓</Badge>
+            ) : (
+              <Badge variant="warning">En attente</Badge>
+            )}
+          </div>
+
+          <p className="text-3xl font-light text-[#c9a227]">
+            {provision.toLocaleString('fr-FR')} €
+          </p>
+
+          {affaire.provision_recue ? (
+            <div className="mt-3 space-y-2">
+              <p className="text-sm text-green-700">
+                Reçue le {formatDateFr(affaire.provision_date_reception)}
+              </p>
+              {affaire.provision_mode_paiement && (
+                <p className="text-xs text-[#737373]">
+                  Mode: {affaire.provision_mode_paiement === 'virement' ? 'Virement bancaire' :
+                         affaire.provision_mode_paiement === 'cheque' ? 'Chèque' : 'Autre'}
+                </p>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={RotateCcw}
+                onClick={handleCancelProvision}
+                className="mt-2 text-amber-600 hover:text-amber-700"
+              >
+                Annuler la validation
+              </Button>
+            </div>
+          ) : (
+            <div className="mt-4">
+              <Button
+                variant="primary"
+                icon={CheckCircle}
+                onClick={() => setShowProvisionModal(true)}
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
+                Valider la réception
+              </Button>
+            </div>
+          )}
+        </Card>
+
+        <Card className="p-6">
+          <h4 className="font-medium text-[#1a1a1a] mb-4">Honoraires à ce jour</h4>
+          <p className="text-3xl font-light text-[#1a1a1a]">
+            {(totalVacations + totalFrais).toLocaleString('fr-FR')} €
+          </p>
+          <p className="text-sm text-[#737373] mt-1">
+            Vacations: {totalVacations.toLocaleString('fr-FR')} € • Frais: {totalFrais.toLocaleString('fr-FR')} €
+          </p>
+        </Card>
+      </div>
+
+      {/* Modal de validation provision */}
+      <ModalBase
+        isOpen={showProvisionModal}
+        onClose={() => setShowProvisionModal(false)}
+        title="Valider la réception de la provision"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">
+              Montant reçu (€)
+            </label>
+            <input
+              type="number"
+              value={provisionData.montant}
+              onChange={(e) => setProvisionData({ ...provisionData, montant: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              placeholder="10000"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">
+              Date de réception
+            </label>
+            <input
+              type="date"
+              value={provisionData.date_reception}
+              onChange={(e) => setProvisionData({ ...provisionData, date_reception: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">
+              Mode de paiement
+            </label>
+            <select
+              value={provisionData.mode_paiement}
+              onChange={(e) => setProvisionData({ ...provisionData, mode_paiement: e.target.value })}
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            >
+              <option value="virement">Virement bancaire</option>
+              <option value="cheque">Chèque</option>
+              <option value="autre">Autre</option>
+            </select>
+          </div>
+
+          <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+            <Button variant="secondary" onClick={() => setShowProvisionModal(false)} className="flex-1">
+              Annuler
+            </Button>
+            <Button
+              variant="primary"
+              icon={CheckCircle}
+              onClick={handleValidateProvision}
+              loading={loading}
+              className="flex-1 bg-green-600 hover:bg-green-700"
+            >
+              Confirmer la réception
+            </Button>
+          </div>
+        </div>
+      </ModalBase>
     </div>
   );
 };

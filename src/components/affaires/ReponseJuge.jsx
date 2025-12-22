@@ -41,49 +41,146 @@ export const ReponseJuge = ({ affaire, onUpdate }) => {
     setShowModal(true);
   };
 
+  // État pour le mode modification
+  const [showModifyConfirm, setShowModifyConfirm] = useState(false);
+
+  // Annuler/Modifier la réponse
+  const handleModifyResponse = async () => {
+    try {
+      await onUpdate({
+        reponse_juge: null,
+        date_reponse_juge: null,
+        motif_refus: null,
+        motif_recusation: null
+      });
+      setShowModifyConfirm(false);
+    } catch (error) {
+      console.error('Erreur modification réponse:', error);
+    }
+  };
+
   // Si déjà répondu
   if (affaire.reponse_juge) {
     const reponse = STATUTS_REPONSE_JUGE.find(s => s.id === affaire.reponse_juge);
     return (
-      <Card className={`p-5 ${
-        affaire.reponse_juge === 'acceptee' ? 'border-green-200 bg-green-50' :
-        affaire.reponse_juge === 'refusee' ? 'border-red-200 bg-red-50' :
-        'border-orange-200 bg-orange-50'
-      }`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {affaire.reponse_juge === 'acceptee' ? (
-              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                <Check className="w-5 h-5 text-white" />
-              </div>
-            ) : affaire.reponse_juge === 'refusee' ? (
-              <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
-                <X className="w-5 h-5 text-white" />
-              </div>
-            ) : (
-              <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-white" />
-              </div>
-            )}
-            <div>
-              <p className="font-medium text-[#1a1a1a]">{reponse?.label}</p>
-              {affaire.date_reponse_juge && (
-                <p className="text-sm text-[#737373]">
-                  Répondu le {formatDateFr(affaire.date_reponse_juge)}
-                </p>
+      <>
+        <Card className={`p-5 ${
+          affaire.reponse_juge === 'acceptee' ? 'border-green-200 bg-green-50' :
+          affaire.reponse_juge === 'refusee' ? 'border-red-200 bg-red-50' :
+          'border-orange-200 bg-orange-50'
+        }`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {affaire.reponse_juge === 'acceptee' ? (
+                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                  <Check className="w-5 h-5 text-white" />
+                </div>
+              ) : affaire.reponse_juge === 'refusee' ? (
+                <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                  <X className="w-5 h-5 text-white" />
+                </div>
+              ) : (
+                <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-white" />
+                </div>
               )}
-              {affaire.motif_refus && (
-                <p className="text-sm text-[#737373] mt-1">
-                  Motif : {MOTIFS_REFUS.find(m => m.id === affaire.motif_refus)?.label}
-                </p>
-              )}
+              <div>
+                <p className="font-medium text-[#1a1a1a]">{reponse?.label}</p>
+                {affaire.date_reponse_juge && (
+                  <p className="text-sm text-[#737373]">
+                    Répondu le {formatDateFr(affaire.date_reponse_juge)}
+                  </p>
+                )}
+                {affaire.motif_refus && (
+                  <p className="text-sm text-[#737373] mt-1">
+                    Motif : {MOTIFS_REFUS.find(m => m.id === affaire.motif_refus)?.label}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="secondary" size="sm" icon={FileText}>
+                Voir le courrier
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowModifyConfirm(true)}
+                className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+              >
+                Modifier ma réponse
+              </Button>
             </div>
           </div>
-          <Button variant="secondary" size="sm" icon={FileText}>
-            Voir le courrier
-          </Button>
-        </div>
-      </Card>
+
+          {/* Actions supplémentaires selon le statut */}
+          {affaire.reponse_juge === 'acceptee' && (
+            <div className="mt-4 pt-4 border-t border-green-200">
+              <p className="text-sm text-green-700 mb-3">
+                Vous pouvez encore vous récuser si un conflit d'intérêt apparaît.
+              </p>
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={AlertTriangle}
+                onClick={() => openModal('recuser')}
+                className="text-orange-600 border-orange-300 hover:bg-orange-50"
+              >
+                Me récuser maintenant
+              </Button>
+            </div>
+          )}
+        </Card>
+
+        {/* Modal de confirmation pour modifier la réponse */}
+        {showModifyConfirm && (
+          <ModalBase
+            isOpen={showModifyConfirm}
+            onClose={() => setShowModifyConfirm(false)}
+            title="Modifier votre réponse"
+          >
+            <div className="space-y-4">
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-amber-800">Attention</p>
+                    <p className="text-sm text-amber-700 mt-1">
+                      Modifier votre réponse au juge est une action importante.
+                      Un nouveau courrier devra être envoyé au tribunal.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-[#525252]">
+                Votre réponse actuelle : <strong>{reponse?.label}</strong>
+              </p>
+              <p className="text-sm text-[#737373]">
+                En confirmant, vous pourrez sélectionner une nouvelle réponse
+                (accepter, refuser ou vous récuser).
+              </p>
+
+              <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowModifyConfirm(false)}
+                  className="flex-1"
+                >
+                  Annuler
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleModifyResponse}
+                  className="flex-1 bg-amber-600 hover:bg-amber-700"
+                >
+                  Confirmer la modification
+                </Button>
+              </div>
+            </div>
+          </ModalBase>
+        )}
+      </>
     );
   }
 
