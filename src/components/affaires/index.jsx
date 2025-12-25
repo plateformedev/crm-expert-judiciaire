@@ -49,6 +49,7 @@ import { TimerWidget } from './TimerWidget';
 import { GestionParties } from './GestionParties';
 import { EditeurMission } from './EditeurMission';
 import { GestionDesordres } from './GestionDesordres';
+import { GenerateurCourriers } from './GenerateurCourriers';
 
 // Phase 5 - Intégrations externes
 import {
@@ -1437,6 +1438,13 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
       count: null
     },
     {
+      id: 'courriers',
+      label: 'Courriers',
+      icon: Mail,
+      description: 'Génération courriers types',
+      count: affaire.courriers?.length || 0
+    },
+    {
       id: 'finances',
       label: 'Finances',
       icon: Euro,
@@ -1778,6 +1786,15 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
             timer={timer}
             onUpdate={(updates) => update(updates)}
             onOpenEtatFrais={() => setShowEtatFrais(true)}
+          />
+        )}
+
+        {/* ═══════════════════ ONGLET COURRIERS ═══════════════════ */}
+        {/* Génération de courriers types : consignation, prorogation, demande pièces */}
+        {activeTab === 'courriers' && (
+          <GenerateurCourriers
+            affaire={affaire}
+            onUpdate={(updates) => update(updates)}
           />
         )}
 
