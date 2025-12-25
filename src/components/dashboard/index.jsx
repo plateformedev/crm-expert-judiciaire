@@ -468,8 +468,19 @@ const ActionsRapides = ({ onNavigate }) => {
   );
 };
 
-// Affaires récentes
-const AffairesRecentes = ({ affaires, onSelect }) => {
+// Affaires récentes - Style Pennylane épuré
+const AffairesRecentes = ({ affaires, onSelect, onViewAll }) => {
+  // Statut avec couleur et icône
+  const getStatutConfig = (statut, urgent) => {
+    if (urgent) return { color: 'bg-red-500', icon: '🔴' };
+    switch (statut) {
+      case 'termine': return { color: 'bg-green-500', icon: '🟢' };
+      case 'pre-rapport': return { color: 'bg-amber-500', icon: '🟡' };
+      case 'suspendu': return { color: 'bg-gray-400', icon: '⚪' };
+      default: return { color: 'bg-blue-500', icon: '🔵' };
+    }
+  };
+
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
@@ -481,37 +492,51 @@ const AffairesRecentes = ({ affaires, onSelect }) => {
         </div>
       </div>
 
-      <div className="space-y-3">
-        {affaires.map(affaire => (
-          <div
-            key={affaire.id}
-            className="p-3 rounded-xl bg-[#fafafa] cursor-pointer hover:shadow-sm transition-shadow"
-            onClick={() => onSelect && onSelect(affaire)}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-sm text-[#1a1a1a]">{affaire.reference}</p>
-                <p className="text-xs text-[#737373]">{affaire.bien_ville || affaire.tribunal}</p>
+      {/* Liste épurée - max 4 items */}
+      <div className="space-y-2">
+        {affaires.slice(0, 4).map(affaire => {
+          const config = getStatutConfig(affaire.statut, affaire.urgent);
+          return (
+            <div
+              key={affaire.id}
+              className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#fafafa] cursor-pointer transition-colors group"
+              onClick={() => onSelect && onSelect(affaire)}
+            >
+              {/* Indicateur statut */}
+              <div className={`w-2 h-2 rounded-full ${config.color} flex-shrink-0`} />
+
+              {/* Infos principales */}
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm text-[#1a1a1a] truncate group-hover:text-[#c9a227]">
+                  {affaire.reference}
+                </p>
+                <p className="text-xs text-[#737373] truncate">
+                  {affaire.bien_ville || affaire.tribunal}
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                {affaire.urgent && <Badge variant="error">Urgent</Badge>}
-                <Badge variant={
-                  affaire.statut === 'termine' ? 'success' :
-                  affaire.statut === 'pre-rapport' ? 'warning' : 'info'
-                }>
-                  {affaire.statut || 'En cours'}
-                </Badge>
-              </div>
+
+              {/* Montant à droite */}
+              {affaire.provision_montant && (
+                <span className="text-sm font-semibold text-[#1a1a1a]">
+                  {parseFloat(affaire.provision_montant).toLocaleString('fr-FR')} €
+                </span>
+              )}
+
+              <ChevronRight className="w-4 h-4 text-[#a3a3a3] opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <ProgressBar 
-              value={affaire.avancement || 0} 
-              size="sm" 
-              showLabel={false}
-              className="mt-2"
-            />
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      {/* Lien "Voir toutes" */}
+      {affaires.length > 4 && (
+        <button
+          onClick={onViewAll}
+          className="w-full mt-4 py-2.5 text-sm font-medium text-[#c9a227] hover:bg-[#faf8f3] rounded-xl transition-colors"
+        >
+          Voir toutes les affaires →
+        </button>
+      )}
     </Card>
   );
 };

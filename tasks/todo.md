@@ -30,10 +30,10 @@ Implémenter les améliorations UX inspirées de Pennylane pour rendre le CRM pl
 - [x] Afficher le raccourci ⌘K visuellement dans la barre
 - [ ] Catégoriser les résultats (reporté - complexe)
 
-### 2.4 Améliorer les listes d'affaires
-- [ ] Style épuré : Référence + Ville + Montant
-- [ ] Limiter à 4-5 items avec "Voir toutes"
-- [ ] Icônes de statut colorées
+### 2.4 Améliorer les listes d'affaires ✅
+- [x] Style épuré : Référence + Ville + Montant
+- [x] Limiter à 4 items avec "Voir toutes les affaires →"
+- [x] Indicateurs de statut colorés (🔴🟡🟢🔵)
 
 ---
 
@@ -45,5 +45,19 @@ Implémenter les améliorations UX inspirées de Pennylane pour rendre le CRM pl
 ---
 
 ## Review
-*À compléter après implémentation*
+
+### Résumé des modifications (Priorité 2)
+
+| Tâche | Fichiers modifiés | Changement |
+|-------|-------------------|------------|
+| 2.1 Menu repliable | `Sidebar.jsx`, `App.jsx` | Tooltip + localStorage |
+| 2.2 Notifications | `NotificationsPanel.jsx`, `Header.jsx` | Nouveau panneau 3 onglets |
+| 2.3 Recherche | `Header.jsx` | Badge ⌘K visible |
+| 2.4 Listes | `dashboard/index.jsx` | Style épuré + indicateurs couleur |
+
+### Principes respectés
+- ✅ Changements minimaux et simples
+- ✅ Impact limité sur le code existant
+- ✅ Pas de régression (build OK)
+- ✅ Style cohérent avec l'existant
 
