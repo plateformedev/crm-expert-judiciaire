@@ -53,6 +53,7 @@ import { GenerateurCourriers } from './GenerateurCourriers';
 import { ExportDocuments } from './ExportDocuments';
 import { GestionModeles } from './GestionModeles';
 import { HistoriqueModifications } from './HistoriqueModifications';
+import { CalculateurDelais } from './CalculateurDelais';
 
 // Phase 5 - Intégrations externes
 import {
@@ -1770,6 +1771,11 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
             {/* Export multi-format */}
             <div className="pt-6 border-t border-[#e5e5e5]">
               <ExportDocuments affaire={affaire} />
+            </div>
+
+            {/* Calculateur de délais */}
+            <div className="pt-6 border-t border-[#e5e5e5]">
+              <CalculateurDelais affaire={affaire} onUpdate={(updates) => update(updates)} />
             </div>
 
             {/* Outils d'expertise */}
