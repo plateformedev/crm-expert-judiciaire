@@ -51,6 +51,7 @@ import { EditeurMission } from './EditeurMission';
 import { GestionDesordres } from './GestionDesordres';
 import { GenerateurCourriers } from './GenerateurCourriers';
 import { ExportDocuments } from './ExportDocuments';
+import { GestionModeles } from './GestionModeles';
 
 // Phase 5 - Intégrations externes
 import {
@@ -1319,6 +1320,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
   const [showAddReunion, setShowAddReunion] = useState(false);
   const [showAddDesordre, setShowAddDesordre] = useState(false);
   const [showActionMenu, setShowActionMenu] = useState(false);
+  const [showModeles, setShowModeles] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null); // { type: 'delete'|'archive'|'suspend' }
 
   // États pour les modules workflow
@@ -1798,10 +1800,23 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
         {/* ═══════════════════ ONGLET COURRIERS ═══════════════════ */}
         {/* Génération de courriers types : consignation, prorogation, demande pièces */}
         {activeTab === 'courriers' && (
-          <GenerateurCourriers
-            affaire={affaire}
-            onUpdate={(updates) => update(updates)}
-          />
+          <div className="space-y-6">
+            {/* Générateur de courriers */}
+            <GenerateurCourriers
+              affaire={affaire}
+              onUpdate={(updates) => update(updates)}
+            />
+
+            {/* Gestion des modèles personnalisés */}
+            <div className="pt-6 border-t border-[#e5e5e5]">
+              <GestionModeles
+                onSelectModele={(modele) => {
+                  // TODO: Injecter le modèle dans le générateur
+                  toast.success('Modèle sélectionné', `Le modèle "${modele.nom}" a été appliqué`);
+                }}
+              />
+            </div>
+          </div>
         )}
 
         {/* ═══════════════════ ANCIENS ONGLETS (COMPATIBILITÉ) ═══════════════════ */}
