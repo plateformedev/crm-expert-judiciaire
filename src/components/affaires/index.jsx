@@ -48,6 +48,7 @@ import { CycleReunion } from './CycleReunion';
 import { TimerWidget } from './TimerWidget';
 import { GestionParties } from './GestionParties';
 import { EditeurMission } from './EditeurMission';
+import { GestionDesordres } from './GestionDesordres';
 
 // Phase 5 - Intégrations externes
 import {
@@ -1789,7 +1790,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
             onUpdate={(updates) => update(updates)}
           />
         )}
-        {activeTab === 'desordres' && <TabDesordres affaire={affaire} onAddDesordre={() => setShowAddDesordre(true)} onUpdate={(updates) => update(updates)} />}
+        {activeTab === 'desordres' && <GestionDesordres affaire={affaire} onUpdate={(updates) => update(updates)} />}
         {activeTab === 'dires' && (
           <GestionDires
             affaire={affaire}
