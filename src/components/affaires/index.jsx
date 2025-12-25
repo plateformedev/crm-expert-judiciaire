@@ -54,6 +54,7 @@ import { ExportDocuments } from './ExportDocuments';
 import { GestionModeles } from './GestionModeles';
 import { HistoriqueModifications } from './HistoriqueModifications';
 import { CalculateurDelais } from './CalculateurDelais';
+import { GestionPieces } from './GestionPieces';
 
 // Phase 5 - Intégrations externes
 import {
@@ -1743,6 +1744,14 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
                 affaire={affaire}
                 onUpdate={(updates) => update(updates)}
                 onDownload={handleDownloadDocument}
+              />
+            </div>
+
+            {/* Gestion avancée des pièces */}
+            <div className="pt-6 border-t border-[#e5e5e5]">
+              <GestionPieces
+                affaire={affaire}
+                onUpdate={(updates) => update(updates)}
               />
             </div>
           </div>
