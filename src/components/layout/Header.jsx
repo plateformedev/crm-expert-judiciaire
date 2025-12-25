@@ -102,9 +102,15 @@ const Header = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
-            className="w-full pl-12 pr-4 py-3 bg-transparent text-[#1f1f1f] placeholder-[#757575] text-[15px] focus:outline-none rounded-2xl"
+            className="w-full pl-12 pr-16 py-3 bg-transparent text-[#1f1f1f] placeholder-[#757575] text-[15px] focus:outline-none rounded-2xl"
             data-search
           />
+          {/* Raccourci clavier visible */}
+          {!searchFocused && !searchQuery && (
+            <div className="absolute right-3 flex items-center gap-1 px-2 py-1 bg-white rounded-lg border border-[#e0e0e0] shadow-sm">
+              <span className="text-xs text-[#757575] font-medium">⌘K</span>
+            </div>
+          )}
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}

@@ -25,10 +25,10 @@ Implémenter les améliorations UX inspirées de Pennylane pour rendre le CRM pl
 - [x] 3 onglets : À faire | Alertes | Historique
 - [x] Message positif quand tout est fait ("🎉 Vous êtes à jour !")
 
-### 2.3 Améliorer la recherche globale
-- [ ] Rendre la barre de recherche plus visible
-- [ ] Ajouter raccourci clavier Ctrl+K
-- [ ] Catégoriser les résultats (Affaires, Contacts, Documents)
+### 2.3 Améliorer la recherche globale ✅
+- [x] ~~Ajouter raccourci clavier Ctrl+K~~ (déjà existant)
+- [x] Afficher le raccourci ⌘K visuellement dans la barre
+- [ ] Catégoriser les résultats (reporté - complexe)
 
 ### 2.4 Améliorer les listes d'affaires
 - [ ] Style épuré : Référence + Ville + Montant
