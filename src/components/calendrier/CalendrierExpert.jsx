@@ -7,9 +7,9 @@ import React, { useState, useMemo } from 'react';
 import {
   Calendar, ChevronLeft, ChevronRight, Clock, MapPin, Users,
   AlertTriangle, FileText, Euro, Scale, Eye, Plus,
-  CalendarDays, List, Grid3X3
+  CalendarDays, List, Grid3X3, Download
 } from 'lucide-react';
-import { Card, Badge, Button, ModalBase } from '../ui';
+import { Card, Badge, Button, ModalBase, useToast } from '../ui';
 import { formatDateFr } from '../../utils/helpers';
 
 // ============================================================================
@@ -28,6 +28,111 @@ const TYPES_EVENEMENTS = {
   dire: { label: 'Dire', color: 'bg-orange-500', textColor: 'text-orange-700', bgLight: 'bg-orange-100' },
   provision: { label: 'Provision', color: 'bg-green-500', textColor: 'text-green-700', bgLight: 'bg-green-100' },
   rapport: { label: 'Rapport', color: 'bg-blue-500', textColor: 'text-blue-700', bgLight: 'bg-blue-100' }
+};
+
+// ============================================================================
+// FONCTIONS EXPORT ICS
+// ============================================================================
+
+const formatDateICS = (date) => {
+  const d = new Date(date);
+  return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+};
+
+const genererICS = (evenement) => {
+  const now = new Date();
+  const dateDebut = new Date(evenement.date);
+  if (evenement.heure) {
+    const [heures, minutes] = evenement.heure.split(':');
+    if (heures && minutes) {
+      dateDebut.setHours(parseInt(heures), parseInt(minutes));
+    }
+  }
+  const dateFin = new Date(dateDebut);
+  dateFin.setHours(dateFin.getHours() + 2); // Durée par défaut 2h
+
+  const typeConfig = TYPES_EVENEMENTS[evenement.type] || TYPES_EVENEMENTS.reunion;
+
+  return `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//CRM Expert Judiciaire//FR
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:${Date.now()}-${Math.random().toString(36).substr(2, 9)}@crm-expert.fr
+DTSTAMP:${formatDateICS(now)}
+DTSTART:${formatDateICS(dateDebut)}
+DTEND:${formatDateICS(dateFin)}
+SUMMARY:${evenement.titre || typeConfig.label} - ${evenement.affaireRef || ''}
+DESCRIPTION:${(evenement.description || '').replace(/\n/g, '\\n')}\\nAffaire: ${evenement.affaireRef || 'N/A'}\\nTribunal: ${evenement.tribunal || 'N/A'}
+LOCATION:${evenement.lieu || ''}
+CATEGORIES:${typeConfig.label}
+STATUS:CONFIRMED
+BEGIN:VALARM
+TRIGGER:-PT1H
+ACTION:DISPLAY
+DESCRIPTION:Rappel: ${evenement.titre || typeConfig.label}
+END:VALARM
+END:VEVENT
+END:VCALENDAR`;
+};
+
+const exporterEvenementICS = (evenement) => {
+  const ics = genererICS(evenement);
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${evenement.type}_${evenement.affaireRef || 'evenement'}.ics`;
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
+const exporterMultipleICS = (evenements) => {
+  const now = new Date();
+  let events = '';
+
+  evenements.forEach(evt => {
+    const dateDebut = new Date(evt.date);
+    if (evt.heure) {
+      const [heures, minutes] = evt.heure.split(':');
+      if (heures && minutes) {
+        dateDebut.setHours(parseInt(heures), parseInt(minutes));
+      }
+    }
+    const dateFin = new Date(dateDebut);
+    dateFin.setHours(dateFin.getHours() + 2);
+
+    const typeConfig = TYPES_EVENEMENTS[evt.type] || TYPES_EVENEMENTS.reunion;
+
+    events += `BEGIN:VEVENT
+UID:${Date.now()}-${Math.random().toString(36).substr(2, 9)}@crm-expert.fr
+DTSTAMP:${formatDateICS(now)}
+DTSTART:${formatDateICS(dateDebut)}
+DTEND:${formatDateICS(dateFin)}
+SUMMARY:${evt.titre || typeConfig.label} - ${evt.affaireRef || ''}
+DESCRIPTION:${(evt.description || '').replace(/\n/g, '\\n')}\\nAffaire: ${evt.affaireRef || 'N/A'}
+LOCATION:${evt.lieu || ''}
+CATEGORIES:${typeConfig.label}
+STATUS:CONFIRMED
+END:VEVENT
+`;
+  });
+
+  const ics = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//CRM Expert Judiciaire//FR
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+${events}END:VCALENDAR`;
+
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `calendrier_expert_${new Date().toISOString().split('T')[0]}.ics`;
+  link.click();
+  URL.revokeObjectURL(url);
 };
 
 // ============================================================================
@@ -229,10 +334,27 @@ const ModalDetailEvenement = ({ evenement, onClose, onNavigate }) => {
 // ============================================================================
 
 export const CalendrierExpert = ({ affaires = [], onSelectAffaire }) => {
+  const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [viewMode, setViewMode] = useState('month'); // 'month' | 'week' | 'list'
+
+  // Export ICS
+  const handleExportAll = () => {
+    const futurs = evenements.filter(e => e.date >= new Date());
+    if (futurs.length === 0) {
+      toast({ title: "Aucun événement", description: "Pas d'événement futur à exporter" });
+      return;
+    }
+    exporterMultipleICS(futurs);
+    toast({ title: "Export réussi", description: `${futurs.length} événement(s) exporté(s)` });
+  };
+
+  const handleExportEvent = (evt) => {
+    exporterEvenementICS(evt);
+    toast({ title: "Export réussi", description: "Événement exporté au format ICS" });
+  };
 
   // Extraire tous les événements
   const evenements = useMemo(() => {
@@ -398,6 +520,9 @@ export const CalendrierExpert = ({ affaires = [], onSelectAffaire }) => {
         <div className="flex items-center gap-2">
           <Button variant="secondary" size="sm" onClick={goToToday}>
             Aujourd'hui
+          </Button>
+          <Button variant="secondary" size="sm" icon={Download} onClick={handleExportAll}>
+            Export ICS
           </Button>
           <div className="flex items-center border border-[#e5e5e5] rounded-xl overflow-hidden">
             <button
