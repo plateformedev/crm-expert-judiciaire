@@ -47,6 +47,7 @@ import { TableauContradictoire } from './TableauContradictoire';
 import { CycleReunion } from './CycleReunion';
 import { TimerWidget } from './TimerWidget';
 import { GestionParties } from './GestionParties';
+import { EditeurMission } from './EditeurMission';
 
 // Phase 5 - Intégrations externes
 import {
@@ -1613,7 +1614,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
         {activeTab === 'dossier' && (
           <div className="space-y-6">
             {/* Infos générales */}
-            <TabGeneral affaire={affaire} />
+            <TabGeneral affaire={affaire} onUpdate={(updates) => update(updates)} />
 
             {/* Parties (intégré) */}
             <div className="pt-6 border-t border-[#e5e5e5]">
@@ -1780,7 +1781,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
         )}
 
         {/* ═══════════════════ ANCIENS ONGLETS (COMPATIBILITÉ) ═══════════════════ */}
-        {activeTab === 'general' && <TabGeneral affaire={affaire} />}
+        {activeTab === 'general' && <TabGeneral affaire={affaire} onUpdate={(updates) => update(updates)} />}
         {activeTab === 'parties' && <GestionParties affaire={affaire} onUpdate={(updates) => update(updates)} />}
         {activeTab === 'reunions' && (
           <GestionReunions
@@ -2027,7 +2028,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
 // TABS CONTENU
 // ============================================================================
 
-const TabGeneral = ({ affaire }) => (
+const TabGeneral = ({ affaire, onUpdate }) => (
   <div className="grid grid-cols-2 gap-6">
     <Card className="p-6">
       <h4 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
@@ -2086,15 +2087,10 @@ const TabGeneral = ({ affaire }) => (
       </div>
     </Card>
 
-    <Card className="p-6 col-span-2">
-      <h4 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-        <FileText className="w-5 h-5 text-[#2563EB]" />
-        Mission
-      </h4>
-      <p className="text-sm text-[#525252] whitespace-pre-wrap">
-        {affaire.mission || 'Mission non renseignée'}
-      </p>
-    </Card>
+    {/* Mission avec éditeur structuré */}
+    <div className="col-span-2">
+      <EditeurMission affaire={affaire} onUpdate={onUpdate} compact={true} />
+    </div>
   </div>
 );
 
