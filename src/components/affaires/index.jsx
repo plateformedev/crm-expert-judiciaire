@@ -52,6 +52,7 @@ import { GestionDesordres } from './GestionDesordres';
 import { GenerateurCourriers } from './GenerateurCourriers';
 import { ExportDocuments } from './ExportDocuments';
 import { GestionModeles } from './GestionModeles';
+import { HistoriqueModifications } from './HistoriqueModifications';
 
 // Phase 5 - Intégrations externes
 import {
@@ -1631,6 +1632,11 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
             {/* Parties (intégré) */}
             <div className="pt-6 border-t border-[#e5e5e5]">
               <GestionParties affaire={affaire} onUpdate={(updates) => update(updates)} />
+            </div>
+
+            {/* Historique des modifications */}
+            <div className="pt-6 border-t border-[#e5e5e5]">
+              <HistoriqueModifications affaire={affaire} onUpdate={(updates) => update(updates)} />
             </div>
           </div>
         )}
