@@ -105,73 +105,176 @@ ${expert?.email ? `Email : ${expert.email}` : ''}`;
 // COMPOSANT: Sélecteur de destinataire
 // ============================================================================
 
-const SelecteurDestinataires = ({ parties, selectedIds, onToggle, onSelectAll }) => {
+const SelecteurDestinataires = ({ parties, selectedIds, onToggle, onSelectAll, includeAvocats = true }) => {
+  // Extraire les avocats avec coordonnées complètes
+  const avocats = useMemo(() => {
+    const avocatMap = new Map();
+    parties.forEach(partie => {
+      if (partie.avocat_nom && partie.avocat_email) {
+        const avocatKey = `avocat_${partie.avocat_email}`;
+        if (!avocatMap.has(avocatKey)) {
+          avocatMap.set(avocatKey, {
+            id: avocatKey,
+            type: 'avocat',
+            nom: partie.avocat_nom,
+            cabinet: partie.avocat_cabinet,
+            email: partie.avocat_email,
+            telephone: partie.avocat_telephone,
+            adresse: partie.avocat_adresse,
+            representePour: [partie]
+          });
+        } else {
+          avocatMap.get(avocatKey).representePour.push(partie);
+        }
+      }
+    });
+    return Array.from(avocatMap.values());
+  }, [parties]);
+
+  const allDestinataires = includeAvocats ? [...parties, ...avocats] : parties;
+  const totalCount = allDestinataires.length;
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-medium text-[#1a1a1a]">Destinataires</h4>
         <button
-          onClick={onSelectAll}
+          onClick={() => onSelectAll(allDestinataires.map(d => d.id))}
           className="text-xs text-[#2563EB] hover:underline"
         >
-          {selectedIds.length === parties.length ? 'Tout désélectionner' : 'Tout sélectionner'}
+          {selectedIds.length === totalCount ? 'Tout désélectionner' : 'Tout sélectionner'}
         </button>
       </div>
 
-      <div className="space-y-2 max-h-60 overflow-y-auto">
-        {parties.map(partie => {
-          const isSelected = selectedIds.includes(partie.id);
-          const nom = partie.raison_sociale || `${partie.prenom || ''} ${partie.nom}`.trim();
+      {/* Statistiques rapides */}
+      <div className="flex gap-2 text-xs">
+        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+          {parties.filter(p => selectedIds.includes(p.id)).length}/{parties.length} parties
+        </span>
+        {includeAvocats && avocats.length > 0 && (
+          <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full">
+            {avocats.filter(a => selectedIds.includes(a.id)).length}/{avocats.length} avocats
+          </span>
+        )}
+      </div>
 
-          return (
-            <div
-              key={partie.id}
-              onClick={() => onToggle(partie.id)}
-              className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                isSelected
-                  ? 'border-[#2563EB] bg-[#EFF6FF]'
-                  : 'border-[#e5e5e5] hover:border-[#2563EB]'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                  isSelected ? 'bg-[#2563EB] border-[#2563EB]' : 'border-[#d4d4d4]'
-                }`}>
-                  {isSelected && <Check className="w-3 h-3 text-white" />}
-                </div>
+      <div className="space-y-2 max-h-72 overflow-y-auto">
+        {/* Parties */}
+        {parties.length > 0 && (
+          <>
+            <div className="text-xs text-[#a3a3a3] uppercase tracking-wider mt-2">Parties</div>
+            {parties.map(partie => {
+              const isSelected = selectedIds.includes(partie.id);
+              const nom = partie.raison_sociale || `${partie.prenom || ''} ${partie.nom}`.trim();
 
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm text-[#1a1a1a]">{nom}</span>
-                    <Badge variant={partie.type === 'demandeur' ? 'info' : partie.type === 'defendeur' ? 'warning' : 'default'}>
-                      {partie.type}
-                    </Badge>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 mt-1 text-xs text-[#737373]">
-                    {partie.email && (
-                      <span className="flex items-center gap-1">
-                        <AtSign className="w-3 h-3" /> {partie.email}
-                      </span>
-                    )}
-                    {partie.adresse && (
-                      <span className="flex items-center gap-1">
-                        <Home className="w-3 h-3" /> {partie.adresse}
-                      </span>
-                    )}
-                  </div>
-
-                  {partie.avocat_nom && (
-                    <div className="mt-1 text-xs text-[#a3a3a3]">
-                      Représenté par Me {partie.avocat_nom}
-                      {partie.avocat_email && ` (${partie.avocat_email})`}
+              return (
+                <div
+                  key={partie.id}
+                  onClick={() => onToggle(partie.id)}
+                  className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                    isSelected
+                      ? 'border-[#2563EB] bg-[#EFF6FF]'
+                      : 'border-[#e5e5e5] hover:border-[#2563EB]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                      isSelected ? 'bg-[#2563EB] border-[#2563EB]' : 'border-[#d4d4d4]'
+                    }`}>
+                      {isSelected && <Check className="w-3 h-3 text-white" />}
                     </div>
-                  )}
+
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <User className="w-3.5 h-3.5 text-[#737373]" />
+                        <span className="font-medium text-sm text-[#1a1a1a]">{nom}</span>
+                        <Badge variant={partie.type === 'demandeur' ? 'info' : partie.type === 'defendeur' ? 'warning' : 'default'}>
+                          {partie.qualite || partie.type}
+                        </Badge>
+                      </div>
+
+                      <div className="flex flex-wrap gap-3 mt-1 text-xs text-[#737373]">
+                        {partie.email && (
+                          <span className="flex items-center gap-1">
+                            <AtSign className="w-3 h-3" /> {partie.email}
+                          </span>
+                        )}
+                        {partie.adresse && (
+                          <span className="flex items-center gap-1 truncate max-w-[180px]">
+                            <Home className="w-3 h-3" /> {partie.adresse}
+                          </span>
+                        )}
+                      </div>
+
+                      {partie.avocat_nom && (
+                        <div className="mt-1 text-xs text-[#a3a3a3]">
+                          <Briefcase className="w-3 h-3 inline mr-1" />
+                          Représenté par Me {partie.avocat_nom}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })}
+          </>
+        )}
+
+        {/* Avocats */}
+        {includeAvocats && avocats.length > 0 && (
+          <>
+            <div className="text-xs text-[#a3a3a3] uppercase tracking-wider mt-4">Avocats</div>
+            {avocats.map(avocat => {
+              const isSelected = selectedIds.includes(avocat.id);
+
+              return (
+                <div
+                  key={avocat.id}
+                  onClick={() => onToggle(avocat.id)}
+                  className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                    isSelected
+                      ? 'border-purple-500 bg-purple-50'
+                      : 'border-[#e5e5e5] hover:border-purple-500'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                      isSelected ? 'bg-purple-500 border-purple-500' : 'border-[#d4d4d4]'
+                    }`}>
+                      {isSelected && <Check className="w-3 h-3 text-white" />}
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <Briefcase className="w-3.5 h-3.5 text-purple-600" />
+                        <span className="font-medium text-sm text-[#1a1a1a]">Me {avocat.nom}</span>
+                        <Badge className="bg-purple-100 text-purple-700">Avocat</Badge>
+                      </div>
+
+                      {avocat.cabinet && (
+                        <p className="text-xs text-[#737373] mt-1">{avocat.cabinet}</p>
+                      )}
+
+                      <div className="flex flex-wrap gap-3 mt-1 text-xs text-[#737373]">
+                        {avocat.email && (
+                          <span className="flex items-center gap-1">
+                            <AtSign className="w-3 h-3" /> {avocat.email}
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-xs text-[#a3a3a3] mt-1">
+                        Représente : {avocat.representePour.map(p =>
+                          p.raison_sociale || `${p.prenom || ''} ${p.nom}`.trim()
+                        ).join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </>
+        )}
 
         {parties.length === 0 && (
           <div className="text-center py-8 text-[#737373]">
@@ -432,11 +535,11 @@ export const ModuleConvocation = ({ affaire, reunion, expert, onUpdate, onClose 
   };
 
   // Sélectionner/désélectionner tout
-  const toggleSelectAll = () => {
-    if (selectedParties.length === parties.length) {
+  const toggleSelectAll = (allIds) => {
+    if (selectedParties.length === allIds.length) {
       setSelectedParties([]);
     } else {
-      setSelectedParties(parties.map(p => p.id));
+      setSelectedParties(allIds);
     }
   };
 
