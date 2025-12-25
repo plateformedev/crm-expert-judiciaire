@@ -144,3 +144,36 @@ Le tableau a déjà :
 | Sauvegarde filtres | ✅ | `affaires/index.jsx` |
 | Export CSV | ✅ | `affaires/index.jsx` |
 
+---
+
+## TIME TRACKING INTÉGRÉ (5.2)
+
+### État actuel
+Il existe déjà :
+- ✅ `useAutoTimer` - Timer automatique qui démarre en consultant une affaire
+- ✅ `Chronometre` - Composant manuel dans /outils
+- ✅ `useTimer` - Hook basique
+
+### Améliorations prévues
+
+- [ ] 5.2.1 Widget timer flottant visible sur page affaire
+- [ ] 5.2.2 Bouton Play/Pause pour contrôle manuel
+- [ ] 5.2.3 Affichage temps session + temps total affaire
+
+### Détails techniques
+
+#### 5.2.1 Widget timer flottant
+- Créer `TimerWidget.jsx` - petit widget compact
+- Position fixe en bas à droite de la page affaire
+- Affiche : temps session, bouton play/pause, montant estimé
+
+#### 5.2.2 Contrôle manuel
+- Bouton Play/Pause toggle `isRunning`
+- Modifier `useAutoTimer` pour accepter contrôle manuel
+- Sauvegarder même si arrêté manuellement
+
+#### 5.2.3 Affichage temps
+- Session actuelle : `00:12:34`
+- Total affaire : `2h 45min`
+- Montant estimé : `247.50 €`
+
