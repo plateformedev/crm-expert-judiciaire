@@ -156,24 +156,33 @@ Il existe déjà :
 
 ### Améliorations prévues
 
-- [ ] 5.2.1 Widget timer flottant visible sur page affaire
-- [ ] 5.2.2 Bouton Play/Pause pour contrôle manuel
-- [ ] 5.2.3 Affichage temps session + temps total affaire
+- [x] 5.2.1 Widget timer flottant visible sur page affaire
+- [x] 5.2.2 Bouton Play/Pause pour contrôle manuel
+- [x] 5.2.3 Affichage temps session + temps total affaire
 
 ### Détails techniques
 
-#### 5.2.1 Widget timer flottant
+#### 5.2.1 Widget timer flottant ✅
 - Créer `TimerWidget.jsx` - petit widget compact
 - Position fixe en bas à droite de la page affaire
 - Affiche : temps session, bouton play/pause, montant estimé
 
-#### 5.2.2 Contrôle manuel
-- Bouton Play/Pause toggle `isRunning`
-- Modifier `useAutoTimer` pour accepter contrôle manuel
-- Sauvegarder même si arrêté manuellement
+#### 5.2.2 Contrôle manuel ✅
+- Hook `useControllableTimer` avec toggle play/pause
+- Auto-save du temps à la fermeture (si > 10 secondes)
+- État visible : pastille verte (actif) ou grise (pause)
 
-#### 5.2.3 Affichage temps
+#### 5.2.3 Affichage temps ✅
 - Session actuelle : `00:12:34`
 - Total affaire : `2h 45min`
 - Montant estimé : `247.50 €`
+
+---
+
+### Review Time Tracking
+| Amélioration | Statut | Fichier |
+|--------------|--------|---------|
+| Widget timer flottant | ✅ | `affaires/TimerWidget.jsx` |
+| Hook controllable | ✅ | `affaires/TimerWidget.jsx` |
+| Intégration FicheAffaire | ✅ | `affaires/index.jsx` |
 

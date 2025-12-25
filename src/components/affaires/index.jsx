@@ -45,6 +45,7 @@ import { ModuleCompteRendu } from './ModuleCompteRendu';
 import { AlertesDelais } from './AlertesDelais';
 import { TableauContradictoire } from './TableauContradictoire';
 import { CycleReunion } from './CycleReunion';
+import { TimerWidget } from './TimerWidget';
 
 // Phase 5 - Intégrations externes
 import {
@@ -2011,6 +2012,13 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
           }}
         />
       )}
+
+      {/* ⏱️ Widget Timer flottant */}
+      <TimerWidget
+        affaireId={affaireId}
+        affaireRef={affaire?.reference}
+        tauxHoraire={90}
+      />
     </div>
   );
 };
