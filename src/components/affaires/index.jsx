@@ -19,7 +19,7 @@ import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupaba
 import { useAutoTimer } from '../../hooks';
 import { ETAPES_TUNNEL, GARANTIES, STATUTS_REUNION, JURISPRUDENCE, QUALIFICATION_DESORDRES, OPALEXE_CHECKLIST, BASE_DTU } from '../../data';
 import { getStoredAffaires, saveAffaires } from '../../lib/demoData';
-import { formatDateFr, calculerDelaiRestant, calculerAvancementTunnel } from '../../utils/helpers';
+import { formatDateFr, calculerDelaiRestant, calculerAvancementTunnel, formatDureeHeures } from '../../utils/helpers';
 
 // Nouveaux composants Phase 1
 import { WorkflowTunnel } from './WorkflowTunnel';
@@ -3473,13 +3473,13 @@ const TabOutils = ({ affaire }) => {
               <Button
                 variant="outline"
                 onClick={() => {
-                  const heures = (chronoTime / 3600).toFixed(2);
-                  toast.success(`${heures}h enregistrées`, 'Temps ajouté à l\'affaire');
+                  const heuresFormatees = formatDureeHeures(chronoTime / 3600);
+                  toast.success(`${heuresFormatees} enregistrées`, 'Temps ajouté à l\'affaire');
                 }}
                 className="text-[#c9a227] border-[#c9a227]"
               >
                 <Save className="w-4 h-4 mr-2" />
-                Enregistrer le temps ({(chronoTime / 3600).toFixed(2)}h)
+                Enregistrer le temps ({formatDureeHeures(chronoTime / 3600)})
               </Button>
             </div>
           </div>

@@ -116,43 +116,66 @@ export const DashboardExpert = ({
 
   return (
     <div className="space-y-6">
-      {/* En-tête personnalisé */}
-      <div className="bg-gradient-to-r from-[#1a1a1a] to-[#2a2a2a] rounded-2xl p-6 text-white">
+      {/* En-tête personnalisé - Style Pennylane */}
+      <div className="bg-gradient-to-r from-[#1a1a1a] to-[#2a2a2a] rounded-2xl p-8 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-2 text-white/60 mb-1">
+            <div className="flex items-center gap-2 text-white/60 mb-2">
               <SalutIcon className="w-5 h-5" />
-              <span>{salutation.text}</span>
+              <span className="text-sm">{formatDateFr(new Date(), true)}</span>
             </div>
-            <h1 className="text-2xl font-light">
-              {expert?.prenom || 'Expert'} {expert?.nom || ''}
+            <h1 className="text-3xl font-semibold mb-2">
+              {salutation.text}, {expert?.prenom || 'Expert'} 👋
             </h1>
-            <p className="text-white/60 mt-1">
-              {formatDateFr(new Date(), true)} — Voici votre tableau de bord
+            {/* Message contextuel avec nombre d'actions */}
+            <p className="text-white/80 text-lg">
+              {alerteStats.critiques > 0 ? (
+                <span className="text-red-300">
+                  ⚠️ {alerteStats.critiques + alerteStats.hautes} affaire(s) nécessitent votre attention
+                </span>
+              ) : stats.reunionsSemaine.length > 0 ? (
+                <span>
+                  📅 {stats.reunionsSemaine.length} réunion(s) cette semaine • {stats.diresEnAttente} dire(s) à traiter
+                </span>
+              ) : stats.diresEnAttente > 0 ? (
+                <span>
+                  📝 {stats.diresEnAttente} dire(s) en attente de réponse
+                </span>
+              ) : (
+                <span className="text-green-300">
+                  ✨ Vous êtes à jour ! Aucune action urgente.
+                </span>
+              )}
             </p>
           </div>
-          
+
           <div className="flex items-center gap-4">
-            {/* Météo des alertes */}
-            <div className={`px-4 py-2 rounded-xl ${
-              alerteStats.critiques > 0 ? 'bg-red-500/20' :
-              alerteStats.hautes > 0 ? 'bg-orange-500/20' :
-              'bg-green-500/20'
+            {/* Météo des alertes - Style badge arrondi */}
+            <div className={`px-5 py-3 rounded-2xl ${
+              alerteStats.critiques > 0 ? 'bg-red-500/20 border border-red-500/30' :
+              alerteStats.hautes > 0 ? 'bg-orange-500/20 border border-orange-500/30' :
+              'bg-green-500/20 border border-green-500/30'
             }`}>
               {alerteStats.critiques > 0 ? (
                 <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-red-400" />
-                  <span className="text-red-300">{alerteStats.critiques} critique(s)</span>
+                  <AlertTriangle className="w-6 h-6 text-red-400" />
+                  <div>
+                    <span className="text-red-300 font-semibold text-lg">{alerteStats.critiques}</span>
+                    <span className="text-red-300/70 text-sm ml-1">critique(s)</span>
+                  </div>
                 </div>
               ) : alerteStats.hautes > 0 ? (
                 <div className="flex items-center gap-2">
-                  <Bell className="w-5 h-5 text-orange-400" />
-                  <span className="text-orange-300">{alerteStats.hautes} alerte(s)</span>
+                  <Bell className="w-6 h-6 text-orange-400" />
+                  <div>
+                    <span className="text-orange-300 font-semibold text-lg">{alerteStats.hautes}</span>
+                    <span className="text-orange-300/70 text-sm ml-1">alerte(s)</span>
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span className="text-green-300">Tout va bien</span>
+                  <CheckCircle className="w-6 h-6 text-green-400" />
+                  <span className="text-green-300 font-medium">Tout va bien</span>
                 </div>
               )}
             </div>
@@ -244,29 +267,56 @@ export const DashboardExpert = ({
 // COMPOSANTS WIDGETS
 // ============================================================================
 
-// KPI Card
+// KPI Card - Style Pennylane avec grands chiffres et tendances
 const KPICard = ({ icon: Icon, label, value, subValue, trend, onClick }) => {
-  const trendColors = {
-    success: 'text-green-600',
-    warning: 'text-amber-600',
-    danger: 'text-red-600',
-    neutral: 'text-[#737373]'
+  const trendConfig = {
+    success: {
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+      arrow: '↗',
+      iconBg: 'bg-green-100'
+    },
+    warning: {
+      color: 'text-amber-600',
+      bgColor: 'bg-amber-50',
+      arrow: '→',
+      iconBg: 'bg-amber-100'
+    },
+    danger: {
+      color: 'text-red-600',
+      bgColor: 'bg-red-50',
+      arrow: '↘',
+      iconBg: 'bg-red-100'
+    },
+    neutral: {
+      color: 'text-[#737373]',
+      bgColor: 'bg-[#fafafa]',
+      arrow: '',
+      iconBg: 'bg-[#f5e6c8]'
+    }
   };
 
+  const config = trendConfig[trend] || trendConfig.neutral;
+
   return (
-    <Card 
-      className={`p-5 ${onClick ? 'cursor-pointer hover:border-[#c9a227] transition-colors' : ''}`}
+    <Card
+      className={`p-6 ${onClick ? 'cursor-pointer hover:border-[#c9a227] hover:shadow-md transition-all' : ''}`}
       onClick={onClick}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-1">{label}</p>
-          <p className="text-3xl font-light text-[#1a1a1a]">{value}</p>
-          <p className={`text-sm mt-1 ${trendColors[trend]}`}>{subValue}</p>
+      <div className="flex items-start justify-between mb-3">
+        <p className="text-xs text-[#a3a3a3] uppercase tracking-wider font-medium">{label}</p>
+        <div className={`w-10 h-10 ${config.iconBg} rounded-xl flex items-center justify-center`}>
+          <Icon className={`w-5 h-5 ${trend === 'neutral' ? 'text-[#c9a227]' : config.color}`} />
         </div>
-        <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
-          <Icon className="w-5 h-5 text-[#c9a227]" />
-        </div>
+      </div>
+
+      {/* Valeur principale - 48px comme Pennylane */}
+      <p className="text-5xl font-bold text-[#1a1a1a] leading-none mb-2">{value}</p>
+
+      {/* Sous-valeur avec flèche tendance */}
+      <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg ${config.bgColor}`}>
+        {config.arrow && <span className={`${config.color} font-medium`}>{config.arrow}</span>}
+        <span className={`text-sm ${config.color}`}>{subValue}</span>
       </div>
     </Card>
   );
@@ -328,9 +378,19 @@ const AgendaSemaine = ({ reunions, onSelectAffaire }) => {
 
       {/* Liste des réunions */}
       {reunions.length === 0 ? (
-        <p className="text-sm text-[#737373] text-center py-4">
-          Aucune réunion cette semaine
-        </p>
+        <div className="text-center py-8">
+          <div className="text-5xl mb-3">🗓️</div>
+          <p className="font-medium text-[#1a1a1a] mb-1">Semaine libre !</p>
+          <p className="text-sm text-[#737373] mb-4">Aucune réunion planifiée cette semaine</p>
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={Calendar}
+            onClick={() => {}}
+          >
+            Planifier une réunion
+          </Button>
+        </div>
       ) : (
         <div className="space-y-3">
           {reunions.slice(0, 4).map((reunion, i) => {
