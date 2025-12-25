@@ -67,7 +67,7 @@ export const AR24Panel = ({ affaire, onEnvoiSuccess }) => {
         {balance && (
           <div className="text-right">
             <div className="text-sm text-[#737373]">Solde disponible</div>
-            <div className="text-xl font-semibold text-[#c9a227]">
+            <div className="text-xl font-semibold text-[#2563EB]">
               {formatMontant(balance.balance)}
             </div>
           </div>
@@ -93,11 +93,11 @@ export const AR24Panel = ({ affaire, onEnvoiSuccess }) => {
       {/* Actions rapides */}
       <div className="grid grid-cols-3 gap-4">
         <Card
-          className="p-4 hover:border-[#c9a227] cursor-pointer transition-colors"
+          className="p-4 hover:border-[#2563EB] cursor-pointer transition-colors"
           onClick={() => setShowEnvoiModal(true)}
         >
           <div className="flex flex-col items-center text-center gap-2">
-            <div className="w-10 h-10 bg-[#c9a227] rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#2563EB] rounded-full flex items-center justify-center">
               <Send className="w-5 h-5 text-white" />
             </div>
             <span className="font-medium text-sm">Nouvel envoi</span>
@@ -108,7 +108,7 @@ export const AR24Panel = ({ affaire, onEnvoiSuccess }) => {
           <Card key={type.code} className="p-4">
             <div className="flex flex-col items-center text-center gap-1">
               <span className="text-sm text-[#737373]">{type.label}</span>
-              <span className="font-semibold text-[#c9a227]">{formatMontant(type.prix)}</span>
+              <span className="font-semibold text-[#2563EB]">{formatMontant(type.prix)}</span>
             </div>
           </Card>
         ))}
@@ -131,7 +131,7 @@ export const AR24Panel = ({ affaire, onEnvoiSuccess }) => {
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-[#c9a227] animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#2563EB] animate-spin" />
           </div>
         ) : history.length === 0 ? (
           <EmptyState
@@ -270,7 +270,7 @@ const EnvoiCard = ({ envoi }) => {
             <div className="space-y-2">
               {details.events.map((event, idx) => (
                 <div key={idx} className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-[#c9a227] mt-1.5" />
+                  <div className="w-2 h-2 rounded-full bg-[#2563EB] mt-1.5" />
                   <div>
                     <div className="text-sm text-[#1a1a1a]">{event.description}</div>
                     <div className="text-xs text-[#a3a3a3]">
@@ -364,8 +364,8 @@ const ModalNouvelEnvoi = ({ isOpen, onClose, affaire, onSuccess }) => {
                     key={idx}
                     className={`p-4 cursor-pointer transition-colors ${
                       formData.destinataire?.id === partie.id
-                        ? 'border-[#c9a227] bg-[#fafafa]'
-                        : 'hover:border-[#c9a227]'
+                        ? 'border-[#2563EB] bg-[#fafafa]'
+                        : 'hover:border-[#2563EB]'
                     }`}
                     onClick={() => setFormData({ ...formData, destinataire: partie })}
                   >
@@ -374,7 +374,7 @@ const ModalNouvelEnvoi = ({ isOpen, onClose, affaire, onSuccess }) => {
                         type="radio"
                         checked={formData.destinataire?.id === partie.id}
                         onChange={() => {}}
-                        className="w-4 h-4 text-[#c9a227]"
+                        className="w-4 h-4 text-[#2563EB]"
                       />
                       <div>
                         <div className="font-medium">{partie.nom}</div>
@@ -461,13 +461,13 @@ const ModalNouvelEnvoi = ({ isOpen, onClose, affaire, onSuccess }) => {
                   key={type.code}
                   className={`p-4 cursor-pointer transition-colors text-center ${
                     formData.typeEnvoi === type.code
-                      ? 'border-[#c9a227] bg-[#fafafa]'
-                      : 'hover:border-[#c9a227]'
+                      ? 'border-[#2563EB] bg-[#fafafa]'
+                      : 'hover:border-[#2563EB]'
                   }`}
                   onClick={() => setFormData({ ...formData, typeEnvoi: type.code })}
                 >
                   <div className="font-medium text-sm">{type.label}</div>
-                  <div className="text-lg font-semibold text-[#c9a227] mt-1">
+                  <div className="text-lg font-semibold text-[#2563EB] mt-1">
                     {formatMontant(type.prix)}
                   </div>
                 </Card>
@@ -557,7 +557,7 @@ const ModalNouvelEnvoi = ({ isOpen, onClose, affaire, onSuccess }) => {
                 </div>
                 <div className="flex justify-between pt-3 border-t border-[#e5e5e5]">
                   <span className="font-medium">Total</span>
-                  <span className="text-xl font-semibold text-[#c9a227]">
+                  <span className="text-xl font-semibold text-[#2563EB]">
                     {formatMontant(AR24_TYPES[formData.typeEnvoi.toUpperCase()]?.prix || 4.99)}
                   </span>
                 </div>

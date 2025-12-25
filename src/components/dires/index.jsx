@@ -159,7 +159,7 @@ export const GestionDires = ({ affaireId, affaire, parties = [] }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-[#c9a227] border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -199,14 +199,14 @@ export const GestionDires = ({ affaireId, affaire, parties = [] }) => {
             placeholder="Rechercher dans les dires..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
           />
         </div>
 
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+          className="px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
         >
           <option value="all">Tous statuts</option>
           <option value="recu">Reçus</option>
@@ -306,9 +306,9 @@ const DireCard = ({ dire, onView, onReply, onStatusChange }) => {
       <div className="flex items-start gap-4">
         {/* Numéro */}
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-          enRetard ? 'bg-red-100' : 'bg-[#f5e6c8]'
+          enRetard ? 'bg-red-100' : 'bg-[#DBEAFE]'
         }`}>
-          <span className={`font-medium ${enRetard ? 'text-red-600' : 'text-[#c9a227]'}`}>
+          <span className={`font-medium ${enRetard ? 'text-red-600' : 'text-[#2563EB]'}`}>
             D{dire.numero}
           </span>
         </div>
@@ -449,7 +449,7 @@ const ModalNouveauDire = ({ isOpen, onClose, parties, onSubmit }) => {
             onChange={(e) => setFormData(prev => ({ ...prev, contenu: e.target.value }))}
             rows={8}
             required
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none"
             placeholder="Collez ou saisissez le contenu du dire..."
           />
         </div>
@@ -458,7 +458,7 @@ const ModalNouveauDire = ({ isOpen, onClose, parties, onSubmit }) => {
         <div className="p-4 border-2 border-dashed border-[#e5e5e5] rounded-xl text-center">
           <Paperclip className="w-8 h-8 text-[#a3a3a3] mx-auto mb-2" />
           <p className="text-sm text-[#737373]">
-            Glissez des fichiers ici ou <span className="text-[#c9a227] cursor-pointer">parcourez</span>
+            Glissez des fichiers ici ou <span className="text-[#2563EB] cursor-pointer">parcourez</span>
           </p>
           <p className="text-xs text-[#a3a3a3] mt-1">PDF, DOC, images (max 10 Mo)</p>
         </div>
@@ -511,8 +511,8 @@ const ModalDetailDire = ({ isOpen, onClose, dire, onReply }) => {
         <Card className="p-4 bg-[#fafafa]">
           <p className="text-xs text-[#a3a3a3] uppercase tracking-wider mb-2">Émetteur</p>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
-              <User className="w-5 h-5 text-[#c9a227]" />
+            <div className="w-10 h-10 bg-[#DBEAFE] rounded-xl flex items-center justify-center">
+              <User className="w-5 h-5 text-[#2563EB]" />
             </div>
             <div>
               <p className="font-medium text-[#1a1a1a]">{nomPartie}</p>
@@ -542,7 +542,7 @@ const ModalDetailDire = ({ isOpen, onClose, dire, onReply }) => {
                 <div key={i} className="flex items-center gap-2 px-3 py-2 bg-[#f5f5f5] rounded-lg">
                   <Paperclip className="w-4 h-4 text-[#737373]" />
                   <span className="text-sm">{piece}</span>
-                  <Download className="w-4 h-4 text-[#a3a3a3] cursor-pointer hover:text-[#c9a227]" />
+                  <Download className="w-4 h-4 text-[#a3a3a3] cursor-pointer hover:text-[#2563EB]" />
                 </div>
               ))}
             </div>
@@ -643,7 +643,7 @@ const ModalRepondreDire = ({ isOpen, onClose, dire, onSubmit }) => {
                 key={i}
                 type="button"
                 onClick={() => setReponse(prev => prev + (prev ? '\n\n' : '') + sug)}
-                className="px-3 py-1.5 bg-[#f5f5f5] border border-[#e5e5e5] rounded-lg text-xs text-[#525252] hover:border-[#c9a227] transition-colors text-left"
+                className="px-3 py-1.5 bg-[#f5f5f5] border border-[#e5e5e5] rounded-lg text-xs text-[#525252] hover:border-[#2563EB] transition-colors text-left"
               >
                 {sug.substring(0, 50)}...
               </button>
@@ -671,7 +671,7 @@ const ModalRepondreDire = ({ isOpen, onClose, dire, onSubmit }) => {
             onChange={(e) => setReponse(e.target.value)}
             rows={10}
             required
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none"
             placeholder="Rédigez votre réponse..."
           />
         </div>

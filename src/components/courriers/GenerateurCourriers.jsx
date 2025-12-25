@@ -459,13 +459,13 @@ const ModeleCourrierCard = ({ modele, onSelect, selected }) => {
       onClick={() => onSelect(modele)}
       className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
         selected
-          ? 'border-[#c9a227] bg-[#faf8f3]'
-          : 'border-[#e5e5e5] hover:border-[#c9a227] bg-white'
+          ? 'border-[#2563EB] bg-[#EFF6FF]'
+          : 'border-[#e5e5e5] hover:border-[#2563EB] bg-white'
       }`}
     >
       <div className="flex items-start gap-3">
         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-          selected ? 'bg-[#c9a227] text-white' : 'bg-[#f5f5f5] text-[#737373]'
+          selected ? 'bg-[#2563EB] text-white' : 'bg-[#f5f5f5] text-[#737373]'
         }`}>
           <Icon className="w-5 h-5" />
         </div>
@@ -478,7 +478,7 @@ const ModeleCourrierCard = ({ modele, onSelect, selected }) => {
           </div>
           <p className="text-xs text-[#737373] mt-1">{modele.description}</p>
         </div>
-        <ChevronRight className={`w-4 h-4 ${selected ? 'text-[#c9a227]' : 'text-[#a3a3a3]'}`} />
+        <ChevronRight className={`w-4 h-4 ${selected ? 'text-[#2563EB]' : 'text-[#a3a3a3]'}`} />
       </div>
     </button>
   );
@@ -575,9 +575,9 @@ export const GenerateurCourriers = ({ affaire, expert, onSave }) => {
             categorie.modeles.length > 0 && (
               <Card key={key} className="p-4">
                 <h3 className="font-medium text-[#1a1a1a] mb-3 flex items-center gap-2">
-                  {key === 'juge' && <Scale className="w-4 h-4 text-[#c9a227]" />}
-                  {key === 'parties' && <Users className="w-4 h-4 text-[#c9a227]" />}
-                  {key === 'greffe' && <Building className="w-4 h-4 text-[#c9a227]" />}
+                  {key === 'juge' && <Scale className="w-4 h-4 text-[#2563EB]" />}
+                  {key === 'parties' && <Users className="w-4 h-4 text-[#2563EB]" />}
+                  {key === 'greffe' && <Building className="w-4 h-4 text-[#2563EB]" />}
                   {categorie.label}
                 </h3>
                 <div className="space-y-2">
@@ -607,9 +607,9 @@ export const GenerateurCourriers = ({ affaire, expert, onSave }) => {
           ) : (
             <Card className="overflow-hidden">
               {/* Barre d'outils */}
-              <div className="p-4 bg-[#faf8f3] border-b border-[#e5e5e5] flex items-center justify-between">
+              <div className="p-4 bg-[#EFF6FF] border-b border-[#e5e5e5] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <selectedModele.icon className="w-5 h-5 text-[#c9a227]" />
+                  <selectedModele.icon className="w-5 h-5 text-[#2563EB]" />
                   <div>
                     <h3 className="font-medium text-[#1a1a1a]">{selectedModele.titre}</h3>
                     <p className="text-xs text-[#737373]">
@@ -701,7 +701,7 @@ export const GenerateurCourriers = ({ affaire, expert, onSave }) => {
                           value={options.motif || ''}
                           onChange={(e) => setOptions({ ...options, motif: e.target.value })}
                           rows={3}
-                          className="w-full px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] text-sm"
+                          className="w-full px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] text-sm"
                           placeholder="Précisez le motif..."
                         />
                       </div>
@@ -723,7 +723,7 @@ export const GenerateurCourriers = ({ affaire, expert, onSave }) => {
                     value={contenu}
                     onChange={(e) => setContenu(e.target.value)}
                     rows={25}
-                    className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] font-mono text-sm leading-relaxed"
+                    className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] font-mono text-sm leading-relaxed"
                     placeholder="Le contenu du courrier apparaîtra ici..."
                   />
                 )}

@@ -276,9 +276,9 @@ export const MatriceImputabilite = ({
                                   e.target.value
                                 )}
                                 onClick={(e) => e.target.select()}
-                                className={`w-16 text-center px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-[#c9a227] ${
+                                className={`w-16 text-center px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-[#2563EB] ${
                                   cell.pourcentage > 0 
-                                    ? 'bg-[#f5e6c8] border-[#c9a227] font-medium' 
+                                    ? 'bg-[#DBEAFE] border-[#2563EB] font-medium' 
                                     : 'border-[#e5e5e5]'
                                 }`}
                                 placeholder="-"
@@ -286,7 +286,7 @@ export const MatriceImputabilite = ({
                               {cell.pourcentage > 0 && (
                                 <button
                                   onClick={() => setShowDetail({ pathologie, intervenant, cell })}
-                                  className="absolute -top-1 -right-1 w-4 h-4 bg-[#c9a227] text-white rounded-full text-xs flex items-center justify-center"
+                                  className="absolute -top-1 -right-1 w-4 h-4 bg-[#2563EB] text-white rounded-full text-xs flex items-center justify-center"
                                 >
                                   {cell.fondement ? <Check className="w-3 h-3" /> : <Edit className="w-3 h-3" />}
                                 </button>
@@ -345,7 +345,7 @@ export const MatriceImputabilite = ({
       {repartitionFinanciere.length > 0 && chiffrage?.total_ttc && (
         <Card className="p-6">
           <h3 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-            <Euro className="w-5 h-5 text-[#c9a227]" />
+            <Euro className="w-5 h-5 text-[#2563EB]" />
             Répartition financière
           </h3>
           <div className="space-y-4">
@@ -361,7 +361,7 @@ export const MatriceImputabilite = ({
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-light text-[#c9a227]">{formatMontant(montant)}</p>
+                    <p className="text-2xl font-light text-[#2563EB]">{formatMontant(montant)}</p>
                     <p className="text-xs text-[#737373]">
                       {Math.round((montant / parseFloat(chiffrage.total_ttc)) * 100)}% du total
                     </p>
@@ -466,7 +466,7 @@ const ModalDetailImputabilite = ({ isOpen, onClose, pathologie, intervenant, cel
               className="flex-1"
             />
             <div className="w-20 text-center">
-              <span className="text-2xl font-light text-[#c9a227]">{formData.pourcentage}%</span>
+              <span className="text-2xl font-light text-[#2563EB]">{formData.pourcentage}%</span>
             </div>
           </div>
         </div>
@@ -502,7 +502,7 @@ const ModalDetailImputabilite = ({ isOpen, onClose, pathologie, intervenant, cel
             value={formData.justification}
             onChange={(e) => setFormData({ ...formData, justification: e.target.value })}
             rows={5}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none"
             placeholder="Expliquez les raisons de l'imputabilité (obligation non respectée, lien de causalité avec le désordre...)"
           />
         </div>
@@ -521,7 +521,7 @@ const ModalDetailImputabilite = ({ isOpen, onClose, pathologie, intervenant, cel
                 key={i}
                 type="button"
                 onClick={() => setFormData({ ...formData, justification: sug })}
-                className="block w-full text-left px-3 py-2 text-sm text-[#525252] bg-white rounded-lg hover:bg-[#f5e6c8] transition-colors"
+                className="block w-full text-left px-3 py-2 text-sm text-[#525252] bg-white rounded-lg hover:bg-[#DBEAFE] transition-colors"
               >
                 {sug}
               </button>
@@ -581,7 +581,7 @@ export const ImputabiliteWidget = ({ matrice, pathologies, parties, chiffrageTTC
   return (
     <Card className="p-6">
       <h3 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-        <PieChart className="w-5 h-5 text-[#c9a227]" />
+        <PieChart className="w-5 h-5 text-[#2563EB]" />
         Imputabilité (top 3)
       </h3>
       <div className="space-y-3">
@@ -594,7 +594,7 @@ export const ImputabiliteWidget = ({ matrice, pathologies, parties, chiffrageTTC
               <p className="text-xs text-[#737373]">{partie.role_btp}</p>
             </div>
             <div className="text-right">
-              <p className="font-medium text-[#c9a227]">{moyenne}%</p>
+              <p className="font-medium text-[#2563EB]">{moyenne}%</p>
               {montant > 0 && (
                 <p className="text-xs text-[#737373]">{formatMontant(montant)}</p>
               )}

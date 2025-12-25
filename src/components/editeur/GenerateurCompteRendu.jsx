@@ -183,7 +183,7 @@ const PreviewCompteRendu = ({ reunion, affaire, desordres, photos }) => {
   return (
     <Card className="p-4 bg-[#fafafa] border-dashed">
       <h4 className="font-medium text-[#1a1a1a] mb-3 flex items-center gap-2">
-        <FileText className="w-5 h-5 text-[#c9a227]" />
+        <FileText className="w-5 h-5 text-[#2563EB]" />
         Données disponibles pour R{reunion.numero}
       </h4>
 
@@ -292,7 +292,7 @@ export const GenerateurCompteRendu = ({
           {/* Récapitulatif de la réunion */}
           <Card className="p-4">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-[#c9a227] text-white rounded-xl flex items-center justify-center font-bold text-lg">
+              <div className="w-12 h-12 bg-[#2563EB] text-white rounded-xl flex items-center justify-center font-bold text-lg">
                 R{reunion.numero}
               </div>
               <div>
@@ -405,15 +405,15 @@ export const GenerateurCompteRendu = ({
             <h4 className="font-medium text-[#1a1a1a] mb-3">Prochaines étapes</h4>
             <div className="space-y-2 text-sm">
               <label className="flex items-center gap-3 p-3 bg-[#fafafa] rounded-lg cursor-pointer hover:bg-[#f0f0f0]">
-                <input type="checkbox" className="w-4 h-4 text-[#c9a227]" />
+                <input type="checkbox" className="w-4 h-4 text-[#2563EB]" />
                 <span>Envoyer aux parties par email / AR24</span>
               </label>
               <label className="flex items-center gap-3 p-3 bg-[#fafafa] rounded-lg cursor-pointer hover:bg-[#f0f0f0]">
-                <input type="checkbox" className="w-4 h-4 text-[#c9a227]" />
+                <input type="checkbox" className="w-4 h-4 text-[#2563EB]" />
                 <span>Joindre les photos en annexe</span>
               </label>
               <label className="flex items-center gap-3 p-3 bg-[#fafafa] rounded-lg cursor-pointer hover:bg-[#f0f0f0]">
-                <input type="checkbox" className="w-4 h-4 text-[#c9a227]" />
+                <input type="checkbox" className="w-4 h-4 text-[#2563EB]" />
                 <span>Archiver dans le dossier</span>
               </label>
             </div>

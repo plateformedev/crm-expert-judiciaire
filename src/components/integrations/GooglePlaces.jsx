@@ -272,12 +272,12 @@ export const AdresseAutocomplete = ({
           disabled={disabled}
           required={required}
           className="w-full pl-10 pr-10 py-3 border border-[#e5e5e5] rounded-xl
-                     focus:outline-none focus:border-[#c9a227] transition-colors
+                     focus:outline-none focus:border-[#2563EB] transition-colors
                      disabled:bg-[#f5f5f5] disabled:cursor-not-allowed"
           autoComplete="off"
         />
         {loading && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#c9a227] animate-spin" />
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2563EB] animate-spin" />
         )}
         {inputValue && !loading && (
           <button
@@ -307,7 +307,7 @@ export const AdresseAutocomplete = ({
                          ${index === highlightIndex ? 'bg-[#fafafa]' : ''}`}
             >
               <div className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-[#c9a227] mt-0.5 flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-[#2563EB] mt-0.5 flex-shrink-0" />
                 <div>
                   <div className="font-medium text-[#1a1a1a]">{suggestion.main}</div>
                   {suggestion.secondary && (
@@ -556,7 +556,7 @@ export const FormulaireAdresse = ({
             onChange={(e) => handleFieldChange('codePostal', e.target.value)}
             disabled={disabled}
             className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl
-                       focus:outline-none focus:border-[#c9a227]
+                       focus:outline-none focus:border-[#2563EB]
                        disabled:bg-[#f5f5f5]"
             placeholder="75001"
           />
@@ -571,7 +571,7 @@ export const FormulaireAdresse = ({
             onChange={(e) => handleFieldChange('ville', e.target.value)}
             disabled={disabled}
             className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl
-                       focus:outline-none focus:border-[#c9a227]
+                       focus:outline-none focus:border-[#2563EB]
                        disabled:bg-[#f5f5f5]"
             placeholder="Paris"
           />

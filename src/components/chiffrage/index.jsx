@@ -340,7 +340,7 @@ export const ModuleChiffrage = ({
         </div>
         <div className="flex items-center gap-4">
           {indiceBT && (
-            <div className="px-4 py-2 bg-[#f5e6c8] rounded-xl">
+            <div className="px-4 py-2 bg-[#DBEAFE] rounded-xl">
               <span className="text-xs text-[#8b7355] uppercase tracking-wider">Indice BT01</span>
               <p className="font-medium text-[#1a1a1a]">
                 {indiceBT.valeur.toFixed(1)}
@@ -376,7 +376,7 @@ export const ModuleChiffrage = ({
                   key={scenario.id}
                   className={`p-4 cursor-pointer transition-all ${
                     activeScenario === scenario.id 
-                      ? 'border-[#c9a227] bg-[#fefcf7]' 
+                      ? 'border-[#2563EB] bg-[#fefcf7]' 
                       : 'hover:border-[#d4d4d4]'
                   }`}
                   onClick={() => setActiveScenario(scenario.id)}
@@ -388,7 +388,7 @@ export const ModuleChiffrage = ({
                     </div>
                     {scenario.retenu && <Badge variant="gold">Retenu</Badge>}
                   </div>
-                  <p className="text-lg font-medium text-[#c9a227] mt-2">
+                  <p className="text-lg font-medium text-[#2563EB] mt-2">
                     {formatMontant(total)} HT
                   </p>
                 </Card>
@@ -472,7 +472,7 @@ export const ModuleChiffrage = ({
                     </div>
                     <div className="flex justify-between pt-2 border-t border-[#e5e5e5]">
                       <span className="font-medium text-[#1a1a1a]">Total TTC</span>
-                      <span className="text-xl font-medium text-[#c9a227]">{formatMontant(totaux.ttc)}</span>
+                      <span className="text-xl font-medium text-[#2563EB]">{formatMontant(totaux.ttc)}</span>
                     </div>
                   </div>
                   
@@ -554,7 +554,7 @@ const ModalAjoutPoste = ({ isOpen, onClose, pathologies, onSubmit }) => {
                     className="w-full px-4 py-3 flex items-center justify-between hover:bg-[#fafafa]"
                   >
                     <span className="flex items-center gap-2">
-                      <Icon className="w-5 h-5 text-[#c9a227]" />
+                      <Icon className="w-5 h-5 text-[#2563EB]" />
                       {categorie.categorie}
                     </span>
                     {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
@@ -566,7 +566,7 @@ const ModalAjoutPoste = ({ isOpen, onClose, pathologies, onSubmit }) => {
                         <button
                           key={poste.code}
                           onClick={() => selectPosteBase(poste)}
-                          className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#f5e6c8] transition-colors"
+                          className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#DBEAFE] transition-colors"
                         >
                           <p className="text-sm font-medium text-[#1a1a1a]">{poste.designation}</p>
                           <p className="text-xs text-[#737373]">
@@ -640,7 +640,7 @@ const ModalAjoutPoste = ({ isOpen, onClose, pathologies, onSubmit }) => {
               />
             )}
 
-            <Card className="p-4 bg-[#f5e6c8]">
+            <Card className="p-4 bg-[#DBEAFE]">
               <div className="flex justify-between items-center">
                 <span className="text-[#8b7355]">Total HT</span>
                 <span className="text-xl font-medium text-[#1a1a1a]">

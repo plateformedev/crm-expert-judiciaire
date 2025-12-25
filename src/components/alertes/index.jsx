@@ -608,7 +608,7 @@ const AlerteCard = ({ alerte, onClick, onDismiss, dismissed }) => {
                 <button
                   key={i}
                   onClick={(e) => { e.stopPropagation(); }}
-                  className="px-3 py-1 bg-white border border-[#e5e5e5] rounded-full text-xs text-[#525252] hover:border-[#c9a227] hover:text-[#c9a227] transition-colors"
+                  className="px-3 py-1 bg-white border border-[#e5e5e5] rounded-full text-xs text-[#525252] hover:border-[#2563EB] hover:text-[#2563EB] transition-colors"
                 >
                   {action}
                 </button>

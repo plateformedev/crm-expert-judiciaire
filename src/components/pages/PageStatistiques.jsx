@@ -20,7 +20,7 @@ import { formatDateFr } from '../../utils/helpers';
 
 const KPICard = ({ title, value, unit, trend, trendValue, icon: Icon, color = 'gold', detail }) => {
   const colorMap = {
-    gold: 'bg-[#f5e6c8] text-[#c9a227]',
+    gold: 'bg-[#DBEAFE] text-[#2563EB]',
     green: 'bg-green-100 text-green-600',
     blue: 'bg-blue-100 text-blue-600',
     red: 'bg-red-100 text-red-600',
@@ -76,7 +76,7 @@ const SimpleBarChart = ({ data, title, maxValue }) => {
             <span className="text-xs text-[#737373] w-16 text-right">{item.label}</span>
             <div className="flex-1 h-6 bg-[#f5f5f5] rounded overflow-hidden">
               <div
-                className="h-full bg-[#c9a227] rounded transition-all"
+                className="h-full bg-[#2563EB] rounded transition-all"
                 style={{ width: `${(item.value / max) * 100}%` }}
               />
             </div>
@@ -96,7 +96,7 @@ const SimpleDonut = ({ data, title, centerLabel }) => {
   const total = data.reduce((sum, d) => sum + d.value, 0);
   let currentAngle = 0;
 
-  const colors = ['#c9a227', '#4ade80', '#60a5fa', '#f97316', '#a78bfa', '#f472b6'];
+  const colors = ['#2563EB', '#4ade80', '#60a5fa', '#f97316', '#a78bfa', '#f472b6'];
 
   return (
     <div className="flex items-center gap-6">
@@ -170,7 +170,7 @@ const RankingTable = ({ data, title, columns }) => (
         <tbody>
           {data.slice(0, 5).map((row, index) => (
             <tr key={index} className="border-t border-[#e5e5e5]">
-              <td className="px-3 py-2 font-medium text-[#c9a227]">{index + 1}</td>
+              <td className="px-3 py-2 font-medium text-[#2563EB]">{index + 1}</td>
               {columns.map((col, i) => (
                 <td key={i} className="px-3 py-2">
                   {col.render ? col.render(row[col.key], row) : row[col.key]}
@@ -363,7 +363,7 @@ export const PageStatistiques = () => {
           <select
             value={periode}
             onChange={(e) => setPeriode(e.target.value)}
-            className="px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#c9a227]"
+            className="px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#2563EB]"
           >
             <option value="mois">Ce mois</option>
             <option value="trimestre">Ce trimestre</option>
@@ -603,9 +603,9 @@ export const PageStatistiques = () => {
           </div>
 
           {/* Conseil */}
-          <div className="mt-6 p-3 bg-[#faf8f3] rounded-lg">
+          <div className="mt-6 p-3 bg-[#EFF6FF] rounded-lg">
             <div className="flex items-start gap-2">
-              <Award className="w-4 h-4 text-[#c9a227] flex-shrink-0 mt-0.5" />
+              <Award className="w-4 h-4 text-[#2563EB] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-xs font-medium text-[#1a1a1a]">Conseil performance</p>
                 <p className="text-xs text-[#737373] mt-1">

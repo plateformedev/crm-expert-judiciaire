@@ -173,7 +173,7 @@ const CycleReunionCard = ({
                 ? 'bg-green-500 text-white'
                 : reunion.statut === 'en-cours'
                   ? 'bg-blue-500 text-white'
-                  : 'bg-[#c9a227] text-white'
+                  : 'bg-[#2563EB] text-white'
             }`}>
               R{reunion.numero}
             </div>
@@ -218,7 +218,7 @@ const CycleReunionCard = ({
               <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full ${
-                    progression === 100 ? 'bg-green-500' : 'bg-[#c9a227]'
+                    progression === 100 ? 'bg-green-500' : 'bg-[#2563EB]'
                   }`}
                   style={{ width: `${progression}%` }}
                 />
@@ -263,7 +263,7 @@ const CycleReunionCard = ({
                     {!isLast && (
                       <div className={`flex-1 h-0.5 mx-2 ${
                         etapesStatuts[index + 1].statut !== 'bloque' && etapesStatuts[index + 1].statut !== 'non-commence'
-                          ? 'bg-[#c9a227]'
+                          ? 'bg-[#2563EB]'
                           : 'bg-gray-200'
                       }`} />
                     )}
@@ -278,7 +278,7 @@ const CycleReunionCard = ({
             <div className="p-4 border-t border-[#e5e5e5]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#c9a227] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-[#2563EB] flex items-center justify-center">
                     <prochaineEtape.icon className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -341,7 +341,7 @@ const CycleReunionCard = ({
                     className="p-3 bg-[#fafafa] rounded-lg flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-medium text-[#c9a227]">D{index + 1}</span>
+                      <span className="text-sm font-medium text-[#2563EB]">D{index + 1}</span>
                       <span className="text-sm text-[#1a1a1a]">{desordre.designation || desordre.titre}</span>
                       {desordre.photos?.length > 0 && (
                         <Badge variant="info" size="sm">

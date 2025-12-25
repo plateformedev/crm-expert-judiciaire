@@ -63,7 +63,7 @@ const EventItem = ({ event, compact = false, onClick }) => {
   return (
     <Card
       onClick={() => onClick?.(event)}
-      className="p-3 hover:border-[#c9a227] transition-colors cursor-pointer"
+      className="p-3 hover:border-[#2563EB] transition-colors cursor-pointer"
     >
       <div className="flex items-start gap-3">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
@@ -127,7 +127,7 @@ const CalendarCell = ({ date, events, isCurrentMonth, isToday, isSelected, onCli
       onClick={() => onClick(date)}
       className={`min-h-[100px] p-2 border border-[#e0e0e0] cursor-pointer transition-colors ${
         !isCurrentMonth ? 'bg-[#f7f7f7] text-[#ababab]' :
-        isSelected ? 'bg-[#fdf8e8] border-[#c9a227] border-2' :
+        isSelected ? 'bg-[#EFF6FF] border-[#2563EB] border-2' :
         isToday ? 'bg-[#e5f3ff] border-[#0381fe]' :
         'bg-white hover:bg-[#f7f7f7]'
       }`}
@@ -516,7 +516,7 @@ export const PageCalendrier = () => {
           {/* À venir */}
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-3">
-              <Bell className="w-4 h-4 text-[#c9a227]" />
+              <Bell className="w-4 h-4 text-[#2563EB]" />
               <h3 className="font-medium text-[#1a1a1a]">À venir (7 jours)</h3>
             </div>
 
@@ -598,7 +598,7 @@ export const PageCalendrier = () => {
               <select
                 value={newEvent.type}
                 onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               >
                 {Object.entries(TYPES_EVENEMENT).map(([key, value]) => (
                   <option key={key} value={key}>{value.label}</option>
@@ -615,7 +615,7 @@ export const PageCalendrier = () => {
                 value={newEvent.titre}
                 onChange={(e) => setNewEvent({ ...newEvent, titre: e.target.value })}
                 placeholder="Ex: Rendez-vous client, Visite chantier..."
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               />
             </div>
 
@@ -628,7 +628,7 @@ export const PageCalendrier = () => {
                   type="date"
                   value={newEvent.date}
                   onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
                 />
               </div>
               <div>
@@ -639,7 +639,7 @@ export const PageCalendrier = () => {
                   type="time"
                   value={newEvent.heure}
                   onChange={(e) => setNewEvent({ ...newEvent, heure: e.target.value })}
-                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
                 />
               </div>
             </div>
@@ -653,7 +653,7 @@ export const PageCalendrier = () => {
                 value={newEvent.lieu}
                 onChange={(e) => setNewEvent({ ...newEvent, lieu: e.target.value })}
                 placeholder="Adresse ou lieu de rendez-vous"
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               />
             </div>
 
@@ -666,7 +666,7 @@ export const PageCalendrier = () => {
                 onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                 placeholder="Informations complémentaires..."
                 rows={3}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none"
               />
             </div>
 

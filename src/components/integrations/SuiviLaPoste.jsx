@@ -409,7 +409,7 @@ export const SuiviLaPoste = ({ affaire }) => {
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-[#c9a227] animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#2563EB] animate-spin" />
           </div>
         ) : envois.length === 0 ? (
           <EmptyState
@@ -465,7 +465,7 @@ const EnvoiCard = ({ envoi, onRemove }) => {
             <div className="text-sm text-[#737373]">
               {envoi.type}
               {envoi.affaireRef && (
-                <span className="ml-2 text-[#c9a227]">• {envoi.affaireRef}</span>
+                <span className="ml-2 text-[#2563EB]">• {envoi.affaireRef}</span>
               )}
             </div>
           </div>
@@ -506,7 +506,7 @@ const EnvoiCard = ({ envoi, onRemove }) => {
             {envoi.events.map((event, idx) => (
               <div key={idx} className="flex items-start gap-3">
                 <div className={`w-2 h-2 rounded-full mt-1.5 ${
-                  idx === 0 ? 'bg-[#c9a227]' : 'bg-[#e5e5e5]'
+                  idx === 0 ? 'bg-[#2563EB]' : 'bg-[#e5e5e5]'
                 }`} />
                 <div className="flex-1">
                   <div className="text-sm text-[#1a1a1a]">{event.label}</div>
@@ -592,7 +592,7 @@ export const SuiviLaPosteWidget = ({ affaire }) => {
       >
         La Poste
         {suivis.length > 0 && (
-          <Badge className="ml-2 bg-[#c9a227] text-white">
+          <Badge className="ml-2 bg-[#2563EB] text-white">
             {suivis.length}
           </Badge>
         )}

@@ -84,7 +84,7 @@ const SectionEditor = ({ section, content, onChange, affaire, onInsertTemplate }
     <Card className="overflow-hidden">
       {/* En-tête de section */}
       <div
-        className="p-4 bg-[#faf8f3] cursor-pointer flex items-center justify-between"
+        className="p-4 bg-[#EFF6FF] cursor-pointer flex items-center justify-between"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
@@ -113,7 +113,7 @@ const SectionEditor = ({ section, content, onChange, affaire, onInsertTemplate }
             onClick={() => setShowTemplates(!showTemplates)}
             title="Insérer un modèle"
           >
-            <Wand2 className="w-4 h-4 text-[#c9a227]" />
+            <Wand2 className="w-4 h-4 text-[#2563EB]" />
           </button>
         </div>
       </div>
@@ -149,7 +149,7 @@ const SectionEditor = ({ section, content, onChange, affaire, onInsertTemplate }
             value={content || ''}
             onChange={(e) => onChange(section.id, e.target.value)}
             rows={8}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] text-sm"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] text-sm"
             placeholder={`Rédigez la section "${section.titre}"...`}
           />
 
@@ -382,7 +382,7 @@ L'Expert Judiciaire
         <div className="flex items-center gap-3">
           <div className="text-right mr-4">
             <p className="text-sm text-[#737373]">Progression</p>
-            <p className="text-2xl font-light text-[#c9a227]">{progression}%</p>
+            <p className="text-2xl font-light text-[#2563EB]">{progression}%</p>
           </div>
 
           <Button
@@ -422,7 +422,7 @@ L'Expert Judiciaire
       {/* Barre de progression */}
       <div className="h-2 bg-[#e5e5e5] rounded-full overflow-hidden">
         <div
-          className="h-full bg-[#c9a227] transition-all"
+          className="h-full bg-[#2563EB] transition-all"
           style={{ width: `${progression}%` }}
         />
       </div>
@@ -437,11 +437,11 @@ L'Expert Judiciaire
       ) : (
         <div className="space-y-4">
           {/* Actions rapides */}
-          <Card className="p-4 bg-gradient-to-r from-[#faf8f3] to-white">
+          <Card className="p-4 bg-gradient-to-r from-[#EFF6FF] to-white">
             <div className="flex items-center gap-4">
-              <Lightbulb className="w-5 h-5 text-[#c9a227]" />
+              <Lightbulb className="w-5 h-5 text-[#2563EB]" />
               <p className="text-sm text-[#525252] flex-1">
-                Utilisez le bouton <Wand2 className="w-4 h-4 inline text-[#c9a227]" /> pour générer automatiquement le contenu depuis les données du dossier.
+                Utilisez le bouton <Wand2 className="w-4 h-4 inline text-[#2563EB]" /> pour générer automatiquement le contenu depuis les données du dossier.
               </p>
               <Button
                 variant="secondary"

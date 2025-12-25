@@ -515,12 +515,12 @@ export const DicteeVocale = ({
             <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
               recorder.isRecording 
                 ? 'bg-red-100 animate-pulse' 
-                : 'bg-[#f5e6c8]'
+                : 'bg-[#DBEAFE]'
             }`}>
               {recorder.isRecording ? (
                 <Mic className="w-6 h-6 text-red-600" />
               ) : (
-                <MicOff className="w-6 h-6 text-[#c9a227]" />
+                <MicOff className="w-6 h-6 text-[#2563EB]" />
               )}
             </div>
             <div>
@@ -601,7 +601,7 @@ export const DicteeVocale = ({
               <button
                 onClick={handleTranscribe}
                 disabled={isTranscribing}
-                className="w-12 h-12 bg-[#c9a227] hover:bg-[#b8922b] rounded-full flex items-center justify-center text-white disabled:opacity-50"
+                className="w-12 h-12 bg-[#2563EB] hover:bg-[#b8922b] rounded-full flex items-center justify-center text-white disabled:opacity-50"
               >
                 {isTranscribing ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -632,7 +632,7 @@ export const DicteeVocale = ({
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium text-[#1a1a1a] flex items-center gap-2">
-            <FileText className="w-5 h-5 text-[#c9a227]" />
+            <FileText className="w-5 h-5 text-[#2563EB]" />
             Transcription
             {segments.length > 0 && (
               <Badge variant="default">{segments.length} segment(s)</Badge>
@@ -654,13 +654,13 @@ export const DicteeVocale = ({
             onChange={(e) => setTranscription(e.target.value)}
             placeholder={placeholder}
             rows={8}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none"
           />
           
           {isTranscribing && (
             <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-xl">
               <div className="flex items-center gap-3">
-                <Loader2 className="w-6 h-6 animate-spin text-[#c9a227]" />
+                <Loader2 className="w-6 h-6 animate-spin text-[#2563EB]" />
                 <span className="text-[#737373]">Transcription en cours...</span>
               </div>
             </div>
@@ -745,7 +745,7 @@ const AudioVisualizer = ({ isActive }) => {
       {Array.from({ length: bars }).map((_, i) => (
         <div
           key={i}
-          className={`w-1 bg-[#c9a227] rounded-full transition-all ${
+          className={`w-1 bg-[#2563EB] rounded-full transition-all ${
             isActive ? 'animate-pulse' : ''
           }`}
           style={{
@@ -812,7 +812,7 @@ export const DicteeWidget = ({ onResult }) => {
       )}
       
       {isTranscribing && (
-        <Loader2 className="w-5 h-5 animate-spin text-[#c9a227]" />
+        <Loader2 className="w-5 h-5 animate-spin text-[#2563EB]" />
       )}
     </div>
   );
@@ -940,7 +940,7 @@ export const DicteeTerrain = ({
       <Card className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium text-[#1a1a1a] flex items-center gap-2">
-            <Mic className="w-5 h-5 text-[#c9a227]" />
+            <Mic className="w-5 h-5 text-[#2563EB]" />
             Dictée Terrain
           </h3>
           {affaireReference && (
@@ -954,7 +954,7 @@ export const DicteeTerrain = ({
             onClick={() => setMode(TRANSCRIPTION_MODES.NATIVE)}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
               mode === TRANSCRIPTION_MODES.NATIVE
-                ? 'border-[#c9a227] bg-[#fdf8e8] text-[#c9a227]'
+                ? 'border-[#2563EB] bg-[#EFF6FF] text-[#2563EB]'
                 : 'border-[#e5e5e5] hover:bg-[#f5f5f5]'
             }`}
           >
@@ -967,7 +967,7 @@ export const DicteeTerrain = ({
             onClick={() => setMode(TRANSCRIPTION_MODES.WHISPER)}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
               mode === TRANSCRIPTION_MODES.WHISPER
-                ? 'border-[#c9a227] bg-[#fdf8e8] text-[#c9a227]'
+                ? 'border-[#2563EB] bg-[#EFF6FF] text-[#2563EB]'
                 : 'border-[#e5e5e5] hover:bg-[#f5f5f5]'
             }`}
           >
@@ -980,7 +980,7 @@ export const DicteeTerrain = ({
             onClick={() => setMode(TRANSCRIPTION_MODES.HYBRID)}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
               mode === TRANSCRIPTION_MODES.HYBRID
-                ? 'border-[#c9a227] bg-[#fdf8e8] text-[#c9a227]'
+                ? 'border-[#2563EB] bg-[#EFF6FF] text-[#2563EB]'
                 : 'border-[#e5e5e5] hover:bg-[#f5f5f5]'
             }`}
           >
@@ -1050,7 +1050,7 @@ export const DicteeTerrain = ({
             </div>
           )}
           {isTranscribing && (
-            <div className="flex items-center gap-2 text-[#c9a227]">
+            <div className="flex items-center gap-2 text-[#2563EB]">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span className="text-sm">Transcription IA en cours...</span>
             </div>
@@ -1070,7 +1070,7 @@ export const DicteeTerrain = ({
         <Card className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-medium text-[#1a1a1a] flex items-center gap-2">
-              <FileText className="w-4 h-4 text-[#c9a227]" />
+              <FileText className="w-4 h-4 text-[#2563EB]" />
               Notes ({notes.length})
             </h4>
             <div className="flex gap-2">

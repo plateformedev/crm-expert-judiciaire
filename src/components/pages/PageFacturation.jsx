@@ -38,7 +38,7 @@ const TYPES_DOCUMENT = {
 
 const SummaryCard = ({ title, value, subtitle, icon: Icon, color, trend }) => {
   const colorMap = {
-    gold: 'bg-[#f5e6c8] text-[#c9a227]',
+    gold: 'bg-[#DBEAFE] text-[#2563EB]',
     green: 'bg-green-100 text-green-600',
     blue: 'bg-blue-100 text-blue-600',
     red: 'bg-red-100 text-red-600',
@@ -76,7 +76,7 @@ const FacturationRow = ({ item, onView, onEdit }) => {
   const StatusIcon = statut.icon;
 
   return (
-    <div className="flex items-center gap-4 p-4 border border-[#e5e5e5] rounded-xl hover:border-[#c9a227] transition-colors">
+    <div className="flex items-center gap-4 p-4 border border-[#e5e5e5] rounded-xl hover:border-[#2563EB] transition-colors">
       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
         type.color === 'blue' ? 'bg-blue-100' :
         type.color === 'purple' ? 'bg-purple-100' : 'bg-green-100'
@@ -439,7 +439,7 @@ export const PageFacturation = () => {
 
       {/* Actions rapides */}
       <div className="grid grid-cols-3 gap-4">
-        <Card className="p-4 hover:border-[#c9a227] transition-colors cursor-pointer" onClick={handleCreateDevis}>
+        <Card className="p-4 hover:border-[#2563EB] transition-colors cursor-pointer" onClick={handleCreateDevis}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
               <FileText className="w-5 h-5 text-blue-600" />
@@ -452,7 +452,7 @@ export const PageFacturation = () => {
           </div>
         </Card>
 
-        <Card className="p-4 hover:border-[#c9a227] transition-colors cursor-pointer" onClick={handleCreateEtatFrais}>
+        <Card className="p-4 hover:border-[#2563EB] transition-colors cursor-pointer" onClick={handleCreateEtatFrais}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
               <Receipt className="w-5 h-5 text-purple-600" />
@@ -465,7 +465,7 @@ export const PageFacturation = () => {
           </div>
         </Card>
 
-        <Card className="p-4 hover:border-[#c9a227] transition-colors cursor-pointer" onClick={handleCreateFacture}>
+        <Card className="p-4 hover:border-[#2563EB] transition-colors cursor-pointer" onClick={handleCreateFacture}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
               <Euro className="w-5 h-5 text-green-600" />
@@ -480,9 +480,9 @@ export const PageFacturation = () => {
       </div>
 
       {/* Aide */}
-      <Card className="p-4 bg-[#faf8f3] border-[#e5d9b3]">
+      <Card className="p-4 bg-[#EFF6FF] border-[#e5d9b3]">
         <div className="flex items-start gap-3">
-          <PiggyBank className="w-5 h-5 text-[#c9a227] flex-shrink-0" />
+          <PiggyBank className="w-5 h-5 text-[#2563EB] flex-shrink-0" />
           <div>
             <p className="text-sm font-medium text-[#1a1a1a]">Conseil facturation</p>
             <p className="text-xs text-[#737373] mt-1">
@@ -674,7 +674,7 @@ const ModalCreationDocument = ({ type, affaires, onClose, onSuccess }) => {
           <select
             value={selectedAffaire}
             onChange={(e) => setSelectedAffaire(e.target.value)}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
           >
             <option value="">Sélectionner une affaire...</option>
             {affaires.map(a => (
@@ -714,7 +714,7 @@ const ModalCreationDocument = ({ type, affaires, onClose, onSuccess }) => {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder={type === 'devis' ? 'Mission d\'expertise judiciaire...' : 'Honoraires et frais d\'expertise...'}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none h-24"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none h-24"
               />
             </div>
 
@@ -734,7 +734,7 @@ const ModalCreationDocument = ({ type, affaires, onClose, onSuccess }) => {
                 <select
                   value={formData.tva_taux}
                   onChange={(e) => setFormData({ ...formData, tva_taux: parseFloat(e.target.value) })}
-                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
                 >
                   <option value="0">0% (Non assujetti)</option>
                   <option value="10">10%</option>
@@ -1000,7 +1000,7 @@ const ModalSimulateur = ({ onClose }) => {
               </div>
               <div className="flex justify-between pt-3 border-t border-gray-700">
                 <span className="text-lg font-medium">Total TTC</span>
-                <span className="text-2xl font-bold text-[#c9a227]">{resultats.totalTTC.toLocaleString('fr-FR')} €</span>
+                <span className="text-2xl font-bold text-[#2563EB]">{resultats.totalTTC.toLocaleString('fr-FR')} €</span>
               </div>
             </div>
           </Card>

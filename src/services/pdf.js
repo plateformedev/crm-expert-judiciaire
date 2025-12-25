@@ -27,7 +27,7 @@ const PDF_STYLES = `
       text-align: center;
       margin-bottom: 30px;
       padding-bottom: 20px;
-      border-bottom: 2px solid #c9a227;
+      border-bottom: 2px solid #2563EB;
     }
     .header h1 {
       font-size: 18pt;
@@ -111,7 +111,7 @@ const PDF_STYLES = `
     .mt-20 { margin-top: 20px; }
     .mb-20 { margin-bottom: 20px; }
     .highlight {
-      background-color: #f5e6c8;
+      background-color: #DBEAFE;
       padding: 2px 5px;
     }
     ul, ol {
@@ -499,7 +499,7 @@ const pdfGenerators = {
           <td>Provision versée</td>
           <td class="text-right">- ${(provision || 0).toFixed(2)} €</td>
         </tr>
-        <tr style="font-weight: bold; ${solde > 0 ? 'color: #c9a227;' : 'color: green;'}">
+        <tr style="font-weight: bold; ${solde > 0 ? 'color: #2563EB;' : 'color: green;'}">
           <td>${solde > 0 ? 'SOLDE À PERCEVOIR' : 'TROP-PERÇU À REMBOURSER'}</td>
           <td class="text-right">${Math.abs(solde).toFixed(2)} €</td>
         </tr>
@@ -559,7 +559,7 @@ const pdfGenerators = {
       Madame/Monsieur le Président du ${affaire.tribunal} nous a désigné en qualité d'expert judiciaire 
       avec la mission suivante :
     </p>
-    <div style="margin: 20px; padding: 15px; background-color: #fafafa; border-left: 3px solid #c9a227;">
+    <div style="margin: 20px; padding: 15px; background-color: #fafafa; border-left: 3px solid #2563EB;">
       ${affaire.mission || 'Mission non renseignée'}
     </div>
   </div>
@@ -586,7 +586,7 @@ const pdfGenerators = {
     <p>${conclusions || 'Conclusions en cours de rédaction'}</p>
   </div>
 
-  <div class="section" style="background-color: #f5e6c8; padding: 20px; border-radius: 5px;">
+  <div class="section" style="background-color: #DBEAFE; padding: 20px; border-radius: 5px;">
     <p><strong>IMPORTANT</strong></p>
     <p>
       Conformément aux dispositions de l'article 276 du Code de Procédure Civile, 

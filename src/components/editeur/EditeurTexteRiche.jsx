@@ -40,7 +40,7 @@ const ToolbarButton = ({ active, disabled, onClick, children, title }) => (
     title={title}
     className={`p-2 rounded-lg transition-colors ${
       active
-        ? 'bg-[#c9a227] text-white'
+        ? 'bg-[#2563EB] text-white'
         : disabled
           ? 'text-gray-300 cursor-not-allowed'
           : 'text-[#525252] hover:bg-[#f0f0f0] active:bg-[#e4e4e4]'
@@ -70,7 +70,7 @@ const ColorPicker = ({ editor, type = 'text' }) => {
   const colors = [
     '#1f1f1f', '#525252', '#737373', '#a3a3a3',
     '#dc2626', '#ea580c', '#ca8a04', '#16a34a',
-    '#0284c7', '#7c3aed', '#db2777', '#c9a227'
+    '#0284c7', '#7c3aed', '#db2777', '#2563EB'
   ];
 
   const applyColor = (color) => {

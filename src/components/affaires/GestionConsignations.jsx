@@ -111,7 +111,7 @@ const ConsignationCard = ({ consignation, numero, onEdit, onDelete }) => {
         <div className="flex items-center gap-1">
           <button
             onClick={() => onEdit(consignation)}
-            className="p-2 text-[#737373] hover:text-[#c9a227] hover:bg-[#faf8f3] rounded-lg transition-colors"
+            className="p-2 text-[#737373] hover:text-[#2563EB] hover:bg-[#EFF6FF] rounded-lg transition-colors"
           >
             <Edit className="w-4 h-4" />
           </button>
@@ -188,8 +188,8 @@ const ModalConsignation = ({ isOpen, onClose, onSave, consignation, isProvision 
                   onClick={() => setFormData({ ...formData, statut: statut.id })}
                   className={`p-3 rounded-xl border-2 flex items-center gap-2 transition-colors ${
                     formData.statut === statut.id
-                      ? 'border-[#c9a227] bg-[#faf8f3]'
-                      : 'border-[#e5e5e5] hover:border-[#c9a227]'
+                      ? 'border-[#2563EB] bg-[#EFF6FF]'
+                      : 'border-[#e5e5e5] hover:border-[#2563EB]'
                   }`}
                 >
                   <Icon className={`w-4 h-4 ${
@@ -243,7 +243,7 @@ const ModalConsignation = ({ isOpen, onClose, onSave, consignation, isProvision 
               value={formData.motif}
               onChange={(e) => setFormData({ ...formData, motif: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] text-sm"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] text-sm"
               placeholder="Ex: Complexité technique, besoin de sapiteur..."
             />
           </div>
@@ -259,7 +259,7 @@ const ModalConsignation = ({ isOpen, onClose, onSave, consignation, isProvision 
               value={formData.motif_refus}
               onChange={(e) => setFormData({ ...formData, motif_refus: e.target.value })}
               rows={2}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] text-sm"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] text-sm"
               placeholder="Motif du refus du juge..."
             />
           </div>

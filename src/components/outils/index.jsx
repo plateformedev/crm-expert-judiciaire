@@ -59,8 +59,8 @@ export const Chronometre = ({ onSave, affaireRef }) => {
     <Card className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
-            <Timer className="w-5 h-5 text-[#c9a227]" />
+          <div className="w-10 h-10 bg-[#DBEAFE] rounded-xl flex items-center justify-center">
+            <Timer className="w-5 h-5 text-[#2563EB]" />
           </div>
           <span className="font-medium text-[#1a1a1a]">Chronomètre Vacation</span>
         </div>
@@ -113,7 +113,7 @@ export const Chronometre = ({ onSave, affaireRef }) => {
           <select
             value={typeVacation}
             onChange={(e) => setTypeVacation(e.target.value)}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
           >
             {Object.entries(TAUX_VACATIONS).map(([key, val]) => (
               <option key={key} value={key}>
@@ -132,7 +132,7 @@ export const Chronometre = ({ onSave, affaireRef }) => {
             placeholder="Description de la vacation..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
           />
         </div>
         
@@ -192,8 +192,8 @@ export const CalculatriceTechnique = () => {
   return (
     <Card className="p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
-          <Calculator className="w-5 h-5 text-[#c9a227]" />
+        <div className="w-10 h-10 bg-[#DBEAFE] rounded-xl flex items-center justify-center">
+          <Calculator className="w-5 h-5 text-[#2563EB]" />
         </div>
         <span className="font-medium text-[#1a1a1a]">Calculatrice technique</span>
       </div>
@@ -223,7 +223,7 @@ export const CalculatriceTechnique = () => {
             onClick={() => { setCalcul(c); setValeurs({}); setResultat(null); }}
             className={`p-3 rounded-xl border text-left transition-all ${
               calcul?.id === c.id 
-                ? 'border-[#c9a227] bg-[#f5e6c8]/20' 
+                ? 'border-[#2563EB] bg-[#DBEAFE]/20' 
                 : 'border-[#e5e5e5] hover:border-[#d4d4d4]'
             }`}
           >
@@ -249,7 +249,7 @@ export const CalculatriceTechnique = () => {
                   step="0.01"
                   value={valeurs[variable] || ''}
                   onChange={(e) => setValeurs({ ...valeurs, [variable]: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-center focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-center focus:outline-none focus:border-[#2563EB]"
                 />
               </div>
             ))}
@@ -257,7 +257,7 @@ export const CalculatriceTechnique = () => {
 
           <button 
             onClick={calculer} 
-            className="w-full py-3 bg-[#c9a227] text-white rounded-xl font-medium hover:bg-[#d4af37] transition-colors"
+            className="w-full py-3 bg-[#2563EB] text-white rounded-xl font-medium hover:bg-[#d4af37] transition-colors"
           >
             Calculer
           </button>
@@ -266,7 +266,7 @@ export const CalculatriceTechnique = () => {
             <div className="p-4 bg-[#1a1a1a] rounded-xl text-center">
               <p className="text-3xl font-light text-white">
                 {resultat.toFixed(2)} 
-                <span className="text-lg text-[#c9a227] ml-2">{calcul.resultat || ''}</span>
+                <span className="text-lg text-[#2563EB] ml-2">{calcul.resultat || ''}</span>
               </p>
             </div>
           )}
@@ -315,8 +315,8 @@ export const DicteeVocale = ({ onTranscription }) => {
   return (
     <Card className="p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
-          <Mic className="w-5 h-5 text-[#c9a227]" />
+        <div className="w-10 h-10 bg-[#DBEAFE] rounded-xl flex items-center justify-center">
+          <Mic className="w-5 h-5 text-[#2563EB]" />
         </div>
         <span className="font-medium text-[#1a1a1a]">Dictée vocale</span>
       </div>

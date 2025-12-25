@@ -103,7 +103,7 @@ const SectionRapport = ({ section, content, onChange, affaire, onInsertTemplate,
     <Card className={`overflow-hidden ${locked ? 'opacity-75' : ''}`}>
       {/* En-tête de section */}
       <div
-        className="p-4 bg-[#faf8f3] cursor-pointer flex items-center justify-between"
+        className="p-4 bg-[#EFF6FF] cursor-pointer flex items-center justify-between"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
@@ -133,7 +133,7 @@ const SectionRapport = ({ section, content, onChange, affaire, onInsertTemplate,
               onClick={() => setShowTemplates(!showTemplates)}
               title="Insérer un modèle"
             >
-              <Wand2 className="w-4 h-4 text-[#c9a227]" />
+              <Wand2 className="w-4 h-4 text-[#2563EB]" />
             </button>
           )}
         </div>
@@ -177,7 +177,7 @@ const SectionRapport = ({ section, content, onChange, affaire, onInsertTemplate,
             onChange={(e) => onChange(section.id, e.target.value)}
             rows={10}
             disabled={locked}
-            className={`w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] text-sm ${
+            className={`w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] text-sm ${
               locked ? 'bg-gray-50 cursor-not-allowed' : ''
             }`}
             placeholder={`Rédigez la section "${section.titre}"...`}
@@ -561,7 +561,7 @@ ${'═'.repeat(80)}
 
           <div className="text-right mr-4">
             <p className="text-sm text-[#737373]">Progression</p>
-            <p className="text-2xl font-light text-[#c9a227]">{progression}%</p>
+            <p className="text-2xl font-light text-[#2563EB]">{progression}%</p>
           </div>
 
           <Button
@@ -616,7 +616,7 @@ ${'═'.repeat(80)}
       {/* Barre de progression */}
       <div className="h-2 bg-[#e5e5e5] rounded-full overflow-hidden">
         <div
-          className={`h-full transition-all ${locked ? 'bg-green-500' : 'bg-[#c9a227]'}`}
+          className={`h-full transition-all ${locked ? 'bg-green-500' : 'bg-[#2563EB]'}`}
           style={{ width: `${progression}%` }}
         />
       </div>
@@ -649,11 +649,11 @@ ${'═'.repeat(80)}
         <div className="space-y-4">
           {/* Actions rapides */}
           {!locked && (
-            <Card className="p-4 bg-gradient-to-r from-[#faf8f3] to-white">
+            <Card className="p-4 bg-gradient-to-r from-[#EFF6FF] to-white">
               <div className="flex items-center gap-4">
-                <Lightbulb className="w-5 h-5 text-[#c9a227]" />
+                <Lightbulb className="w-5 h-5 text-[#2563EB]" />
                 <p className="text-sm text-[#525252] flex-1">
-                  Utilisez le bouton <Wand2 className="w-4 h-4 inline text-[#c9a227]" /> pour générer automatiquement le contenu depuis les données du dossier ou importer depuis la note de synthèse.
+                  Utilisez le bouton <Wand2 className="w-4 h-4 inline text-[#2563EB]" /> pour générer automatiquement le contenu depuis les données du dossier ou importer depuis la note de synthèse.
                 </p>
                 <Button
                   variant="secondary"

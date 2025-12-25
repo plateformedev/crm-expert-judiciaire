@@ -23,7 +23,7 @@ const TAB_ICONS = {
 
 // Couleurs par type
 const TAB_COLORS = {
-  affaire: 'border-[#c9a227]',
+  affaire: 'border-[#2563EB]',
   dashboard: 'border-blue-500',
   default: 'border-gray-400'
 };
@@ -157,7 +157,7 @@ const TabBar = () => {
                 }
               `}
             >
-              <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#c9a227]' : 'text-[#737373]'}`} />
+              <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#2563EB]' : 'text-[#737373]'}`} />
 
               <span className={`flex-1 truncate text-sm ${isActive ? 'text-[#1a1a1a] font-medium' : 'text-[#525252]'}`}>
                 {tab.label}

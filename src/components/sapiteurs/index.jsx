@@ -169,7 +169,7 @@ export const CarnetSapiteurs = ({ expertId, onSelectSapiteur }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-[#c9a227] border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -196,13 +196,13 @@ export const CarnetSapiteurs = ({ expertId, onSelectSapiteur }) => {
             placeholder="Rechercher par nom ou spécialité..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
           />
         </div>
         <select
           value={filterSpecialite}
           onChange={(e) => setFilterSpecialite(e.target.value)}
-          className="px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+          className="px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
         >
           <option value="all">Toutes spécialités</option>
           {SPECIALITES_SAPITEURS.map(spec => (
@@ -275,12 +275,12 @@ export const CarnetSapiteurs = ({ expertId, onSelectSapiteur }) => {
 const SapiteurCard = ({ sapiteur, onClick }) => {
   return (
     <Card
-      className="p-4 cursor-pointer hover:border-[#c9a227] transition-colors"
+      className="p-4 cursor-pointer hover:border-[#2563EB] transition-colors"
       onClick={onClick}
     >
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 bg-[#f5e6c8] rounded-xl flex items-center justify-center flex-shrink-0">
-          <Award className="w-6 h-6 text-[#c9a227]" />
+        <div className="w-12 h-12 bg-[#DBEAFE] rounded-xl flex items-center justify-center flex-shrink-0">
+          <Award className="w-6 h-6 text-[#2563EB]" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
@@ -317,7 +317,7 @@ const SapiteurCard = ({ sapiteur, onClick }) => {
           </div>
 
           {sapiteur.taux_horaire && (
-            <p className="text-sm text-[#c9a227] mt-2">
+            <p className="text-sm text-[#2563EB] mt-2">
               {formatMontant(sapiteur.taux_horaire)}/h
             </p>
           )}
@@ -402,8 +402,8 @@ const ModalAddSapiteur = ({ isOpen, onClose, onSubmit }) => {
                 onClick={() => toggleSpecialite(spec.value)}
                 className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
                   formData.specialites.includes(spec.value)
-                    ? 'bg-[#c9a227] border-[#c9a227] text-white'
-                    : 'border-[#e5e5e5] hover:border-[#c9a227]'
+                    ? 'bg-[#2563EB] border-[#2563EB] text-white'
+                    : 'border-[#e5e5e5] hover:border-[#2563EB]'
                 }`}
               >
                 {spec.icon} {spec.label}
@@ -483,7 +483,7 @@ const ModalAddSapiteur = ({ isOpen, onClose, onSubmit }) => {
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
             rows={3}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none"
             placeholder="Commentaires, délais habituels, qualité des rapports..."
           />
         </div>
@@ -551,7 +551,7 @@ export const InterventionsSapiteurs = ({ affaireId, interventions = [] }) => {
                       </Button>
                     )}
                     {intervention.montant && (
-                      <span className="text-sm font-medium text-[#c9a227]">
+                      <span className="text-sm font-medium text-[#2563EB]">
                         {formatMontant(intervention.montant)}
                       </span>
                     )}

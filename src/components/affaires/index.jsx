@@ -256,8 +256,8 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
   const SortIcon = ({ column }) => {
     if (sortConfig.key !== column) return <ArrowUpDown className="w-3 h-3 text-[#a3a3a3]" />;
     return sortConfig.direction === 'asc'
-      ? <ArrowUp className="w-3 h-3 text-[#c9a227]" />
-      : <ArrowDown className="w-3 h-3 text-[#c9a227]" />;
+      ? <ArrowUp className="w-3 h-3 text-[#2563EB]" />
+      : <ArrowDown className="w-3 h-3 text-[#2563EB]" />;
   };
 
   // Statistiques rapides
@@ -344,7 +344,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-[#c9a227] border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -391,14 +391,14 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-2 px-5 py-3.5 border-2 rounded-xl font-semibold transition-all ${
               showFilters || activeFiltersCount > 0
-                ? 'border-[#c9a227] bg-[#fdf8e8] text-[#9a7b1c]'
+                ? 'border-[#2563EB] bg-[#EFF6FF] text-[#1D4ED8]'
                 : 'border-[#e0e0e0] text-[#555555] hover:bg-[#f7f7f7] active:bg-[#f0f0f0]'
             }`}
           >
             <Filter className="w-5 h-5" />
             <span>Filtres</span>
             {activeFiltersCount > 0 && (
-              <span className="bg-[#c9a227] text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-[#2563EB] text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
                 {activeFiltersCount}
               </span>
             )}
@@ -544,7 +544,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
                 <select
                   value={filters.avecParties}
                   onChange={(e) => updateFilter('avecParties', e.target.value)}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#2563EB]"
                 >
                   <option value="all">Toutes</option>
                   <option value="oui">Avec parties</option>
@@ -560,7 +560,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
                 <select
                   value={filters.avecReunions}
                   onChange={(e) => updateFilter('avecReunions', e.target.value)}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#2563EB]"
                 >
                   <option value="all">Toutes</option>
                   <option value="oui">Avec réunions</option>
@@ -576,7 +576,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
                 <select
                   value={filters.avecDesordres}
                   onChange={(e) => updateFilter('avecDesordres', e.target.value)}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg focus:outline-none focus:border-[#2563EB]"
                 >
                   <option value="all">Toutes</option>
                   <option value="oui">Avec désordres</option>
@@ -974,7 +974,7 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
               )}
             </div>
 
-            <div className="p-3 bg-[#faf8f3] rounded-xl">
+            <div className="p-3 bg-[#EFF6FF] rounded-xl">
               <p className="text-xs text-[#737373] uppercase tracking-wider mb-1">Affaire concernée</p>
               <p className="font-medium text-[#1a1a1a]">{confirmAction.affaire.reference}</p>
               {confirmAction.affaire.tribunal && (
@@ -1032,15 +1032,15 @@ const AffaireCard = ({ affaire, onClick }) => {
   return (
     <Card 
       onClick={onClick}
-      className="p-6 cursor-pointer hover:border-[#c9a227] transition-colors group"
+      className="p-6 cursor-pointer hover:border-[#2563EB] transition-colors group"
     >
       <div className="flex items-start justify-between">
         <div className="flex gap-4 flex-1">
           {/* Icône */}
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-            affaire.urgent ? 'bg-red-100' : 'bg-[#f5e6c8]'
+            affaire.urgent ? 'bg-red-100' : 'bg-[#DBEAFE]'
           }`}>
-            <Scale className={`w-6 h-6 ${affaire.urgent ? 'text-red-600' : 'text-[#c9a227]'}`} />
+            <Scale className={`w-6 h-6 ${affaire.urgent ? 'text-red-600' : 'text-[#2563EB]'}`} />
           </div>
 
           {/* Contenu principal */}
@@ -1098,7 +1098,7 @@ const AffaireCard = ({ affaire, onClick }) => {
               {delaiRestant > 0 ? `J-${delaiRestant}` : 'Échéance dépassée'}
             </span>
           )}
-          <ChevronRight className="w-5 h-5 text-[#a3a3a3] group-hover:text-[#c9a227] transition-colors" />
+          <ChevronRight className="w-5 h-5 text-[#a3a3a3] group-hover:text-[#2563EB] transition-colors" />
         </div>
       </div>
     </Card>
@@ -1198,7 +1198,7 @@ const ModalNouvelleAffaire = ({ onClose, onCreate }) => {
           <button
             type="button"
             onClick={() => setMode(mode === 'simple' ? 'complet' : 'simple')}
-            className="text-sm text-[#c9a227] hover:text-[#9a7b1c] font-medium flex items-center gap-1"
+            className="text-sm text-[#2563EB] hover:text-[#1D4ED8] font-medium flex items-center gap-1"
           >
             {mode === 'simple' ? '+ Ajouter plus de détails' : '− Masquer les détails'}
           </button>
@@ -1223,7 +1223,7 @@ const ModalNouvelleAffaire = ({ onClose, onCreate }) => {
                     id="urgent"
                     checked={data.urgent}
                     onChange={(e) => handleChange('urgent', e.target.checked)}
-                    className="w-5 h-5 rounded accent-[#c9a227]"
+                    className="w-5 h-5 rounded accent-[#2563EB]"
                   />
                   <label htmlFor="urgent" className="text-sm text-[#525252]">
                     Marquer comme urgent
@@ -1383,7 +1383,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-[#c9a227] border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -1447,7 +1447,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <button onClick={onBack} className="text-sm text-[#737373] hover:text-[#c9a227] mb-2">
+          <button onClick={onBack} className="text-sm text-[#737373] hover:text-[#2563EB] mb-2">
             ← Retour à la liste
           </button>
           <div className="flex items-center gap-3">
@@ -1909,7 +1909,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
               )}
             </div>
 
-            <div className="p-3 bg-[#faf8f3] rounded-xl">
+            <div className="p-3 bg-[#EFF6FF] rounded-xl">
               <p className="text-xs text-[#737373] uppercase tracking-wider mb-1">Affaire concernée</p>
               <p className="font-medium text-[#1a1a1a]">{affaire.reference}</p>
               {affaire.tribunal && (
@@ -2031,7 +2031,7 @@ const TabGeneral = ({ affaire }) => (
   <div className="grid grid-cols-2 gap-6">
     <Card className="p-6">
       <h4 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-        <Gavel className="w-5 h-5 text-[#c9a227]" />
+        <Gavel className="w-5 h-5 text-[#2563EB]" />
         Juridiction
       </h4>
       <div className="space-y-3 text-sm">
@@ -2058,7 +2058,7 @@ const TabGeneral = ({ affaire }) => (
 
     <Card className="p-6">
       <h4 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-        <Building className="w-5 h-5 text-[#c9a227]" />
+        <Building className="w-5 h-5 text-[#2563EB]" />
         Bien expertisé
       </h4>
       <div className="space-y-3 text-sm">
@@ -2088,7 +2088,7 @@ const TabGeneral = ({ affaire }) => (
 
     <Card className="p-6 col-span-2">
       <h4 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-        <FileText className="w-5 h-5 text-[#c9a227]" />
+        <FileText className="w-5 h-5 text-[#2563EB]" />
         Mission
       </h4>
       <p className="text-sm text-[#525252] whitespace-pre-wrap">
@@ -2159,7 +2159,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
             </h4>
             <div className="grid gap-4">
               {list.map(partie => (
-                <Card key={partie.id} className="p-4 hover:border-[#c9a227] transition-colors">
+                <Card key={partie.id} className="p-4 hover:border-[#2563EB] transition-colors">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <p className="font-medium text-[#1a1a1a]">
@@ -2180,7 +2180,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
                     <div className="flex gap-1">
                       {partie.email && (
                         <button
-                          className="p-2 text-[#a3a3a3] hover:text-[#c9a227] hover:bg-[#f5f5f5] rounded-lg"
+                          className="p-2 text-[#a3a3a3] hover:text-[#2563EB] hover:bg-[#f5f5f5] rounded-lg"
                           onClick={() => window.location.href = `mailto:${partie.email}`}
                           title={partie.email}
                         >
@@ -2189,7 +2189,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
                       )}
                       {partie.telephone && (
                         <button
-                          className="p-2 text-[#a3a3a3] hover:text-[#c9a227] hover:bg-[#f5f5f5] rounded-lg"
+                          className="p-2 text-[#a3a3a3] hover:text-[#2563EB] hover:bg-[#f5f5f5] rounded-lg"
                           onClick={() => window.location.href = `tel:${partie.telephone}`}
                           title={partie.telephone}
                         >
@@ -2238,7 +2238,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
                 type="text"
                 value={editFormData.nom || ''}
                 onChange={(e) => setEditFormData({ ...editFormData, nom: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               />
             </div>
             <div>
@@ -2247,7 +2247,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
                 type="text"
                 value={editFormData.prenom || ''}
                 onChange={(e) => setEditFormData({ ...editFormData, prenom: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               />
             </div>
           </div>
@@ -2257,7 +2257,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
               type="text"
               value={editFormData.raison_sociale || ''}
               onChange={(e) => setEditFormData({ ...editFormData, raison_sociale: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -2267,7 +2267,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
                 type="email"
                 value={editFormData.email || ''}
                 onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               />
             </div>
             <div>
@@ -2276,7 +2276,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
                 type="tel"
                 value={editFormData.telephone || ''}
                 onChange={(e) => setEditFormData({ ...editFormData, telephone: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               />
             </div>
           </div>
@@ -2286,7 +2286,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
               type="text"
               value={editFormData.adresse || ''}
               onChange={(e) => setEditFormData({ ...editFormData, adresse: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             />
           </div>
           <div className="grid grid-cols-3 gap-4">
@@ -2296,7 +2296,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
                 type="text"
                 value={editFormData.code_postal || ''}
                 onChange={(e) => setEditFormData({ ...editFormData, code_postal: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               />
             </div>
             <div className="col-span-2">
@@ -2305,7 +2305,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
                 type="text"
                 value={editFormData.ville || ''}
                 onChange={(e) => setEditFormData({ ...editFormData, ville: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               />
             </div>
           </div>
@@ -2315,7 +2315,7 @@ const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
               type="text"
               value={editFormData.avocat_nom || ''}
               onChange={(e) => setEditFormData({ ...editFormData, avocat_nom: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               placeholder="Me ..."
             />
           </div>
@@ -2401,18 +2401,18 @@ const TabReunions = ({ affaire, onAddReunion, onUpdate }) => {
         />
       ) : (
         reunions.map(reunion => (
-          <Card key={reunion.id} className={`p-4 hover:border-[#c9a227] transition-colors ${reunion.statut === 'annulee' ? 'opacity-50' : ''}`}>
+          <Card key={reunion.id} className={`p-4 hover:border-[#2563EB] transition-colors ${reunion.statut === 'annulee' ? 'opacity-50' : ''}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                   reunion.statut === 'terminee' ? 'bg-green-100' :
                   reunion.statut === 'annulee' ? 'bg-red-100' :
-                  'bg-[#f5e6c8]'
+                  'bg-[#DBEAFE]'
                 }`}>
                   <span className={`font-medium ${
                     reunion.statut === 'terminee' ? 'text-green-600' :
                     reunion.statut === 'annulee' ? 'text-red-600' :
-                    'text-[#c9a227]'
+                    'text-[#2563EB]'
                   }`}>{reunion.numero}</span>
                 </div>
                 <div>
@@ -2490,7 +2490,7 @@ const TabReunions = ({ affaire, onAddReunion, onUpdate }) => {
                 type="date"
                 value={editFormData.date_reunion || ''}
                 onChange={(e) => setEditFormData({ ...editFormData, date_reunion: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               />
             </div>
             <div>
@@ -2499,7 +2499,7 @@ const TabReunions = ({ affaire, onAddReunion, onUpdate }) => {
                 type="time"
                 value={editFormData.heure_reunion || ''}
                 onChange={(e) => setEditFormData({ ...editFormData, heure_reunion: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               />
             </div>
           </div>
@@ -2509,7 +2509,7 @@ const TabReunions = ({ affaire, onAddReunion, onUpdate }) => {
               type="text"
               value={editFormData.lieu || ''}
               onChange={(e) => setEditFormData({ ...editFormData, lieu: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               placeholder="Adresse de la réunion"
             />
           </div>
@@ -2518,7 +2518,7 @@ const TabReunions = ({ affaire, onAddReunion, onUpdate }) => {
             <select
               value={editFormData.statut || 'planifiee'}
               onChange={(e) => setEditFormData({ ...editFormData, statut: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             >
               <option value="planifiee">Planifiée</option>
               <option value="en_cours">En cours</option>
@@ -2531,7 +2531,7 @@ const TabReunions = ({ affaire, onAddReunion, onUpdate }) => {
             <textarea
               value={editFormData.notes || ''}
               onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none"
               rows={3}
               placeholder="Notes sur cette réunion..."
             />
@@ -2604,7 +2604,7 @@ const TabDesordres = ({ affaire, onAddDesordre, onUpdate }) => {
         />
       ) : (
         pathologies.map(pathologie => (
-          <Card key={pathologie.id} className="p-4 hover:border-[#c9a227] transition-colors">
+          <Card key={pathologie.id} className="p-4 hover:border-[#2563EB] transition-colors">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
@@ -2663,7 +2663,7 @@ const TabDesordres = ({ affaire, onAddDesordre, onUpdate }) => {
               type="text"
               value={editFormData.intitule || ''}
               onChange={(e) => setEditFormData({ ...editFormData, intitule: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               placeholder="Ex: Fissures en façade"
             />
           </div>
@@ -2673,7 +2673,7 @@ const TabDesordres = ({ affaire, onAddDesordre, onUpdate }) => {
               type="text"
               value={editFormData.localisation || ''}
               onChange={(e) => setEditFormData({ ...editFormData, localisation: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               placeholder="Ex: Façade nord, niveau RDC"
             />
           </div>
@@ -2682,7 +2682,7 @@ const TabDesordres = ({ affaire, onAddDesordre, onUpdate }) => {
             <select
               value={editFormData.garantie || ''}
               onChange={(e) => setEditFormData({ ...editFormData, garantie: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             >
               <option value="">À qualifier</option>
               <option value="gpa">GPA (Garantie de Parfait Achèvement)</option>
@@ -2697,7 +2697,7 @@ const TabDesordres = ({ affaire, onAddDesordre, onUpdate }) => {
             <textarea
               value={editFormData.description || ''}
               onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none"
               rows={4}
               placeholder="Description détaillée du désordre..."
             />
@@ -2708,7 +2708,7 @@ const TabDesordres = ({ affaire, onAddDesordre, onUpdate }) => {
               <select
                 value={editFormData.gravite || ''}
                 onChange={(e) => setEditFormData({ ...editFormData, gravite: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               >
                 <option value="">Non définie</option>
                 <option value="mineure">Mineure</option>
@@ -2723,7 +2723,7 @@ const TabDesordres = ({ affaire, onAddDesordre, onUpdate }) => {
                 type="number"
                 value={editFormData.cout_estimation || ''}
                 onChange={(e) => setEditFormData({ ...editFormData, cout_estimation: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
                 placeholder="5000"
               />
             </div>
@@ -2755,7 +2755,7 @@ const TabDocuments = ({ affaire, onDownload }) => (
         <Card key={doc.id} className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <FileText className="w-5 h-5 text-[#c9a227]" />
+              <FileText className="w-5 h-5 text-[#2563EB]" />
               <div>
                 <p className="font-medium text-[#1a1a1a]">{doc.titre}</p>
                 <p className="text-xs text-[#a3a3a3]">
@@ -2790,7 +2790,7 @@ const TabRapports = ({ affaire, onUpdate }) => {
   return (
     <div className="space-y-6">
       {/* Barre d'outils intégrations */}
-      <Card className="p-4 bg-gradient-to-r from-[#faf8f3] to-white">
+      <Card className="p-4 bg-gradient-to-r from-[#EFF6FF] to-white">
         <div className="flex items-center justify-between">
           <div>
             <h4 className="font-medium text-[#1a1a1a]">Outils de rédaction</h4>
@@ -2810,13 +2810,13 @@ const TabRapports = ({ affaire, onUpdate }) => {
             onClick={() => setActiveRapport('note-synthese')}
             className={`flex-1 p-4 rounded-xl border-2 transition-all ${
               activeRapport === 'note-synthese'
-                ? 'border-[#c9a227] bg-[#faf8f3]'
-                : 'border-[#e5e5e5] hover:border-[#c9a227]'
+                ? 'border-[#2563EB] bg-[#EFF6FF]'
+                : 'border-[#e5e5e5] hover:border-[#2563EB]'
             }`}
           >
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                activeRapport === 'note-synthese' ? 'bg-[#c9a227] text-white' : 'bg-gray-100 text-gray-500'
+                activeRapport === 'note-synthese' ? 'bg-[#2563EB] text-white' : 'bg-gray-100 text-gray-500'
               }`}>
                 <FileText className="w-5 h-5" />
               </div>
@@ -2834,13 +2834,13 @@ const TabRapports = ({ affaire, onUpdate }) => {
             onClick={() => setActiveRapport('rapport-final')}
             className={`flex-1 p-4 rounded-xl border-2 transition-all ${
               activeRapport === 'rapport-final'
-                ? 'border-[#c9a227] bg-[#faf8f3]'
-                : 'border-[#e5e5e5] hover:border-[#c9a227]'
+                ? 'border-[#2563EB] bg-[#EFF6FF]'
+                : 'border-[#e5e5e5] hover:border-[#2563EB]'
             }`}
           >
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                activeRapport === 'rapport-final' ? 'bg-[#c9a227] text-white' : 'bg-gray-100 text-gray-500'
+                activeRapport === 'rapport-final' ? 'bg-[#2563EB] text-white' : 'bg-gray-100 text-gray-500'
               }`}>
                 <BookOpen className="w-5 h-5" />
               </div>
@@ -2938,7 +2938,7 @@ const TabFinancier = ({ affaire, onUpdate }) => {
             )}
           </div>
 
-          <p className="text-3xl font-light text-[#c9a227]">
+          <p className="text-3xl font-light text-[#2563EB]">
             {provision.toLocaleString('fr-FR')} €
           </p>
 
@@ -3003,7 +3003,7 @@ const TabFinancier = ({ affaire, onUpdate }) => {
               type="number"
               value={provisionData.montant}
               onChange={(e) => setProvisionData({ ...provisionData, montant: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
               placeholder="10000"
             />
           </div>
@@ -3016,7 +3016,7 @@ const TabFinancier = ({ affaire, onUpdate }) => {
               type="date"
               value={provisionData.date_reception}
               onChange={(e) => setProvisionData({ ...provisionData, date_reception: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             />
           </div>
 
@@ -3027,7 +3027,7 @@ const TabFinancier = ({ affaire, onUpdate }) => {
             <select
               value={provisionData.mode_paiement}
               onChange={(e) => setProvisionData({ ...provisionData, mode_paiement: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             >
               <option value="virement">Virement bancaire</option>
               <option value="cheque">Chèque</option>
@@ -3215,7 +3215,7 @@ const TabOutils = ({ affaire }) => {
           icon: FileText,
           description: 'Générer le rapport',
           disabled: false,
-          color: '#c9a227',
+          color: '#2563EB',
           action: () => navigate(`/affaires/${affaire.id}/rapport`)
         },
         {
@@ -3261,7 +3261,7 @@ const TabOutils = ({ affaire }) => {
                 onClick={() => outil.disabled ? null : (outil.action ? outil.action() : setActiveTool(activeTool === outil.id ? null : outil.id))}
                 className={`p-4 cursor-pointer transition-all border-2 ${
                   outil.disabled ? 'opacity-40 cursor-not-allowed' : 'hover:shadow-md'
-                } ${activeTool === outil.id ? 'border-[#c9a227] bg-[#fdf8e8]' : 'border-transparent hover:border-[#e0e0e0]'}`}
+                } ${activeTool === outil.id ? 'border-[#2563EB] bg-[#EFF6FF]' : 'border-transparent hover:border-[#e0e0e0]'}`}
               >
                 <div className="flex flex-col items-center text-center gap-2">
                   <div
@@ -3286,7 +3286,7 @@ const TabOutils = ({ affaire }) => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-medium text-[#1a1a1a] flex items-center gap-2">
-              <Scale className="w-5 h-5 text-[#c9a227]" />
+              <Scale className="w-5 h-5 text-[#2563EB]" />
               Calculateur de Garanties
             </h3>
             <button onClick={() => setActiveTool(null)} className="text-[#737373] hover:text-[#1a1a1a]">
@@ -3348,7 +3348,7 @@ const TabOutils = ({ affaire }) => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-medium text-[#1a1a1a] flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-[#c9a227]" />
+              <BookOpen className="w-5 h-5 text-[#2563EB]" />
               Références DTU applicables
             </h3>
             <button onClick={() => setActiveTool(null)} className="text-[#737373] hover:text-[#1a1a1a]">
@@ -3365,7 +3365,7 @@ const TabOutils = ({ affaire }) => {
               { code: 'DTU 60.11', titre: 'Règles de calcul des installations de plomberie', applicable: true },
               { code: 'DTU 65.14', titre: 'Exécution de planchers chauffants', applicable: false }
             ].map(dtu => (
-              <div key={dtu.code} className={`p-3 rounded-lg border ${dtu.applicable ? 'border-[#c9a227] bg-[#faf8f3]' : 'border-[#e5e5e5]'}`}>
+              <div key={dtu.code} className={`p-3 rounded-lg border ${dtu.applicable ? 'border-[#2563EB] bg-[#EFF6FF]' : 'border-[#e5e5e5]'}`}>
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium text-[#1a1a1a]">{dtu.code}</span>
@@ -3386,7 +3386,7 @@ const TabOutils = ({ affaire }) => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-medium text-[#1a1a1a] flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-[#c9a227]" />
+              <CheckCircle className="w-5 h-5 text-[#2563EB]" />
               Check-list Conformité CPC
             </h3>
             <button onClick={() => setActiveTool(null)} className="text-[#737373] hover:text-[#1a1a1a]">
@@ -3421,7 +3421,7 @@ const TabOutils = ({ affaire }) => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-medium text-[#1f1f1f] flex items-center gap-2">
-              <Gavel className="w-5 h-5 text-[#c9a227]" />
+              <Gavel className="w-5 h-5 text-[#2563EB]" />
               Jurisprudence de référence
             </h3>
             <button onClick={() => setActiveTool(null)} className="text-[#757575] hover:text-[#1f1f1f]">
@@ -3462,7 +3462,7 @@ const TabOutils = ({ affaire }) => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-medium text-[#1f1f1f] flex items-center gap-2">
-              <FlaskConical className="w-5 h-5 text-[#c9a227]" />
+              <FlaskConical className="w-5 h-5 text-[#2563EB]" />
               Qualification des désordres
             </h3>
             <button onClick={() => setActiveTool(null)} className="text-[#757575] hover:text-[#1f1f1f]">
@@ -3477,7 +3477,7 @@ const TabOutils = ({ affaire }) => {
               { type: 'Non-conformité', description: 'Écart avec les documents contractuels', garantie: 'Droit commun' },
               { type: 'Désordre évolutif', description: 'Aggravation progressive dans le temps', garantie: 'Décennale' }
             ]).map((qual, i) => (
-              <div key={i} className="p-4 border border-[#e0e0e0] rounded-xl hover:border-[#c9a227] transition-colors">
+              <div key={i} className="p-4 border border-[#e0e0e0] rounded-xl hover:border-[#2563EB] transition-colors">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="font-semibold text-[#1f1f1f]">{qual.type}</p>
@@ -3496,7 +3496,7 @@ const TabOutils = ({ affaire }) => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-medium text-[#1f1f1f] flex items-center gap-2">
-              <Upload className="w-5 h-5 text-[#c9a227]" />
+              <Upload className="w-5 h-5 text-[#2563EB]" />
               Check-list OPALEXE
             </h3>
             <button onClick={() => setActiveTool(null)} className="text-[#757575] hover:text-[#1f1f1f]">
@@ -3527,7 +3527,7 @@ const TabOutils = ({ affaire }) => {
                   type="checkbox"
                   checked={opalexeChecks[item.id] || false}
                   onChange={(e) => setOpalexeChecks(prev => ({ ...prev, [item.id]: e.target.checked }))}
-                  className="w-5 h-5 rounded border-[#d1d1d1] text-[#c9a227] focus:ring-[#c9a227]"
+                  className="w-5 h-5 rounded border-[#d1d1d1] text-[#2563EB] focus:ring-[#2563EB]"
                 />
                 <span className={opalexeChecks[item.id] ? 'text-[#1f1f1f]' : 'text-[#757575]'}>
                   {item.label}
@@ -3557,7 +3557,7 @@ const TabOutils = ({ affaire }) => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-medium text-[#1f1f1f] flex items-center gap-2">
-              <Timer className="w-5 h-5 text-[#c9a227]" />
+              <Timer className="w-5 h-5 text-[#2563EB]" />
               Chronomètre - {affaire.reference}
             </h3>
             <button onClick={() => setActiveTool(null)} className="text-[#757575] hover:text-[#1f1f1f]">
@@ -3604,7 +3604,7 @@ const TabOutils = ({ affaire }) => {
                   const heuresFormatees = formatDureeHeures(chronoTime / 3600);
                   toast.success(`${heuresFormatees} enregistrées`, 'Temps ajouté à l\'affaire');
                 }}
-                className="text-[#c9a227] border-[#c9a227]"
+                className="text-[#2563EB] border-[#2563EB]"
               >
                 <Save className="w-4 h-4 mr-2" />
                 Enregistrer le temps ({formatDureeHeures(chronoTime / 3600)})
@@ -3700,7 +3700,7 @@ const ModalAjoutPartie = ({ affaireId, onClose, onSuccess }) => {
                 type="checkbox"
                 checked={isEntreprise}
                 onChange={(e) => setIsEntreprise(e.target.checked)}
-                className="w-5 h-5 rounded border-[#d4d4d4] text-[#c9a227] focus:ring-[#c9a227]"
+                className="w-5 h-5 rounded border-[#d4d4d4] text-[#2563EB] focus:ring-[#2563EB]"
               />
               <span className="text-sm text-[#525252]">Personne morale</span>
             </label>
@@ -3940,7 +3940,7 @@ const ModalAjoutReunion = ({ affaireId, reunionNumero, adresseBien, onClose, onS
             onChange={(e) => handleChange('observations', e.target.value)}
             placeholder="Notes particulières pour cette réunion..."
             rows={3}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none"
           />
         </div>
 
@@ -4044,7 +4044,7 @@ const ModalAjoutDesordre = ({ affaireId, desordreNumero, onClose, onSuccess }) =
             onChange={(e) => handleChange('description', e.target.value)}
             placeholder="Décrivez le désordre constaté, son étendue, ses manifestations..."
             rows={4}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none"
             required
           />
         </div>
@@ -4087,7 +4087,7 @@ const ModalAjoutDesordre = ({ affaireId, desordreNumero, onClose, onSuccess }) =
             onChange={(e) => handleChange('cause_presumee', e.target.value)}
             placeholder="Hypothèses sur l'origine du désordre..."
             rows={2}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none"
           />
         </div>
 

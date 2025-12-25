@@ -284,7 +284,7 @@ const ModeleCard = ({ modele, onEdit, onDuplicate, onDelete, onUse, onToggleFavo
             <div className="flex items-center gap-2">
               <h4 className="font-medium text-[#1a1a1a]">{modele.nom}</h4>
               {modele.favori && (
-                <Star className="w-4 h-4 text-[#c9a227] fill-[#c9a227]" />
+                <Star className="w-4 h-4 text-[#2563EB] fill-[#2563EB]" />
               )}
             </div>
             <p className="text-sm text-[#737373] mt-0.5">{modele.description}</p>
@@ -409,7 +409,7 @@ const ModalEditModele = ({ isOpen, onClose, modele, onSave }) => {
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="w-full px-4 py-2.5 border border-[#e5e5e5] rounded-xl text-[#1a1a1a] focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-2.5 border border-[#e5e5e5] rounded-xl text-[#1a1a1a] focus:outline-none focus:border-[#2563EB]"
             >
               {TYPES_MODELES.map(t => (
                 <option key={t.id} value={t.id}>{t.label}</option>
@@ -569,14 +569,14 @@ export const GestionModeles = ({ onSelectModele }) => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher un modèle..."
-              className="w-full pl-10 pr-4 py-2.5 bg-[#f7f7f7] border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-[#c9a227]"
+              className="w-full pl-10 pr-4 py-2.5 bg-[#f7f7f7] border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-[#2563EB]"
             />
           </div>
 
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2.5 border border-[#e5e5e5] rounded-xl text-[#1a1a1a] focus:outline-none focus:border-[#c9a227]"
+            className="px-4 py-2.5 border border-[#e5e5e5] rounded-xl text-[#1a1a1a] focus:outline-none focus:border-[#2563EB]"
           >
             <option value="all">Tous les types</option>
             {TYPES_MODELES.map(t => (

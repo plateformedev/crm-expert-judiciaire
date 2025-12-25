@@ -357,7 +357,7 @@ export const GenerateurRapport = ({
               {sections.filter(s => s.inclus && s.complete).length} / {sections.filter(s => s.inclus).length} sections complètes
             </p>
           </div>
-          <div className="text-2xl font-light text-[#c9a227]">{avancement}%</div>
+          <div className="text-2xl font-light text-[#2563EB]">{avancement}%</div>
         </div>
         <ProgressBar value={avancement} size="lg" />
       </Card>
@@ -389,7 +389,7 @@ export const GenerateurRapport = ({
                     disabled={section.obligatoire}
                     className="rounded"
                   />
-                  <Icon className={`w-5 h-5 ${activeSection === section.id ? 'text-[#c9a227]' : 'text-[#737373]'}`} />
+                  <Icon className={`w-5 h-5 ${activeSection === section.id ? 'text-[#2563EB]' : 'text-[#737373]'}`} />
                   <div className="flex-1">
                     <p className="font-medium text-sm">
                       {section.numero && `${section.numero}. `}{section.titre}
@@ -437,7 +437,7 @@ export const GenerateurRapport = ({
                   <textarea
                     value={section.contenu || genererContenuSection(section.id)}
                     onChange={(e) => updateSectionContent(section.id, e.target.value)}
-                    className="w-full h-[400px] px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] resize-none font-mono text-sm"
+                    className="w-full h-[400px] px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] resize-none font-mono text-sm"
                     placeholder="Contenu de la section..."
                   />
                 )}
@@ -464,7 +464,7 @@ Expert inscrit sur la liste de la Cour d'Appel de ${expert?.cour_appel || 'Paris
 
 <p>en qualité d'expert judiciaire avec la mission suivante :</p>
 
-<blockquote style="background-color: #f5f5f5; padding: 15px; border-left: 3px solid #c9a227; margin: 20px 0;">
+<blockquote style="background-color: #f5f5f5; padding: 15px; border-left: 3px solid #2563EB; margin: 20px 0;">
 ${affaire.mission || 'Mission non renseignée'}
 </blockquote>
 
@@ -647,7 +647,7 @@ const genererChiffrage = (affaire) => {
       <td style="border: 1px solid #ddd; padding: 8px;">TVA ${chiffrage.tva_taux || 20}%</td>
       <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatMontant(chiffrage.total_ht * (chiffrage.tva_taux || 20) / 100)}</td>
     </tr>
-    <tr style="font-weight: bold; background-color: #f5e6c8;">
+    <tr style="font-weight: bold; background-color: #DBEAFE;">
       <td style="border: 1px solid #ddd; padding: 8px;">TOTAL TTC</td>
       <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatMontant(chiffrage.total_ttc)}</td>
     </tr>
@@ -695,10 +695,10 @@ const assemblerRapportHTML = (sections, affaire, expert) => {
     body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.6; color: #1a1a1a; }
     h1, h2, h3, h4 { font-family: 'Arial', sans-serif; }
     h1 { font-size: 24pt; text-align: center; margin-bottom: 30px; }
-    h2 { font-size: 16pt; border-bottom: 2px solid #c9a227; padding-bottom: 5px; margin-top: 30px; }
+    h2 { font-size: 16pt; border-bottom: 2px solid #2563EB; padding-bottom: 5px; margin-top: 30px; }
     h3 { font-size: 14pt; margin-top: 20px; }
     h4 { font-size: 12pt; margin-top: 15px; }
-    blockquote { background: #f5f5f5; padding: 15px; border-left: 3px solid #c9a227; margin: 20px 0; }
+    blockquote { background: #f5f5f5; padding: 15px; border-left: 3px solid #2563EB; margin: 20px 0; }
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
     th, td { border: 1px solid #ddd; padding: 8px; }
     th { background: #f5f5f5; }

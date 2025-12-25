@@ -66,7 +66,7 @@ const EtapeHorizontale = ({ etape, status, isSelected, onClick, isFirst, isLast 
 
   const getStatusStyle = () => {
     if (status === 'completed') return { bg: 'bg-[#34a853]', ring: 'ring-[#34a853]', text: 'text-white' };
-    if (status === 'in-progress') return { bg: 'bg-[#c9a227]', ring: 'ring-[#c9a227]', text: 'text-white' };
+    if (status === 'in-progress') return { bg: 'bg-[#2563EB]', ring: 'ring-[#2563EB]', text: 'text-white' };
     if (status === 'skipped') return { bg: 'bg-[#dadce0]', ring: 'ring-[#dadce0]', text: 'text-[#5f6368]' };
     return { bg: 'bg-white', ring: 'ring-[#dadce0]', text: 'text-[#9aa0a6]' };
   };
@@ -77,7 +77,7 @@ const EtapeHorizontale = ({ etape, status, isSelected, onClick, isFirst, isLast 
     <div className="flex items-center">
       {/* Connecteur gauche */}
       {!isFirst && (
-        <div className={`w-6 h-0.5 ${status === 'completed' ? 'bg-[#34a853]' : status === 'in-progress' ? 'bg-[#c9a227]' : 'bg-[#dadce0]'}`} />
+        <div className={`w-6 h-0.5 ${status === 'completed' ? 'bg-[#34a853]' : status === 'in-progress' ? 'bg-[#2563EB]' : 'bg-[#dadce0]'}`} />
       )}
 
       {/* Étape */}
@@ -85,7 +85,7 @@ const EtapeHorizontale = ({ etape, status, isSelected, onClick, isFirst, isLast 
         onClick={onClick}
         className={`
           relative flex flex-col items-center p-2 rounded-2xl transition-all duration-200
-          ${isSelected ? 'bg-[#fef9e7] ring-2 ring-[#c9a227]' : 'hover:bg-[#f1f3f4]'}
+          ${isSelected ? 'bg-[#fef9e7] ring-2 ring-[#2563EB]' : 'hover:bg-[#f1f3f4]'}
         `}
         title={`${etape.label}\n${etape.description}`}
       >
@@ -106,7 +106,7 @@ const EtapeHorizontale = ({ etape, status, isSelected, onClick, isFirst, isLast 
         <span className={`
           mt-1 text-[10px] font-medium max-w-[60px] text-center leading-tight truncate
           ${status === 'completed' ? 'text-[#34a853]' :
-            status === 'in-progress' ? 'text-[#c9a227]' :
+            status === 'in-progress' ? 'text-[#2563EB]' :
             'text-[#5f6368]'}
         `}>
           {etape.label.split(' ')[0]}
@@ -171,7 +171,7 @@ const PanneauContextuel = ({ etape, affaire, onClose, onNavigate }) => {
       <div className="flex items-start justify-between mb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-[#c9a227] bg-[#fef9e7] px-2 py-0.5 rounded-full">
+            <span className="text-xs font-medium text-[#2563EB] bg-[#fef9e7] px-2 py-0.5 rounded-full">
               Étape {etape.numero}
             </span>
             {!etape.obligatoire && (
@@ -231,7 +231,7 @@ const PanneauContextuel = ({ etape, affaire, onClose, onNavigate }) => {
               'Poser questions aux parties'
             ].map((item, idx) => (
               <label key={idx} className="flex items-center gap-3 text-sm text-[#3c4043] cursor-pointer hover:bg-[#f1f3f4] p-2 rounded-lg -mx-2">
-                <input type="checkbox" className="w-4 h-4 rounded accent-[#c9a227]" />
+                <input type="checkbox" className="w-4 h-4 rounded accent-[#2563EB]" />
                 {item}
               </label>
             ))}
@@ -411,7 +411,7 @@ export const WorkflowTunnel = ({ affaire, onEtapeClick, onNavigate }) => {
           )}
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-2xl font-light text-[#c9a227]">{progression}%</span>
+          <span className="text-2xl font-light text-[#2563EB]">{progression}%</span>
         </div>
       </div>
 
@@ -486,7 +486,7 @@ export const MiniWorkflowTunnel = ({ affaire, onEtapeClick }) => {
               className={`
                 w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-all
                 ${status === 'completed' ? 'bg-[#34a853] text-white' :
-                  status === 'in-progress' ? 'bg-[#c9a227] text-white animate-pulse' :
+                  status === 'in-progress' ? 'bg-[#2563EB] text-white animate-pulse' :
                   'bg-[#f1f3f4] text-[#9aa0a6]'}
               `}
               title={etape.label}

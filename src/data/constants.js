@@ -19,10 +19,10 @@ export const DS = {
     textDisabled: '#cccccc',
 
     // Accent principal - Or Expert Judiciaire
-    primary: '#c9a227',
+    primary: '#2563EB',
     primaryLight: '#f5e6b3',
-    primaryDark: '#9a7b1c',
-    primarySurface: '#fdf8e8',
+    primaryDark: '#1D4ED8',
+    primarySurface: '#EFF6FF',
 
     // Bleu Samsung pour actions secondaires
     samsungBlue: '#0381fe',
@@ -62,9 +62,9 @@ export const DS = {
     noirProfond: '#000000',
     blanc: '#ffffff',
     blancCasse: '#f7f7f7',
-    or: '#c9a227',
+    or: '#2563EB',
     orClair: '#f5e6b3',
-    orPale: '#fdf8e8'
+    orPale: '#EFF6FF'
   },
 
   // Ombres Samsung - Très subtiles, préférence pour les bordures

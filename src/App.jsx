@@ -132,10 +132,10 @@ const PageExcellence = () => {
             <Card
               key={sub.id}
               onClick={() => navigate(sub.path)}
-              className="p-6 cursor-pointer hover:border-[#c9a227] transition-all hover:shadow-lg group"
+              className="p-6 cursor-pointer hover:border-[#2563EB] transition-all hover:shadow-lg group"
             >
-              <div className="w-12 h-12 bg-[#f5e6c8] rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#c9a227] transition-colors">
-                <Icon className="w-6 h-6 text-[#c9a227] group-hover:text-white transition-colors" />
+              <div className="w-12 h-12 bg-[#DBEAFE] rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#2563EB] transition-colors">
+                <Icon className="w-6 h-6 text-[#2563EB] group-hover:text-white transition-colors" />
               </div>
               <h3 className="font-medium text-[#1a1a1a]">{sub.label}</h3>
               <p className="text-sm text-[#737373] mt-1">{sub.description}</p>
@@ -173,10 +173,10 @@ const PageOutils = () => {
             <Card
               key={sub.id}
               onClick={() => navigate(sub.path)}
-              className="p-6 cursor-pointer hover:border-[#c9a227] transition-all hover:shadow-lg group"
+              className="p-6 cursor-pointer hover:border-[#2563EB] transition-all hover:shadow-lg group"
             >
-              <div className="w-12 h-12 bg-[#f5e6c8] rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#c9a227] transition-colors">
-                <Icon className="w-6 h-6 text-[#c9a227] group-hover:text-white transition-colors" />
+              <div className="w-12 h-12 bg-[#DBEAFE] rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#2563EB] transition-colors">
+                <Icon className="w-6 h-6 text-[#2563EB] group-hover:text-white transition-colors" />
               </div>
               <h3 className="font-medium text-[#1a1a1a]">{sub.label}</h3>
               <p className="text-sm text-[#737373] mt-1">{sub.description}</p>
@@ -437,7 +437,7 @@ const AppLayout = ({ children }) => {
             <div className="px-8 pt-4">
               <button
                 onClick={goBack}
-                className="flex items-center gap-2 text-sm text-[#5f6368] hover:text-[#c9a227] transition-colors"
+                className="flex items-center gap-2 text-sm text-[#5f6368] hover:text-[#2563EB] transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Retour

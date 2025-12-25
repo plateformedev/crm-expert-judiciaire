@@ -156,7 +156,7 @@ export const TimerWidget = ({ affaireId, affaireRef, tauxHoraire = 90 }) => {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed bottom-4 right-4 z-50 w-12 h-12 bg-[#c9a227] text-white rounded-full shadow-lg flex items-center justify-center hover:bg-[#b08d20] transition-colors"
+        className="fixed bottom-4 right-4 z-50 w-12 h-12 bg-[#2563EB] text-white rounded-full shadow-lg flex items-center justify-center hover:bg-[#b08d20] transition-colors"
         title="Afficher le timer"
       >
         <Timer className="w-5 h-5" />
@@ -226,9 +226,9 @@ export const TimerWidget = ({ affaireId, affaireRef, tauxHoraire = 90 }) => {
                 <p className="text-[10px] uppercase text-[#737373]">Session</p>
                 <p className="text-sm font-semibold text-[#1a1a1a]">{timer.sessionMontant.toFixed(2)} €</p>
               </div>
-              <div className="bg-[#f5e6c8] rounded-lg p-2">
-                <p className="text-[10px] uppercase text-[#9a7b1c]">Total</p>
-                <p className="text-sm font-semibold text-[#c9a227]">{timer.totalMontant.toFixed(2)} €</p>
+              <div className="bg-[#DBEAFE] rounded-lg p-2">
+                <p className="text-[10px] uppercase text-[#1D4ED8]">Total</p>
+                <p className="text-sm font-semibold text-[#2563EB]">{timer.totalMontant.toFixed(2)} €</p>
               </div>
             </div>
 

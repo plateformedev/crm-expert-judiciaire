@@ -50,7 +50,7 @@ const ReunionCard = ({ reunion, parties, onEdit, onStartNotes, onViewCompteRendu
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {/* Numéro de réunion */}
-            <div className="w-12 h-12 bg-[#c9a227] text-white rounded-xl flex items-center justify-center font-bold text-lg">
+            <div className="w-12 h-12 bg-[#2563EB] text-white rounded-xl flex items-center justify-center font-bold text-lg">
               R{reunion.numero}
             </div>
 
@@ -285,14 +285,14 @@ export const GestionReunions = ({ affaire, onUpdate }) => {
     <div className="space-y-6">
       {/* Prochaine réunion - mise en avant */}
       {prochaineReunion && (
-        <Card className="p-4 bg-gradient-to-r from-[#faf8f3] to-white border-l-4 border-[#c9a227]">
+        <Card className="p-4 bg-gradient-to-r from-[#EFF6FF] to-white border-l-4 border-[#2563EB]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#c9a227] rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-[#2563EB] rounded-full flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wider text-[#c9a227] font-medium">
+                <p className="text-xs uppercase tracking-wider text-[#2563EB] font-medium">
                   Prochaine réunion
                 </p>
                 <p className="font-medium text-[#1a1a1a]">
@@ -473,7 +473,7 @@ const ModalAjoutReunion = ({ reunion, reunionNumero, affaire, onClose, onSave })
           <select
             value={data.type}
             onChange={(e) => handleChange('type', e.target.value)}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
           >
             {TYPES_REUNION.map(t => (
               <option key={t.id} value={t.id}>{t.label}</option>
@@ -521,7 +521,7 @@ const ModalAjoutReunion = ({ reunion, reunionNumero, affaire, onClose, onSave })
             value={data.objet}
             onChange={(e) => handleChange('objet', e.target.value)}
             rows={3}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             placeholder="Décrire l'objet de cette réunion..."
           />
         </div>
@@ -580,8 +580,8 @@ const ModalPriseNotes = ({ reunion, affaire, onClose, onSave, onTerminer }) => {
     >
       <div className="space-y-6">
         {/* Info réunion */}
-        <div className="p-3 bg-[#faf8f3] rounded-xl flex items-center gap-4">
-          <div className="w-10 h-10 bg-[#c9a227] rounded-full flex items-center justify-center text-white font-bold">
+        <div className="p-3 bg-[#EFF6FF] rounded-xl flex items-center gap-4">
+          <div className="w-10 h-10 bg-[#2563EB] rounded-full flex items-center justify-center text-white font-bold">
             R{reunion.numero}
           </div>
           <div>
@@ -634,7 +634,7 @@ const ModalPriseNotes = ({ reunion, affaire, onClose, onSave, onTerminer }) => {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={10}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] font-mono text-sm"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] font-mono text-sm"
             placeholder="Saisissez vos notes pendant la réunion...
 
 • Constatations visuelles
@@ -739,7 +739,7 @@ L'Expert Judiciaire`;
                         setSelectedParties(selectedParties.filter(p => p !== id));
                       }
                     }}
-                    className="w-4 h-4 text-[#c9a227] rounded"
+                    className="w-4 h-4 text-[#2563EB] rounded"
                   />
                   <div className="flex-1">
                     <p className="text-sm font-medium">{name}</p>
@@ -771,7 +771,7 @@ L'Expert Judiciaire`;
             </div>
           </div>
           <textarea
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] font-mono text-sm"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] font-mono text-sm"
             rows={12}
             defaultValue={getConvocationTemplate()}
           />
@@ -782,16 +782,16 @@ L'Expert Judiciaire`;
           <p className="text-sm font-medium text-[#1a1a1a] mb-3">Mode d'envoi</p>
           <div className="space-y-2">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="envoi" value="lrar" defaultChecked className="text-[#c9a227]" />
+              <input type="radio" name="envoi" value="lrar" defaultChecked className="text-[#2563EB]" />
               <span className="text-sm">LRAR (Lettre recommandée avec AR)</span>
               <Badge variant="info" className="ml-2">Obligatoire</Badge>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="envoi" value="email" className="text-[#c9a227]" />
+              <input type="radio" name="envoi" value="email" className="text-[#2563EB]" />
               <span className="text-sm">Email (en complément)</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="envoi" value="rpvj" className="text-[#c9a227]" />
+              <input type="radio" name="envoi" value="rpvj" className="text-[#2563EB]" />
               <span className="text-sm">RPVJ (pour les avocats)</span>
             </label>
           </div>
@@ -908,7 +908,7 @@ L'Expert Judiciaire`;
             value={cr}
             onChange={(e) => setCR(e.target.value)}
             rows={20}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] font-mono text-sm"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] font-mono text-sm"
             placeholder="Rédigez le compte-rendu de la réunion..."
           />
         </div>

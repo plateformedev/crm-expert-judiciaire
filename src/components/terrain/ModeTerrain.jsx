@@ -188,7 +188,7 @@ export const ModeTerrain = ({
               </button>
               <div>
                 <h1 className="font-bold text-[#1a1a1a] flex items-center gap-2">
-                  <Smartphone className="w-5 h-5 text-[#c9a227]" />
+                  <Smartphone className="w-5 h-5 text-[#2563EB]" />
                   Mode Terrain
                 </h1>
                 <p className="text-sm text-[#737373]">
@@ -263,7 +263,7 @@ export const ModeTerrain = ({
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
                 {tab.badge > 0 && (
-                  <span className="px-1.5 py-0.5 bg-[#c9a227] text-white text-xs rounded-full">
+                  <span className="px-1.5 py-0.5 bg-[#2563EB] text-white text-xs rounded-full">
                     {tab.badge}
                   </span>
                 )}
@@ -281,18 +281,18 @@ export const ModeTerrain = ({
             {/* Résumé de la visite */}
             <Card className="p-4">
               <h2 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-                <Home className="w-5 h-5 text-[#c9a227]" />
+                <Home className="w-5 h-5 text-[#2563EB]" />
                 Résumé de la visite
               </h2>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-[#fafafa] rounded-xl text-center">
-                  <Camera className="w-8 h-8 mx-auto mb-2 text-[#c9a227]" />
+                  <Camera className="w-8 h-8 mx-auto mb-2 text-[#2563EB]" />
                   <p className="text-2xl font-bold text-[#1a1a1a]">{photos.length}</p>
                   <p className="text-sm text-[#737373]">Photos</p>
                 </div>
                 <div className="p-4 bg-[#fafafa] rounded-xl text-center">
-                  <FileText className="w-8 h-8 mx-auto mb-2 text-[#c9a227]" />
+                  <FileText className="w-8 h-8 mx-auto mb-2 text-[#2563EB]" />
                   <p className="text-2xl font-bold text-[#1a1a1a]">{notes.length}</p>
                   <p className="text-sm text-[#737373]">Notes</p>
                 </div>

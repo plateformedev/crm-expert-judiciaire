@@ -166,7 +166,7 @@ const COURS_APPEL_OPTIONS = [
 const FormSection = ({ title, icon: Icon, children, description }) => (
   <Card className="p-6">
     <div className="flex items-center gap-3 mb-4 pb-4 border-b border-[#e5e5e5]">
-      <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
+      <div className="w-10 h-10 bg-[#DBEAFE] rounded-xl flex items-center justify-center">
         <Icon className="w-5 h-5 text-[#2563EB]" />
       </div>
       <div>
@@ -800,7 +800,7 @@ export const PageParametres = () => {
             </div>
 
             {/* Récapitulatif */}
-            <div className="mt-6 p-4 bg-[#faf8f3] rounded-xl">
+            <div className="mt-6 p-4 bg-[#EFF6FF] rounded-xl">
               <h4 className="text-sm font-medium text-[#1a1a1a] mb-3">Récapitulatif de vos tarifs</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -1351,7 +1351,7 @@ export const PageParametres = () => {
                       onClick={() => setPreferences({...preferences, theme: theme.id})}
                       className={`flex-1 p-3 rounded-lg border-2 transition-colors ${
                         preferences.theme === theme.id
-                          ? 'border-[#2563EB] bg-[#faf8f3]'
+                          ? 'border-[#2563EB] bg-[#EFF6FF]'
                           : 'border-[#e5e5e5] hover:border-[#2563EB]'
                       }`}
                     >

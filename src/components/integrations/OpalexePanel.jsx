@@ -350,7 +350,7 @@ export const OpalexePanel = ({ affaire }) => {
 
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-[#c9a227] animate-spin" />
+              <Loader2 className="w-8 h-8 text-[#2563EB] animate-spin" />
             </div>
           ) : dossiersFiltres.length === 0 ? (
             <EmptyState
@@ -413,12 +413,12 @@ const DossierCard = ({ dossier, selected, onClick }) => {
   return (
     <Card
       className={`p-4 cursor-pointer transition-colors ${
-        selected ? 'border-[#c9a227] bg-[#fafafa]' : 'hover:border-[#c9a227]'
+        selected ? 'border-[#2563EB] bg-[#fafafa]' : 'hover:border-[#2563EB]'
       }`}
       onClick={onClick}
     >
       <div className="flex items-start justify-between mb-2">
-        <div className="font-mono font-medium text-[#c9a227]">
+        <div className="font-mono font-medium text-[#2563EB]">
           RG {dossier.numero_rg}
         </div>
         <Badge className={colorClasses[statutInfo.color]}>

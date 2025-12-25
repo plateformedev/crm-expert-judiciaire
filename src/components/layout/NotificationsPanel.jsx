@@ -64,7 +64,7 @@ const NotificationsPanel = ({ isOpen, onClose, alertes = [], affaires = [] }) =>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[#e5e5e5]">
           <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-[#c9a227]" />
+            <Bell className="w-5 h-5 text-[#2563EB]" />
             <h2 className="font-semibold text-lg text-[#1a1a1a]">Notifications</h2>
           </div>
           <button
@@ -83,20 +83,20 @@ const NotificationsPanel = ({ isOpen, onClose, alertes = [], affaires = [] }) =>
               onClick={() => setActiveTab(tab.id)}
               className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
                 activeTab === tab.id
-                  ? 'text-[#c9a227]'
+                  ? 'text-[#2563EB]'
                   : 'text-[#737373] hover:text-[#1a1a1a]'
               }`}
             >
               {tab.label}
               {tab.count > 0 && (
                 <span className={`ml-1 px-1.5 py-0.5 text-xs rounded-full ${
-                  activeTab === tab.id ? 'bg-[#c9a227] text-white' : 'bg-[#e5e5e5] text-[#737373]'
+                  activeTab === tab.id ? 'bg-[#2563EB] text-white' : 'bg-[#e5e5e5] text-[#737373]'
                 }`}>
                   {tab.count}
                 </span>
               )}
               {activeTab === tab.id && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#c9a227]" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2563EB]" />
               )}
             </button>
           ))}

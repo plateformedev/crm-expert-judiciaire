@@ -419,7 +419,7 @@ export const PhotoCaptureTerrain = ({
                     onClick={() => setMetadata(prev => ({ ...prev, categorie: cat.value }))}
                     className={`flex items-center gap-1 px-3 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
                       metadata.categorie === cat.value
-                        ? 'bg-[#c9a227] text-white'
+                        ? 'bg-[#2563EB] text-white'
                         : 'bg-white/20 text-white hover:bg-white/30'
                     }`}
                   >
@@ -435,7 +435,7 @@ export const PhotoCaptureTerrain = ({
                 value={metadata.legende}
                 onChange={(e) => setMetadata(prev => ({ ...prev, legende: e.target.value }))}
                 placeholder={`Photo n°${metadata.numero} - Description...`}
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:border-[#c9a227]"
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:border-[#2563EB]"
               />
 
               {/* Lier à un désordre */}
@@ -443,7 +443,7 @@ export const PhotoCaptureTerrain = ({
                 <select
                   value={metadata.pathologie_id}
                   onChange={(e) => setMetadata(prev => ({ ...prev, pathologie_id: e.target.value }))}
-                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-[#2563EB]"
                 >
                   <option value="" className="text-black">Lier à un désordre (optionnel)</option>
                   {pathologies.map(p => (
@@ -466,7 +466,7 @@ export const PhotoCaptureTerrain = ({
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="flex-1 py-3 bg-[#c9a227] text-white rounded-xl flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 py-3 bg-[#2563EB] text-white rounded-xl flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {saving ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -564,7 +564,7 @@ export const PhotoCaptureTerrain = ({
                 onClick={() => setMetadata(prev => ({ ...prev, categorie: cat.value }))}
                 className={`px-3 py-1 rounded-full text-xs transition-colors ${
                   metadata.categorie === cat.value
-                    ? 'bg-[#c9a227] text-white'
+                    ? 'bg-[#2563EB] text-white'
                     : 'bg-white/20 text-white/80'
                 }`}
               >
@@ -621,7 +621,7 @@ export const PhotoQuickCapture = ({ onCapture, disabled = false }) => {
       <button
         onClick={() => fileInputRef.current?.click()}
         disabled={disabled}
-        className="p-3 bg-[#c9a227] text-white rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-[#b8922b] transition-colors"
+        className="p-3 bg-[#2563EB] text-white rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-[#b8922b] transition-colors"
       >
         <Camera className="w-5 h-5" />
         <span>Photo</span>

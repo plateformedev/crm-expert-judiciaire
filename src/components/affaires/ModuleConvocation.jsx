@@ -112,7 +112,7 @@ const SelecteurDestinataires = ({ parties, selectedIds, onToggle, onSelectAll })
         <h4 className="text-sm font-medium text-[#1a1a1a]">Destinataires</h4>
         <button
           onClick={onSelectAll}
-          className="text-xs text-[#c9a227] hover:underline"
+          className="text-xs text-[#2563EB] hover:underline"
         >
           {selectedIds.length === parties.length ? 'Tout désélectionner' : 'Tout sélectionner'}
         </button>
@@ -129,13 +129,13 @@ const SelecteurDestinataires = ({ parties, selectedIds, onToggle, onSelectAll })
               onClick={() => onToggle(partie.id)}
               className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
                 isSelected
-                  ? 'border-[#c9a227] bg-[#faf8f3]'
-                  : 'border-[#e5e5e5] hover:border-[#c9a227]'
+                  ? 'border-[#2563EB] bg-[#EFF6FF]'
+                  : 'border-[#e5e5e5] hover:border-[#2563EB]'
               }`}
             >
               <div className="flex items-center gap-3">
                 <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                  isSelected ? 'bg-[#c9a227] border-[#c9a227]' : 'border-[#d4d4d4]'
+                  isSelected ? 'bg-[#2563EB] border-[#2563EB]' : 'border-[#d4d4d4]'
                 }`}>
                   {isSelected && <Check className="w-3 h-3 text-white" />}
                 </div>
@@ -204,13 +204,13 @@ const SelecteurModeEnvoi = ({ selectedMode, onSelect }) => {
               onClick={() => onSelect(mode.id)}
               className={`p-4 rounded-xl border-2 text-left transition-all ${
                 isSelected
-                  ? 'border-[#c9a227] bg-[#faf8f3]'
-                  : 'border-[#e5e5e5] hover:border-[#c9a227]'
+                  ? 'border-[#2563EB] bg-[#EFF6FF]'
+                  : 'border-[#e5e5e5] hover:border-[#2563EB]'
               }`}
             >
               <div className="flex items-start gap-3">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                  isSelected ? 'bg-[#c9a227] text-white' : 'bg-[#f5f5f5] text-[#737373]'
+                  isSelected ? 'bg-[#2563EB] text-white' : 'bg-[#f5f5f5] text-[#737373]'
                 }`}>
                   <Icon className="w-5 h-5" />
                 </div>
@@ -309,7 +309,7 @@ const EditeurConvocation = ({ contenu, onChange, affaire, reunion, partie, exper
           value={contenu}
           onChange={(e) => onChange(e.target.value)}
           rows={18}
-          className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] font-mono text-sm leading-relaxed"
+          className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] font-mono text-sm leading-relaxed"
           placeholder="Rédigez votre convocation..."
         />
       )}
@@ -520,17 +520,17 @@ export const ModuleConvocation = ({ affaire, reunion, expert, onUpdate, onClose 
           {/* Infos réunion compactes */}
           <div className="flex items-center gap-4 bg-white/10 rounded-lg px-4 py-2 text-sm">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-[#c9a227]" />
+              <Calendar className="w-4 h-4 text-[#2563EB]" />
               <span>{reunion?.date_reunion ? formatDateFr(reunion.date_reunion) : 'Date non définie'}</span>
             </div>
             <div className="w-px h-4 bg-white/20" />
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#c9a227]" />
+              <Clock className="w-4 h-4 text-[#2563EB]" />
               <span>{reunion?.heure || '—'}</span>
             </div>
             <div className="w-px h-4 bg-white/20" />
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#c9a227]" />
+              <MapPin className="w-4 h-4 text-[#2563EB]" />
               <span className="max-w-[200px] truncate">{reunion?.lieu || affaire?.bien_adresse || 'Lieu non défini'}</span>
             </div>
           </div>
@@ -563,7 +563,7 @@ export const ModuleConvocation = ({ affaire, reunion, expert, onUpdate, onClose 
               onClick={() => setActiveTab('composer')}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'composer'
-                  ? 'border-[#c9a227] text-[#c9a227]'
+                  ? 'border-[#2563EB] text-[#2563EB]'
                   : 'border-transparent text-[#737373] hover:text-[#1a1a1a]'
               }`}
             >
@@ -574,7 +574,7 @@ export const ModuleConvocation = ({ affaire, reunion, expert, onUpdate, onClose 
               onClick={() => setActiveTab('historique')}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'historique'
-                  ? 'border-[#c9a227] text-[#c9a227]'
+                  ? 'border-[#2563EB] text-[#2563EB]'
                   : 'border-transparent text-[#737373] hover:text-[#1a1a1a]'
               }`}
             >
@@ -636,7 +636,7 @@ export const ModuleConvocation = ({ affaire, reunion, expert, onUpdate, onClose 
                       icon={Send}
                       onClick={() => setShowConfirmModal(true)}
                       disabled={selectedParties.length === 0 || !contenu}
-                      className="bg-[#c9a227] hover:bg-[#b8922a]"
+                      className="bg-[#2563EB] hover:bg-[#b8922a]"
                     >
                       Envoyer la convocation ({selectedParties.length})
                     </Button>
@@ -647,7 +647,7 @@ export const ModuleConvocation = ({ affaire, reunion, expert, onUpdate, onClose 
           ) : (
             <Card className="p-6">
               <h3 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-                <FileCheck className="w-5 h-5 text-[#c9a227]" />
+                <FileCheck className="w-5 h-5 text-[#2563EB]" />
                 Historique des envois
               </h3>
               <HistoriqueEnvois envois={envois} parties={parties} />
@@ -670,7 +670,7 @@ export const ModuleConvocation = ({ affaire, reunion, expert, onUpdate, onClose 
               via <strong>{MODES_ENVOI.find(m => m.id === modeEnvoi)?.label}</strong>.
             </p>
 
-            <div className="p-4 bg-[#faf8f3] rounded-xl">
+            <div className="p-4 bg-[#EFF6FF] rounded-xl">
               <p className="text-xs text-[#737373] mb-2">Destinataires :</p>
               <div className="space-y-1">
                 {selectedParties.map(partieId => {

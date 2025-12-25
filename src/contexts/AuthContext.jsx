@@ -358,7 +358,7 @@ export const ProtectedRoute = ({ children, fallback = null }) => {
   if (loading) {
     return fallback || (
       <div className="h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-[#c9a227] border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full" />
       </div>
     );
   }

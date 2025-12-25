@@ -165,7 +165,7 @@ export const MANIFEST = {
   start_url: "/",
   display: "standalone",
   background_color: "#1a1a1a",
-  theme_color: "#c9a227",
+  theme_color: "#2563EB",
   orientation: "any",
   icons: [
     {
@@ -567,7 +567,7 @@ export const OfflineIndicator = () => {
       {isInstallable && (
         <button
           onClick={install}
-          className="flex items-center gap-1 px-2 py-1 bg-[#f5e6c8] text-[#c9a227] rounded-lg text-xs"
+          className="flex items-center gap-1 px-2 py-1 bg-[#DBEAFE] text-[#2563EB] rounded-lg text-xs"
         >
           <Download className="w-3 h-3" />
           Installer

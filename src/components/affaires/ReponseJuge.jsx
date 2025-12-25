@@ -350,7 +350,7 @@ Je vous serais reconnaissant de bien vouloir procéder à mon remplacement et vo
     >
       <div className="space-y-6">
         {/* Info affaire */}
-        <div className="p-4 bg-[#faf8f3] rounded-xl">
+        <div className="p-4 bg-[#EFF6FF] rounded-xl">
           <p className="text-xs text-[#737373] uppercase tracking-wider mb-1">Affaire concernée</p>
           <p className="font-medium text-[#1a1a1a]">{affaire.reference}</p>
           <p className="text-sm text-[#737373]">{affaire.tribunal} • RG {affaire.rg}</p>
@@ -373,7 +373,7 @@ Je vous serais reconnaissant de bien vouloir procéder à mon remplacement et vo
             <select
               value={motif}
               onChange={(e) => setMotif(e.target.value)}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             >
               <option value="">Sélectionner un motif</option>
               {MOTIFS_REFUS.map(m => (
@@ -383,7 +383,7 @@ Je vous serais reconnaissant de bien vouloir procéder à mon remplacement et vo
 
             {motif === 'autre' && (
               <textarea
-                className="mt-3 w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+                className="mt-3 w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
                 placeholder="Précisez le motif..."
                 rows={3}
                 value={motifAutre}
@@ -407,7 +407,7 @@ Je vous serais reconnaissant de bien vouloir procéder à mon remplacement et vo
           {courrierGenere && (
             <div className="relative">
               <textarea
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] font-mono text-sm"
+                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] font-mono text-sm"
                 rows={12}
                 defaultValue={getCourrierTemplate()}
               />
@@ -432,16 +432,16 @@ Je vous serais reconnaissant de bien vouloir procéder à mon remplacement et vo
           <p className="text-sm font-medium text-[#1a1a1a] mb-3">Mode d'envoi</p>
           <div className="space-y-2">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="envoi" value="opalex" className="text-[#c9a227]" />
+              <input type="radio" name="envoi" value="opalex" className="text-[#2563EB]" />
               <span className="text-sm">Via OPALEX / RPVJ</span>
               <Badge variant="info" className="ml-2">Recommandé</Badge>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="envoi" value="email" className="text-[#c9a227]" />
+              <input type="radio" name="envoi" value="email" className="text-[#2563EB]" />
               <span className="text-sm">Par email au greffe</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="envoi" value="courrier" className="text-[#c9a227]" />
+              <input type="radio" name="envoi" value="courrier" className="text-[#2563EB]" />
               <span className="text-sm">Par courrier postal</span>
             </label>
           </div>

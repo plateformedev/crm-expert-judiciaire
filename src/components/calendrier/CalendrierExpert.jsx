@@ -60,13 +60,13 @@ const CelluleCalendrier = ({ date, evenements, isCurrentMonth, isToday, onSelect
   return (
     <div
       className={`min-h-24 p-1 border-b border-r border-[#e5e5e5] cursor-pointer transition-colors ${
-        !isCurrentMonth ? 'bg-[#fafafa]' : 'bg-white hover:bg-[#faf8f3]'
-      } ${isToday ? 'ring-2 ring-[#c9a227] ring-inset' : ''}`}
+        !isCurrentMonth ? 'bg-[#fafafa]' : 'bg-white hover:bg-[#EFF6FF]'
+      } ${isToday ? 'ring-2 ring-[#2563EB] ring-inset' : ''}`}
       onClick={() => onSelectDate(date)}
     >
       {/* Numéro du jour */}
       <div className={`text-sm font-medium mb-1 ${
-        isToday ? 'w-6 h-6 bg-[#c9a227] text-white rounded-full flex items-center justify-center' :
+        isToday ? 'w-6 h-6 bg-[#2563EB] text-white rounded-full flex items-center justify-center' :
         !isCurrentMonth ? 'text-[#a3a3a3]' : 'text-[#1a1a1a]'
       }`}>
         {date.getDate()}
@@ -179,7 +179,7 @@ const ModalDetailEvenement = ({ evenement, onClose, onNavigate }) => {
         </div>
 
         {/* Affaire */}
-        <div className="p-4 bg-[#faf8f3] rounded-xl">
+        <div className="p-4 bg-[#EFF6FF] rounded-xl">
           <p className="text-xs text-[#737373] uppercase tracking-wider mb-1">Affaire</p>
           <p className="font-medium text-[#1a1a1a]">{evenement.affaireRef}</p>
           {evenement.tribunal && (
@@ -421,10 +421,10 @@ export const CalendrierExpert = ({ affaires = [], onSelectAffaire }) => {
 
       {/* Prochain événement */}
       {stats.prochainEvenement && (
-        <Card className="p-4 bg-gradient-to-r from-[#faf8f3] to-white border-l-4 border-l-[#c9a227]">
+        <Card className="p-4 bg-gradient-to-r from-[#EFF6FF] to-white border-l-4 border-l-[#2563EB]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#c9a227] rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-[#2563EB] rounded-xl flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -454,7 +454,7 @@ export const CalendrierExpert = ({ affaires = [], onSelectAffaire }) => {
         <div className="col-span-3">
           <Card className="overflow-hidden">
             {/* En-tête jours de la semaine */}
-            <div className="grid grid-cols-7 bg-[#faf8f3]">
+            <div className="grid grid-cols-7 bg-[#EFF6FF]">
               {JOURS_SEMAINE.map(jour => (
                 <div key={jour} className="py-2 text-center text-xs font-medium text-[#737373] uppercase">
                   {jour}
@@ -512,7 +512,7 @@ export const CalendrierExpert = ({ affaires = [], onSelectAffaire }) => {
           {/* Prochaines réunions */}
           <Card className="p-4">
             <h3 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-              <Users className="w-4 h-4 text-[#c9a227]" />
+              <Users className="w-4 h-4 text-[#2563EB]" />
               Prochaines réunions
             </h3>
             <div className="space-y-3">
@@ -522,7 +522,7 @@ export const CalendrierExpert = ({ affaires = [], onSelectAffaire }) => {
                 .map((evt, i) => (
                   <div
                     key={i}
-                    className="p-3 bg-[#faf8f3] rounded-lg cursor-pointer hover:bg-[#f5e6c8] transition-colors"
+                    className="p-3 bg-[#EFF6FF] rounded-lg cursor-pointer hover:bg-[#DBEAFE] transition-colors"
                     onClick={() => setSelectedEvent(evt)}
                   >
                     <p className="text-sm font-medium text-[#1a1a1a]">{evt.titre}</p>

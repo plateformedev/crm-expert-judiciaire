@@ -46,7 +46,7 @@ const LigneHonoraire = ({ ligne, index, onUpdate, onDelete }) => {
   const montant = (ligne.heures || 0) * (ligne.tauxHoraire || 0);
 
   return (
-    <tr className="border-b border-[#e5e5e5] hover:bg-[#faf8f3]">
+    <tr className="border-b border-[#e5e5e5] hover:bg-[#EFF6FF]">
       <td className="py-3 px-2">
         <input
           type="date"
@@ -124,7 +124,7 @@ const LigneFrais = ({ ligne, index, onUpdate, onDelete }) => {
   const montant = (ligne.quantite || 0) * (ligne.tauxUnitaire || 0);
 
   return (
-    <tr className="border-b border-[#e5e5e5] hover:bg-[#faf8f3]">
+    <tr className="border-b border-[#e5e5e5] hover:bg-[#EFF6FF]">
       <td className="py-3 px-2">
         <input
           type="date"
@@ -536,9 +536,9 @@ L'Expert Judiciaire
         <>
           {/* Section Honoraires */}
           <Card className="overflow-hidden">
-            <div className="p-4 bg-[#faf8f3] flex items-center justify-between">
+            <div className="p-4 bg-[#EFF6FF] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-[#c9a227]" />
+                <Clock className="w-5 h-5 text-[#2563EB]" />
                 <div>
                   <h3 className="font-medium text-[#1a1a1a]">Honoraires</h3>
                   <p className="text-xs text-[#737373]">
@@ -600,9 +600,9 @@ L'Expert Judiciaire
 
           {/* Section Frais */}
           <Card className="overflow-hidden">
-            <div className="p-4 bg-[#faf8f3] flex items-center justify-between">
+            <div className="p-4 bg-[#EFF6FF] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Car className="w-5 h-5 text-[#c9a227]" />
+                <Car className="w-5 h-5 text-[#2563EB]" />
                 <div>
                   <h3 className="font-medium text-[#1a1a1a]">Frais</h3>
                   <p className="text-xs text-[#737373]">
@@ -673,7 +673,7 @@ L'Expert Judiciaire
               </div>
               <div className="border-t border-[#e5e5e5] pt-2 flex justify-between text-lg">
                 <span className="font-medium text-[#1a1a1a]">Total TTC</span>
-                <span className="font-bold text-[#c9a227]">{totaux.totalTTC.toLocaleString('fr-FR')} €</span>
+                <span className="font-bold text-[#2563EB]">{totaux.totalTTC.toLocaleString('fr-FR')} €</span>
               </div>
 
               <div className="border-t border-[#e5e5e5] pt-4 mt-4">
@@ -739,7 +739,7 @@ L'Expert Judiciaire
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-[#737373]">Montant demandé TTC</span>
-                <span className="font-bold text-[#c9a227]">{totaux.totalTTC.toLocaleString('fr-FR')} €</span>
+                <span className="font-bold text-[#2563EB]">{totaux.totalTTC.toLocaleString('fr-FR')} €</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#737373]">Provisions reçues</span>

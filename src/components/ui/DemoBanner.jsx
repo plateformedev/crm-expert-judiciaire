@@ -122,7 +122,7 @@ export const DemoBanner = ({ onResetData }) => {
             </div>
 
             {/* Footer */}
-            <div className="bg-[#faf8f3] px-6 py-4">
+            <div className="bg-[#EFF6FF] px-6 py-4">
               <button
                 onClick={() => setShowInfo(false)}
                 className="w-full px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-xl transition-colors"

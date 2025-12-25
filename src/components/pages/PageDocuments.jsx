@@ -55,7 +55,7 @@ const DocumentItem = ({ doc, viewMode, onView, onDownload, onToggleFavorite }) =
 
   if (viewMode === 'grid') {
     return (
-      <Card className="p-4 hover:border-[#c9a227] transition-colors cursor-pointer group">
+      <Card className="p-4 hover:border-[#2563EB] transition-colors cursor-pointer group">
         <div className="flex items-start justify-between mb-3">
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
             extension === 'pdf' ? 'bg-red-100' :
@@ -109,7 +109,7 @@ const DocumentItem = ({ doc, viewMode, onView, onDownload, onToggleFavorite }) =
 
   // Vue liste
   return (
-    <div className="flex items-center gap-4 p-3 border border-[#e5e5e5] rounded-lg hover:border-[#c9a227] transition-colors group">
+    <div className="flex items-center gap-4 p-3 border border-[#e5e5e5] rounded-lg hover:border-[#2563EB] transition-colors group">
       <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
         extension === 'pdf' ? 'bg-red-100' :
         ['jpg', 'jpeg', 'png'].includes(extension) ? 'bg-pink-100' :
@@ -356,8 +356,8 @@ export const PageDocuments = () => {
               onClick={() => setSelectedCategorie(selectedCategorie === cat.id ? 'tous' : cat.id)}
               className={`p-4 cursor-pointer transition-all ${
                 selectedCategorie === cat.id
-                  ? 'border-[#c9a227] bg-[#faf8f3]'
-                  : 'hover:border-[#c9a227]'
+                  ? 'border-[#2563EB] bg-[#EFF6FF]'
+                  : 'hover:border-[#2563EB]'
               }`}
             >
               <div className="flex items-center gap-3">
@@ -502,7 +502,7 @@ export const PageDocuments = () => {
           size="md"
         >
           <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 bg-[#faf8f3] rounded-xl">
+            <div className="flex items-center gap-4 p-4 bg-[#EFF6FF] rounded-xl">
               <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center border border-[#e5e5e5]">
                 {TYPE_ICONS[selectedDocument.nom?.split('.').pop()] ?
                   React.createElement(TYPE_ICONS[selectedDocument.nom?.split('.').pop()], {

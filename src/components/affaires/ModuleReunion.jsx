@@ -198,7 +198,7 @@ const ChronometreReunion = ({ isRunning, onStart, onPause, onStop, elapsedTime }
     <Card className="p-4 bg-gradient-to-r from-[#1a1a1a] to-[#2a2a2a] text-white">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Clock className="w-5 h-5 text-[#c9a227]" />
+          <Clock className="w-5 h-5 text-[#2563EB]" />
           <div>
             <p className="text-xs text-white/60 uppercase">Durée réunion</p>
             <p className="text-2xl font-mono font-light">{formatTime(elapsedTime)}</p>
@@ -254,7 +254,7 @@ const EtapeReunion = ({
 
   return (
     <div className={`rounded-xl border-2 overflow-hidden transition-all ${
-      isActive ? 'border-[#c9a227] bg-[#faf8f3]' :
+      isActive ? 'border-[#2563EB] bg-[#EFF6FF]' :
       isCompleted ? 'border-green-300 bg-green-50' :
       'border-[#e5e5e5] bg-white'
     }`}>
@@ -267,7 +267,7 @@ const EtapeReunion = ({
           {/* Numéro/Statut */}
           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
             isCompleted ? 'bg-green-500 text-white' :
-            isActive ? 'bg-[#c9a227] text-white' :
+            isActive ? 'bg-[#2563EB] text-white' :
             'bg-[#e5e5e5] text-[#737373]'
           }`}>
             {isCompleted ? <Check className="w-4 h-4" /> : etape.numero}
@@ -285,7 +285,7 @@ const EtapeReunion = ({
               <p className="text-xs text-[#737373]">{completedCount}/{totalItems}</p>
               <div className="w-20 h-1.5 bg-[#e5e5e5] rounded-full overflow-hidden">
                 <div
-                  className={`h-full transition-all ${isCompleted ? 'bg-green-500' : 'bg-[#c9a227]'}`}
+                  className={`h-full transition-all ${isCompleted ? 'bg-green-500' : 'bg-[#2563EB]'}`}
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -357,7 +357,7 @@ const EtapeReunion = ({
               value={notes || ''}
               onChange={(e) => onNotesChange(etape.id, e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#2563EB]"
               placeholder="Notez vos observations..."
             />
           </div>
@@ -401,7 +401,7 @@ const GestionnairePhotos = ({ photos, onAddPhoto, onDeletePhoto, onUpdatePhoto }
     <Card className="p-4">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Camera className="w-5 h-5 text-[#c9a227]" />
+          <Camera className="w-5 h-5 text-[#2563EB]" />
           <h3 className="font-medium text-[#1a1a1a]">Photos ({photos.length})</h3>
         </div>
         <input
@@ -424,7 +424,7 @@ const GestionnairePhotos = ({ photos, onAddPhoto, onDeletePhoto, onUpdatePhoto }
 
       {photos.length === 0 ? (
         <div
-          className="border-2 border-dashed border-[#e5e5e5] rounded-xl p-8 text-center cursor-pointer hover:border-[#c9a227] transition-colors"
+          className="border-2 border-dashed border-[#e5e5e5] rounded-xl p-8 text-center cursor-pointer hover:border-[#2563EB] transition-colors"
           onClick={() => fileInputRef.current?.click()}
         >
           <Camera className="w-12 h-12 text-[#e5e5e5] mx-auto mb-3" />
@@ -523,7 +523,7 @@ const GestionPresences = ({ parties, presents, absents, onTogglePresence }) => {
   return (
     <Card className="p-4">
       <div className="flex items-center gap-2 mb-4">
-        <Users className="w-5 h-5 text-[#c9a227]" />
+        <Users className="w-5 h-5 text-[#2563EB]" />
         <h3 className="font-medium text-[#1a1a1a]">Présences</h3>
       </div>
 
@@ -534,7 +534,7 @@ const GestionPresences = ({ parties, presents, absents, onTogglePresence }) => {
           const isAbsent = absents.includes(partie.id);
 
           return (
-            <div key={partie.id} className="flex items-center justify-between p-3 bg-[#faf8f3] rounded-lg">
+            <div key={partie.id} className="flex items-center justify-between p-3 bg-[#EFF6FF] rounded-lg">
               <div>
                 <p className="font-medium text-sm text-[#1a1a1a]">{nom}</p>
                 <p className="text-xs text-[#737373]">{partie.type}</p>
@@ -724,7 +724,7 @@ export const ModuleReunion = ({ affaire, reunion, expert, onUpdate, onClose }) =
         <div className="flex items-center gap-4">
           {/* Chronomètre compact dans l'en-tête */}
           <div className="flex items-center gap-3 bg-white/10 rounded-lg px-4 py-2">
-            <Clock className="w-4 h-4 text-[#c9a227]" />
+            <Clock className="w-4 h-4 text-[#2563EB]" />
             <span className="text-lg font-mono">{formatTime(elapsedTime)}</span>
             <div className="flex items-center gap-1">
               {!isRunning ? (
@@ -755,7 +755,7 @@ export const ModuleReunion = ({ affaire, reunion, expert, onUpdate, onClose }) =
             {progressionGlobale}% complété
           </Badge>
 
-          <Button variant="primary" icon={Save} onClick={handleSave} className="bg-[#c9a227] hover:bg-[#b8922a]">
+          <Button variant="primary" icon={Save} onClick={handleSave} className="bg-[#2563EB] hover:bg-[#b8922a]">
             Sauvegarder
           </Button>
         </div>
@@ -768,7 +768,7 @@ export const ModuleReunion = ({ affaire, reunion, expert, onUpdate, onClose }) =
             {/* Colonne 1: Étapes (2/3 de la largeur) */}
             <div className="col-span-2 space-y-4">
               <h2 className="text-lg font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-                <ClipboardList className="w-5 h-5 text-[#c9a227]" />
+                <ClipboardList className="w-5 h-5 text-[#2563EB]" />
                 Guide d'expertise - 9 étapes
               </h2>
 
@@ -808,14 +808,14 @@ export const ModuleReunion = ({ affaire, reunion, expert, onUpdate, onClose }) =
               {/* Notes générales */}
               <Card className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <FileText className="w-5 h-5 text-[#c9a227]" />
+                  <FileText className="w-5 h-5 text-[#2563EB]" />
                   <h3 className="font-medium text-[#1a1a1a]">Notes générales</h3>
                 </div>
                 <textarea
                   value={notesGenerales}
                   onChange={(e) => setNotesGenerales(e.target.value)}
                   rows={6}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#2563EB]"
                   placeholder="Notes libres sur la réunion..."
                 />
               </Card>

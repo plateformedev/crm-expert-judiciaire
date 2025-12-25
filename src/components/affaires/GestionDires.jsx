@@ -359,7 +359,7 @@ const ModalAjoutDire = ({ dire, parties, onClose, onSave }) => {
           <select
             value={data.partie_id}
             onChange={(e) => handleChange('partie_id', e.target.value)}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             required
           >
             <option value="">Sélectionner une partie</option>
@@ -397,7 +397,7 @@ const ModalAjoutDire = ({ dire, parties, onClose, onSave }) => {
             value={data.contenu}
             onChange={(e) => handleChange('contenu', e.target.value)}
             rows={6}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             placeholder="Copier/coller ou résumer le contenu du dire..."
           />
         </div>
@@ -452,7 +452,7 @@ const ModalReponseDire = ({ dire, onClose, onSave }) => {
             value={reponse}
             onChange={(e) => setReponse(e.target.value)}
             rows={10}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             placeholder="Rédigez votre réponse à ce dire...
 
 L'expert répond que...

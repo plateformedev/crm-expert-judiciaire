@@ -556,7 +556,7 @@ export const BaseDTU = ({ onSelectDTU, onCiteArticle }) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-light text-[#1a1a1a] flex items-center gap-2">
-            <Book className="w-6 h-6 text-[#c9a227]" />
+            <Book className="w-6 h-6 text-[#2563EB]" />
             Base DTU
           </h2>
           <p className="text-[#737373]">
@@ -581,13 +581,13 @@ export const BaseDTU = ({ onSelectDTU, onCiteArticle }) => {
             placeholder="Rechercher par numéro, titre ou mot-clé..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
           />
         </div>
         <select
           value={filterCategorie}
           onChange={(e) => setFilterCategorie(e.target.value)}
-          className="px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+          className="px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
         >
           <option value="all">Toutes catégories</option>
           {CATEGORIES_DTU.map(cat => (
@@ -658,13 +658,13 @@ export const BaseDTU = ({ onSelectDTU, onCiteArticle }) => {
 const DTUCard = ({ dtu, isFavori, onToggleFavori, onClick, onCopy }) => {
   return (
     <Card
-      className="p-4 hover:border-[#c9a227] cursor-pointer transition-colors"
+      className="p-4 hover:border-[#2563EB] cursor-pointer transition-colors"
       onClick={onClick}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-mono text-sm font-medium text-[#c9a227]">
+            <span className="font-mono text-sm font-medium text-[#2563EB]">
               {dtu.numero}
             </span>
             <button
@@ -754,7 +754,7 @@ const ModalDTUDetail = ({ dtu, isOpen, onClose, onCiteArticle, onCopy }) => {
               {dtu.articles_cles.length > 3 && (
                 <button
                   onClick={() => setShowAllArticles(!showAllArticles)}
-                  className="text-sm text-[#c9a227] hover:underline"
+                  className="text-sm text-[#2563EB] hover:underline"
                 >
                   {showAllArticles ? 'Voir moins' : `Voir tous (${dtu.articles_cles.length})`}
                 </button>
@@ -766,7 +766,7 @@ const ModalDTUDetail = ({ dtu, isOpen, onClose, onCiteArticle, onCopy }) => {
                 <div key={i} className="p-3 bg-[#fafafa] rounded-xl">
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="font-mono text-sm font-medium text-[#c9a227]">
+                      <span className="font-mono text-sm font-medium text-[#2563EB]">
                         Art. {article.ref}
                       </span>
                       <span className="text-sm font-medium text-[#1a1a1a] ml-2">
@@ -839,7 +839,7 @@ export const DTUSearchWidget = ({ onSelect }) => {
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
           placeholder="Rechercher un DTU..."
-          className="w-full pl-10 pr-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#c9a227]"
+          className="w-full pl-10 pr-4 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#2563EB]"
         />
       </div>
 
@@ -855,7 +855,7 @@ export const DTUSearchWidget = ({ onSelect }) => {
               }}
               className="w-full px-4 py-3 text-left hover:bg-[#fafafa] border-b border-[#f5f5f5] last:border-0"
             >
-              <span className="font-mono text-sm text-[#c9a227]">{dtu.numero}</span>
+              <span className="font-mono text-sm text-[#2563EB]">{dtu.numero}</span>
               <p className="text-sm text-[#1a1a1a] truncate">{dtu.titre}</p>
             </button>
           ))}

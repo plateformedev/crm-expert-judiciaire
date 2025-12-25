@@ -339,8 +339,8 @@ const AgendaSemaine = ({ reunions, onSelectAffaire }) => {
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
-            <CalendarDays className="w-5 h-5 text-[#c9a227]" />
+          <div className="w-10 h-10 bg-[#DBEAFE] rounded-xl flex items-center justify-center">
+            <CalendarDays className="w-5 h-5 text-[#2563EB]" />
           </div>
           <div>
             <h3 className="font-medium text-[#1a1a1a]">Cette semaine</h3>
@@ -361,15 +361,15 @@ const AgendaSemaine = ({ reunions, onSelectAffaire }) => {
             <div
               key={i}
               className={`text-center py-2 rounded-lg ${
-                isToday ? 'bg-[#c9a227] text-white' :
-                hasReunion ? 'bg-[#f5e6c8] text-[#c9a227]' :
+                isToday ? 'bg-[#2563EB] text-white' :
+                hasReunion ? 'bg-[#DBEAFE] text-[#2563EB]' :
                 'bg-[#fafafa] text-[#737373]'
               }`}
             >
               <p className="text-xs">{joursLabels[i]}</p>
               <p className="text-lg font-medium">{jour.getDate()}</p>
               {hasReunion && !isToday && (
-                <div className="w-1.5 h-1.5 bg-[#c9a227] rounded-full mx-auto mt-1" />
+                <div className="w-1.5 h-1.5 bg-[#2563EB] rounded-full mx-auto mt-1" />
               )}
             </div>
           );
@@ -401,7 +401,7 @@ const AgendaSemaine = ({ reunions, onSelectAffaire }) => {
               <div
                 key={i}
                 className={`p-3 rounded-xl cursor-pointer hover:shadow-sm transition-shadow ${
-                  isToday ? 'bg-[#f5e6c8] border border-[#c9a227]' : 'bg-[#fafafa]'
+                  isToday ? 'bg-[#DBEAFE] border border-[#2563EB]' : 'bg-[#fafafa]'
                 }`}
                 onClick={() => onSelectAffaire && onSelectAffaire(reunion.affaire)}
               >
@@ -442,7 +442,7 @@ const ActionsRapides = ({ onNavigate }) => {
   return (
     <Card className="p-6">
       <h3 className="font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-        <Target className="w-5 h-5 text-[#c9a227]" />
+        <Target className="w-5 h-5 text-[#2563EB]" />
         Actions rapides
       </h3>
       <div className="grid grid-cols-2 gap-3">
@@ -457,7 +457,7 @@ const ActionsRapides = ({ onNavigate }) => {
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 ${action.color}`}>
                 <Icon className="w-5 h-5" />
               </div>
-              <p className="text-sm font-medium text-[#1a1a1a] group-hover:text-[#c9a227] transition-colors">
+              <p className="text-sm font-medium text-[#1a1a1a] group-hover:text-[#2563EB] transition-colors">
                 {action.label}
               </p>
             </button>
@@ -485,8 +485,8 @@ const AffairesRecentes = ({ affaires, onSelect, onViewAll }) => {
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
-            <Activity className="w-5 h-5 text-[#c9a227]" />
+          <div className="w-10 h-10 bg-[#DBEAFE] rounded-xl flex items-center justify-center">
+            <Activity className="w-5 h-5 text-[#2563EB]" />
           </div>
           <h3 className="font-medium text-[#1a1a1a]">Affaires récentes</h3>
         </div>
@@ -507,7 +507,7 @@ const AffairesRecentes = ({ affaires, onSelect, onViewAll }) => {
 
               {/* Infos principales */}
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm text-[#1a1a1a] truncate group-hover:text-[#c9a227]">
+                <p className="font-medium text-sm text-[#1a1a1a] truncate group-hover:text-[#2563EB]">
                   {affaire.reference}
                 </p>
                 <p className="text-xs text-[#737373] truncate">
@@ -532,7 +532,7 @@ const AffairesRecentes = ({ affaires, onSelect, onViewAll }) => {
       {affaires.length > 4 && (
         <button
           onClick={onViewAll}
-          className="w-full mt-4 py-2.5 text-sm font-medium text-[#c9a227] hover:bg-[#faf8f3] rounded-xl transition-colors"
+          className="w-full mt-4 py-2.5 text-sm font-medium text-[#2563EB] hover:bg-[#EFF6FF] rounded-xl transition-colors"
         >
           Voir toutes les affaires →
         </button>

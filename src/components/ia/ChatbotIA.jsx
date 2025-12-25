@@ -146,7 +146,7 @@ const ChatbotIA = ({ affaire, onInsert }) => {
     return (
       <button
         onClick={() => setIsExpanded(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-[#c9a227] text-white rounded-full shadow-lg flex items-center justify-center hover:bg-[#d4af37] transition-all z-50 group"
+        className="fixed bottom-6 right-6 w-14 h-14 bg-[#2563EB] text-white rounded-full shadow-lg flex items-center justify-center hover:bg-[#d4af37] transition-all z-50 group"
       >
         <Bot className="w-6 h-6 group-hover:scale-110 transition-transform" />
         <span className="absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
@@ -161,7 +161,7 @@ const ChatbotIA = ({ affaire, onInsert }) => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-[#e5e5e5] bg-gradient-to-r from-[#1a1a1a] to-[#2a2a2a] rounded-t-2xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#c9a227] rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-[#2563EB] rounded-xl flex items-center justify-center">
             <Brain className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -237,7 +237,7 @@ const ChatbotIA = ({ affaire, onInsert }) => {
                     <button
                       key={i}
                       onClick={() => handleAction(action)}
-                      className="px-3 py-1 bg-white border border-[#e5e5e5] rounded-full text-xs text-[#525252] hover:border-[#c9a227] hover:text-[#c9a227] transition-colors"
+                      className="px-3 py-1 bg-white border border-[#e5e5e5] rounded-full text-xs text-[#525252] hover:border-[#2563EB] hover:text-[#2563EB] transition-colors"
                     >
                       {action}
                     </button>
@@ -250,14 +250,14 @@ const ChatbotIA = ({ affaire, onInsert }) => {
                 <div className="flex gap-2 mt-2">
                   <button
                     onClick={() => handleCopy(msg.content)}
-                    className="text-xs text-[#a3a3a3] hover:text-[#c9a227] flex items-center gap-1"
+                    className="text-xs text-[#a3a3a3] hover:text-[#2563EB] flex items-center gap-1"
                   >
                     <Copy className="w-3 h-3" /> Copier
                   </button>
                   {onInsert && (
                     <button
                       onClick={() => handleInsert(msg.content)}
-                      className="text-xs text-[#a3a3a3] hover:text-[#c9a227] flex items-center gap-1"
+                      className="text-xs text-[#a3a3a3] hover:text-[#2563EB] flex items-center gap-1"
                     >
                       <FileText className="w-3 h-3" /> Insérer
                     </button>
@@ -272,7 +272,7 @@ const ChatbotIA = ({ affaire, onInsert }) => {
         {isLoading && (
           <div className="flex justify-start">
             <div className="bg-[#f5f5f5] rounded-2xl p-3 flex items-center gap-2">
-              <Loader2 className="w-4 h-4 text-[#c9a227] animate-spin" />
+              <Loader2 className="w-4 h-4 text-[#2563EB] animate-spin" />
               <span className="text-sm text-[#737373]">Analyse en cours...</span>
             </div>
           </div>
@@ -288,7 +288,7 @@ const ChatbotIA = ({ affaire, onInsert }) => {
             <button
               key={sug.id}
               onClick={() => handleSuggestion(sug)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#fafafa] border border-[#e5e5e5] rounded-full text-xs text-[#525252] hover:border-[#c9a227] whitespace-nowrap transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#fafafa] border border-[#e5e5e5] rounded-full text-xs text-[#525252] hover:border-[#2563EB] whitespace-nowrap transition-colors"
             >
               <Icon className="w-3 h-3" />
               {sug.label}
@@ -308,13 +308,13 @@ const ChatbotIA = ({ affaire, onInsert }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Posez votre question..."
-            className="flex-1 px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] text-sm"
+            className="flex-1 px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] text-sm"
             disabled={isLoading}
           />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="px-4 py-2 bg-[#c9a227] text-white rounded-xl hover:bg-[#d4af37] disabled:bg-[#e5e5e5] disabled:text-[#a3a3a3] transition-colors"
+            className="px-4 py-2 bg-[#2563EB] text-white rounded-xl hover:bg-[#d4af37] disabled:bg-[#e5e5e5] disabled:text-[#a3a3a3] transition-colors"
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>

@@ -153,7 +153,7 @@ export const HelpTooltip = ({
           e.stopPropagation();
           setShowTooltip(!showTooltip);
         }}
-        className="ml-1 text-[#a3a3a3] hover:text-[#c9a227] transition-colors cursor-help"
+        className="ml-1 text-[#a3a3a3] hover:text-[#2563EB] transition-colors cursor-help"
         aria-label={`Aide: ${term.titre}`}
       >
         <HelpCircle className={sizes[size]} />
@@ -168,7 +168,7 @@ export const HelpTooltip = ({
           <h4 className="font-medium text-sm text-[#1a1a1a] mb-1">{term.titre}</h4>
           <p className="text-xs text-[#525252] mb-2">{term.definition}</p>
           {term.exemple && (
-            <p className="text-xs text-[#737373] italic border-l-2 border-[#c9a227] pl-2">
+            <p className="text-xs text-[#737373] italic border-l-2 border-[#2563EB] pl-2">
               {term.exemple}
             </p>
           )}
@@ -207,7 +207,7 @@ export const HelpPanel = ({ isOpen, onClose, initialTerm }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[#e5e5e5]">
           <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-[#c9a227]" />
+            <BookOpen className="w-5 h-5 text-[#2563EB]" />
             <h2 className="font-medium text-lg">Glossaire juridique</h2>
           </div>
           <button
@@ -225,7 +225,7 @@ export const HelpPanel = ({ isOpen, onClose, initialTerm }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Rechercher un terme..."
-            className="w-full px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
           />
         </div>
 
@@ -235,7 +235,7 @@ export const HelpPanel = ({ isOpen, onClose, initialTerm }) => {
             <div className="p-4">
               <button
                 onClick={() => setSelectedTerm(null)}
-                className="text-sm text-[#c9a227] hover:underline mb-4"
+                className="text-sm text-[#2563EB] hover:underline mb-4"
               >
                 ← Retour à la liste
               </button>
@@ -247,7 +247,7 @@ export const HelpPanel = ({ isOpen, onClose, initialTerm }) => {
                   {GLOSSAIRE[selectedTerm].definition}
                 </p>
                 {GLOSSAIRE[selectedTerm].exemple && (
-                  <div className="p-4 bg-[#faf8f3] rounded-xl border-l-4 border-[#c9a227]">
+                  <div className="p-4 bg-[#EFF6FF] rounded-xl border-l-4 border-[#2563EB]">
                     <p className="text-sm font-medium text-[#737373] mb-1">Exemple</p>
                     <p className="text-[#525252]">{GLOSSAIRE[selectedTerm].exemple}</p>
                   </div>
@@ -260,7 +260,7 @@ export const HelpPanel = ({ isOpen, onClose, initialTerm }) => {
                 <button
                   key={key}
                   onClick={() => setSelectedTerm(key)}
-                  className="w-full text-left p-4 hover:bg-[#faf8f3] transition-colors"
+                  className="w-full text-left p-4 hover:bg-[#EFF6FF] transition-colors"
                 >
                   <h4 className="font-medium text-[#1a1a1a] mb-1">{term.titre}</h4>
                   <p className="text-sm text-[#737373] line-clamp-2">{term.definition}</p>
@@ -277,7 +277,7 @@ export const HelpPanel = ({ isOpen, onClose, initialTerm }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[#e5e5e5] bg-[#faf8f3]">
+        <div className="p-4 border-t border-[#e5e5e5] bg-[#EFF6FF]">
           <p className="text-xs text-[#737373] text-center">
             Ce glossaire est fourni à titre indicatif. Pour toute question juridique,
             consultez un professionnel du droit.
@@ -296,7 +296,7 @@ export const HelpButton = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="fixed bottom-4 left-4 w-12 h-12 bg-[#c9a227] text-white rounded-full shadow-lg hover:bg-[#d4af37] transition-colors flex items-center justify-center z-40"
+      className="fixed bottom-4 left-4 w-12 h-12 bg-[#2563EB] text-white rounded-full shadow-lg hover:bg-[#d4af37] transition-colors flex items-center justify-center z-40"
       aria-label="Ouvrir l'aide"
     >
       <HelpCircle className="w-6 h-6" />

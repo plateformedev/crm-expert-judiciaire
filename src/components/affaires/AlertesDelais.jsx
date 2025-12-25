@@ -314,7 +314,7 @@ export const AlertesDelais = ({ affaire, onAction, compact = false }) => {
       {/* En-tête */}
       <div className="p-4 bg-[#f7f7f7] border-b border-[#e5e5e5] flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[#c9a227] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-[#2563EB] flex items-center justify-center">
             <Bell className="w-5 h-5 text-white" />
           </div>
           <div>

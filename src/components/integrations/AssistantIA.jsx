@@ -367,7 +367,7 @@ export const AssistantIA = ({ affaire, onInsertText, expanded = false }) => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-[#e5e5e5]">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#c9a227] to-[#a88620] rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-gradient-to-br from-[#2563EB] to-[#a88620] rounded-xl flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -413,7 +413,7 @@ export const AssistantIA = ({ affaire, onInsertText, expanded = false }) => {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center">
-            <Sparkles className="w-12 h-12 text-[#c9a227] mb-4" />
+            <Sparkles className="w-12 h-12 text-[#2563EB] mb-4" />
             <h4 className="font-medium text-[#1a1a1a] mb-2">
               Comment puis-je vous aider ?
             </h4>
@@ -461,7 +461,7 @@ export const AssistantIA = ({ affaire, onInsertText, expanded = false }) => {
             onClick={() => setShowTypes(!showTypes)}
             className="flex items-center gap-2 px-3 py-1.5 bg-[#f5f5f5] rounded-lg text-sm hover:bg-[#e5e5e5] transition-colors"
           >
-            {selectedTypeInfo && <selectedTypeInfo.icon className="w-4 h-4 text-[#c9a227]" />}
+            {selectedTypeInfo && <selectedTypeInfo.icon className="w-4 h-4 text-[#2563EB]" />}
             <span>{selectedTypeInfo?.label}</span>
             <ChevronDown className={`w-4 h-4 transition-transform ${showTypes ? 'rotate-180' : ''}`} />
           </button>
@@ -478,7 +478,7 @@ export const AssistantIA = ({ affaire, onInsertText, expanded = false }) => {
                   className={`w-full flex items-start gap-3 p-3 hover:bg-[#fafafa] transition-colors
                              ${type.id === selectedType ? 'bg-[#fafafa]' : ''}`}
                 >
-                  <type.icon className={`w-5 h-5 ${type.id === selectedType ? 'text-[#c9a227]' : 'text-[#737373]'}`} />
+                  <type.icon className={`w-5 h-5 ${type.id === selectedType ? 'text-[#2563EB]' : 'text-[#737373]'}`} />
                   <div className="text-left">
                     <div className="font-medium text-sm">{type.label}</div>
                     <div className="text-xs text-[#a3a3a3]">{type.description}</div>
@@ -499,7 +499,7 @@ export const AssistantIA = ({ affaire, onInsertText, expanded = false }) => {
             placeholder="Décrivez ce que vous souhaitez rédiger..."
             rows={2}
             className="flex-1 px-4 py-3 border border-[#e5e5e5] rounded-xl resize-none
-                       focus:outline-none focus:border-[#c9a227]"
+                       focus:outline-none focus:border-[#2563EB]"
           />
           <Button
             variant="primary"
@@ -531,7 +531,7 @@ const MessageBubble = ({ message, onCopy, onInsert }) => {
   if (message.role === 'user') {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[80%] bg-[#c9a227] text-white rounded-2xl rounded-br-md px-4 py-3">
+        <div className="max-w-[80%] bg-[#2563EB] text-white rounded-2xl rounded-br-md px-4 py-3">
           <div className="text-sm whitespace-pre-wrap">{message.content}</div>
           <div className="flex items-center gap-2 mt-2 text-xs opacity-70">
             {TYPES_ASSISTANCE.find(t => t.id === message.type)?.label}

@@ -452,7 +452,7 @@ export const TimelineDossier = ({ affaire }) => {
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-3 py-2 border border-[#e5e5e5] rounded-xl text-sm focus:outline-none focus:border-[#c9a227]"
+            className="px-3 py-2 border border-[#e5e5e5] rounded-xl text-sm focus:outline-none focus:border-[#2563EB]"
           >
             <option value="tous">Tous les événements</option>
             {typesPresents.map(type => (
@@ -501,7 +501,7 @@ export const TimelineDossier = ({ affaire }) => {
       )}
 
       {/* Résumé rapide */}
-      <Card className="p-4 bg-[#faf8f3]">
+      <Card className="p-4 bg-[#EFF6FF]">
         <h3 className="text-sm font-medium text-[#1a1a1a] mb-3">Résumé</h3>
         <div className="flex flex-wrap gap-3">
           {Object.entries(TYPES_EVENEMENT).map(([type, config]) => {
@@ -515,7 +515,7 @@ export const TimelineDossier = ({ affaire }) => {
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors ${
                   filterType === type
                     ? `${config.bgColor} ${config.borderColor} border-2`
-                    : 'bg-white border-[#e5e5e5] hover:border-[#c9a227]'
+                    : 'bg-white border-[#e5e5e5] hover:border-[#2563EB]'
                 }`}
               >
                 <config.icon className={`w-4 h-4 ${config.textColor}`} />

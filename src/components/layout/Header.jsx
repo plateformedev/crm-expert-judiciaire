@@ -218,7 +218,7 @@ const Header = ({
             onClick={() => setShowProfile(!showProfile)}
             className="flex items-center gap-2 hover:bg-[#f0f0f0] active:bg-[#e4e4e4] rounded-xl p-1.5 transition-colors"
           >
-            <div className="w-10 h-10 bg-[#c9a227] rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#2563EB] rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-[15px]">
                 {user.nom.charAt(0).toUpperCase()}
               </span>
@@ -230,7 +230,7 @@ const Header = ({
             <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.12)] border border-[#e0e0e0] z-50 overflow-hidden">
               <div className="p-5 bg-[#f7f7f7] border-b border-[#e0e0e0]">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-[#c9a227] rounded-2xl flex items-center justify-center">
+                  <div className="w-14 h-14 bg-[#2563EB] rounded-2xl flex items-center justify-center">
                     <span className="text-white font-bold text-xl">
                       {user.nom.charAt(0).toUpperCase()}
                     </span>

@@ -178,7 +178,7 @@ export const ConformiteModule = ({ affaire, onUpdate }) => {
                 type="checkbox"
                 checked={verifications[activeSection]?.[item.key] || false}
                 onChange={() => handleCheck(activeSection, item.key)}
-                className="mt-0.5 w-5 h-5 rounded border-[#d4d4d4] text-[#c9a227] focus:ring-[#c9a227]"
+                className="mt-0.5 w-5 h-5 rounded border-[#d4d4d4] text-[#2563EB] focus:ring-[#2563EB]"
               />
               <div className="flex-1">
                 <p className={`text-sm ${verifications[activeSection]?.[item.key] ? 'text-green-700' : 'text-[#1a1a1a]'}`}>
@@ -223,7 +223,7 @@ export const ProtectionModule = ({ affaire, onUpdate }) => {
       <Card className="p-6 bg-gradient-to-r from-[#1a1a1a] to-[#2a2a2a]">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Shield className="w-8 h-8 text-[#c9a227]" />
+            <Shield className="w-8 h-8 text-[#2563EB]" />
             <div>
               <h3 className="text-white font-medium">Score de protection</h3>
               <p className="text-[#a3a3a3] text-sm">Niveau de sécurisation de votre mission</p>
@@ -260,7 +260,7 @@ export const ProtectionModule = ({ affaire, onUpdate }) => {
                 type="checkbox"
                 checked={verifications[item.key] || false}
                 onChange={() => handleCheck(item.key)}
-                className="mt-0.5 w-5 h-5 rounded border-[#d4d4d4] text-[#c9a227] focus:ring-[#c9a227]"
+                className="mt-0.5 w-5 h-5 rounded border-[#d4d4d4] text-[#2563EB] focus:ring-[#2563EB]"
               />
               <div className="flex-1">
                 <p className={`text-sm ${verifications[item.key] ? 'text-green-700' : 'text-[#1a1a1a]'}`}>
@@ -310,12 +310,12 @@ export const DTUModule = () => {
           placeholder="Rechercher un DTU..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+          className="flex-1 px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
         />
         <select
           value={categorie}
           onChange={(e) => setCategorie(e.target.value)}
-          className="px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+          className="px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
         >
           <option value="all">Toutes catégories</option>
           {categories.map(cat => (
@@ -327,7 +327,7 @@ export const DTUModule = () => {
       {/* Liste DTU */}
       <div className="grid gap-4">
         {dtuFiltres.map(dtu => (
-          <Card key={dtu.numero} className="p-4 hover:border-[#c9a227] cursor-pointer transition-colors">
+          <Card key={dtu.numero} className="p-4 hover:border-[#2563EB] cursor-pointer transition-colors">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
@@ -374,15 +374,15 @@ export const JurisprudenceModule = () => {
         placeholder="Rechercher par thème..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+        className="w-full px-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
       />
 
       <div className="space-y-4">
         {jurisprudenceFiltree.map((juris, idx) => (
           <Card key={idx} className="p-4">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center flex-shrink-0">
-                <Gavel className="w-5 h-5 text-[#c9a227]" />
+              <div className="w-10 h-10 bg-[#DBEAFE] rounded-xl flex items-center justify-center flex-shrink-0">
+                <Gavel className="w-5 h-5 text-[#2563EB]" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
@@ -439,7 +439,7 @@ export const QualificationModule = ({ onSelect }) => {
           <Badge variant="gold" size="lg" className="mb-3">{result.label}</Badge>
           <p className="text-[#525252] mb-4">{result.description}</p>
           <div className="flex items-center gap-2">
-            <Scale className="w-4 h-4 text-[#c9a227]" />
+            <Scale className="w-4 h-4 text-[#2563EB]" />
             <span className="text-sm font-medium text-[#1a1a1a]">
               Garantie : {result.garantie}
             </span>
@@ -475,7 +475,7 @@ export const QualificationModule = ({ onSelect }) => {
   return (
     <Card className="p-6">
       <div className="flex items-center gap-3 mb-6">
-        <Target className="w-6 h-6 text-[#c9a227]" />
+        <Target className="w-6 h-6 text-[#2563EB]" />
         <h3 className="font-medium text-[#1a1a1a]">Assistant de qualification</h3>
       </div>
 
@@ -552,7 +552,7 @@ export const ImputabiliteModule = ({ affaire, onUpdate }) => {
                 max="100"
                 value={repartition[critere.id] || 0}
                 onChange={(e) => handleChange(critere.id, e.target.value)}
-                className="flex-1 accent-[#c9a227]"
+                className="flex-1 accent-[#2563EB]"
               />
               <span className="w-12 text-right font-medium text-[#1a1a1a]">
                 {repartition[critere.id] || 0}%
@@ -611,7 +611,7 @@ export const OpalexeModule = ({ affaire }) => {
                 type="checkbox"
                 checked={verifications[item.key] || false}
                 onChange={() => handleCheck(item.key)}
-                className="mt-0.5 w-5 h-5 rounded border-[#d4d4d4] text-[#c9a227] focus:ring-[#c9a227]"
+                className="mt-0.5 w-5 h-5 rounded border-[#d4d4d4] text-[#2563EB] focus:ring-[#2563EB]"
               />
               <span className={`text-sm ${verifications[item.key] ? 'text-green-700' : 'text-[#1a1a1a]'}`}>
                 {item.label}

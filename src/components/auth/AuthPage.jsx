@@ -49,10 +49,10 @@ export const LoginPage = ({ onSwitchToRegister }) => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-[#1a1a1a] rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Scale className="w-8 h-8 text-[#c9a227]" />
+            <Scale className="w-8 h-8 text-[#2563EB]" />
           </div>
           <h1 className="text-2xl font-light text-[#1a1a1a]">
-            Expert<span className="text-[#c9a227]">.</span>CRM
+            Expert<span className="text-[#2563EB]">.</span>CRM
           </h1>
           <p className="text-[#737373] mt-2">Connexion à votre espace</p>
         </div>
@@ -110,7 +110,7 @@ export const LoginPage = ({ onSwitchToRegister }) => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="expert@example.com"
                   required
-                  className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] transition-colors"
+                  className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] transition-colors"
                 />
               </div>
             </div>
@@ -129,7 +129,7 @@ export const LoginPage = ({ onSwitchToRegister }) => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     required
-                    className="w-full pl-12 pr-12 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] transition-colors"
+                    className="w-full pl-12 pr-12 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] transition-colors"
                   />
                   <button
                     type="button"
@@ -165,7 +165,7 @@ export const LoginPage = ({ onSwitchToRegister }) => {
           {mode === 'password' && (
             <button
               onClick={() => { setMode('reset'); clearError(); setMessage(''); }}
-              className="w-full mt-4 text-sm text-[#737373] hover:text-[#c9a227] transition-colors"
+              className="w-full mt-4 text-sm text-[#737373] hover:text-[#2563EB] transition-colors"
             >
               Mot de passe oublié ?
             </button>
@@ -174,7 +174,7 @@ export const LoginPage = ({ onSwitchToRegister }) => {
           {mode === 'reset' && (
             <button
               onClick={() => { setMode('password'); clearError(); setMessage(''); }}
-              className="w-full mt-4 text-sm text-[#737373] hover:text-[#c9a227] transition-colors"
+              className="w-full mt-4 text-sm text-[#737373] hover:text-[#2563EB] transition-colors"
             >
               Retour à la connexion
             </button>
@@ -186,7 +186,7 @@ export const LoginPage = ({ onSwitchToRegister }) => {
           Pas encore de compte ?{' '}
           <button
             onClick={onSwitchToRegister}
-            className="text-[#c9a227] hover:underline font-medium"
+            className="text-[#2563EB] hover:underline font-medium"
           >
             Créer un compte
           </button>
@@ -244,10 +244,10 @@ export const RegisterPage = ({ onSwitchToLogin }) => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-[#1a1a1a] rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Scale className="w-8 h-8 text-[#c9a227]" />
+            <Scale className="w-8 h-8 text-[#2563EB]" />
           </div>
           <h1 className="text-2xl font-light text-[#1a1a1a]">
-            Expert<span className="text-[#c9a227]">.</span>CRM
+            Expert<span className="text-[#2563EB]">.</span>CRM
           </h1>
           <p className="text-[#737373] mt-2">Créer votre compte expert</p>
         </div>
@@ -280,7 +280,7 @@ export const RegisterPage = ({ onSwitchToLogin }) => {
                   onChange={(e) => setNom(e.target.value)}
                   placeholder="Dupont"
                   required
-                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] transition-colors"
+                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] transition-colors"
                 />
               </div>
               <div>
@@ -292,7 +292,7 @@ export const RegisterPage = ({ onSwitchToLogin }) => {
                   value={prenom}
                   onChange={(e) => setPrenom(e.target.value)}
                   placeholder="Jean"
-                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] transition-colors"
+                  className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] transition-colors"
                 />
               </div>
             </div>
@@ -310,7 +310,7 @@ export const RegisterPage = ({ onSwitchToLogin }) => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="expert@example.com"
                   required
-                  className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] transition-colors"
+                  className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] transition-colors"
                 />
               </div>
             </div>
@@ -329,7 +329,7 @@ export const RegisterPage = ({ onSwitchToLogin }) => {
                   placeholder="••••••••"
                   required
                   minLength={8}
-                  className="w-full pl-12 pr-12 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] transition-colors"
+                  className="w-full pl-12 pr-12 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] transition-colors"
                 />
                 <button
                   type="button"
@@ -355,7 +355,7 @@ export const RegisterPage = ({ onSwitchToLogin }) => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] transition-colors"
+                  className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] transition-colors"
                 />
               </div>
             </div>
@@ -364,7 +364,7 @@ export const RegisterPage = ({ onSwitchToLogin }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#c9a227] text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-[#d4af37] disabled:bg-[#a3a3a3] transition-colors"
+              className="w-full py-3 bg-[#2563EB] text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-[#d4af37] disabled:bg-[#a3a3a3] transition-colors"
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -383,7 +383,7 @@ export const RegisterPage = ({ onSwitchToLogin }) => {
           Déjà un compte ?{' '}
           <button
             onClick={onSwitchToLogin}
-            className="text-[#c9a227] hover:underline font-medium"
+            className="text-[#2563EB] hover:underline font-medium"
           >
             Se connecter
           </button>

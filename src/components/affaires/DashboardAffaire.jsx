@@ -172,7 +172,7 @@ const PhaseIndicator = ({ phase, status, isActive, onClick }) => {
 
   const getStatusStyle = () => {
     if (status === 'completed') return 'bg-green-500 text-white ring-green-500';
-    if (status === 'in-progress') return 'bg-[#c9a227] text-white ring-[#c9a227] animate-pulse';
+    if (status === 'in-progress') return 'bg-[#2563EB] text-white ring-[#2563EB] animate-pulse';
     return 'bg-gray-100 text-gray-400 ring-gray-200';
   };
 
@@ -181,7 +181,7 @@ const PhaseIndicator = ({ phase, status, isActive, onClick }) => {
       onClick={onClick}
       className={`
         flex flex-col items-center gap-2 p-3 rounded-2xl transition-all min-w-[80px]
-        ${isActive ? 'bg-[#fef9e7] ring-2 ring-[#c9a227]' : 'hover:bg-gray-50'}
+        ${isActive ? 'bg-[#fef9e7] ring-2 ring-[#2563EB]' : 'hover:bg-gray-50'}
       `}
     >
       <div className={`w-12 h-12 rounded-full flex items-center justify-center ring-2 ${getStatusStyle()}`}>
@@ -193,7 +193,7 @@ const PhaseIndicator = ({ phase, status, isActive, onClick }) => {
       </div>
       <span className={`text-xs font-medium text-center ${
         status === 'completed' ? 'text-green-600' :
-        status === 'in-progress' ? 'text-[#c9a227]' :
+        status === 'in-progress' ? 'text-[#2563EB]' :
         'text-gray-500'
       }`}>
         {phase.label}
@@ -213,7 +213,7 @@ const KpiCard = ({ icon: Icon, label, value, variant = 'default', onClick }) => 
     warning: 'bg-amber-50 text-amber-600',
     error: 'bg-red-50 text-red-600',
     info: 'bg-blue-50 text-blue-600',
-    gold: 'bg-[#fef9e7] text-[#c9a227]'
+    gold: 'bg-[#fef9e7] text-[#2563EB]'
   };
 
   return (
@@ -494,13 +494,13 @@ export const DashboardAffaire = ({ affaire, onAction, onNavigate }) => {
       {/* Dashboard principal */}
       <Card className="p-0 overflow-hidden">
         {/* Header avec action recommandée */}
-        <div className="p-5 bg-gradient-to-r from-[#faf8f3] to-white border-b border-[#e5e5e5]">
+        <div className="p-5 bg-gradient-to-r from-[#EFF6FF] to-white border-b border-[#e5e5e5]">
           <div className="flex items-center justify-between gap-6">
             {/* Action recommandée */}
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <Zap className="w-4 h-4 text-[#c9a227]" />
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#c9a227]">
+                <Zap className="w-4 h-4 text-[#2563EB]" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#2563EB]">
                   Prochaine étape
                 </span>
               </div>
@@ -508,11 +508,11 @@ export const DashboardAffaire = ({ affaire, onAction, onNavigate }) => {
               {nextAction && nextAction.priority !== 'none' ? (
                 <button
                   onClick={handleActionClick}
-                  className="group flex items-center gap-4 p-4 bg-white rounded-2xl border-2 border-[#c9a227] hover:bg-[#fef9e7] transition-all w-full text-left"
+                  className="group flex items-center gap-4 p-4 bg-white rounded-2xl border-2 border-[#2563EB] hover:bg-[#fef9e7] transition-all w-full text-left"
                 >
                   <div className={`
                     w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0
-                    ${nextAction.priority === 'high' ? 'bg-[#c9a227] text-white' : 'bg-[#fef9e7] text-[#c9a227]'}
+                    ${nextAction.priority === 'high' ? 'bg-[#2563EB] text-white' : 'bg-[#fef9e7] text-[#2563EB]'}
                   `}>
                     <ActionIcon className="w-7 h-7" />
                   </div>
@@ -520,7 +520,7 @@ export const DashboardAffaire = ({ affaire, onAction, onNavigate }) => {
                     <h3 className="font-semibold text-[#1a1a1a] text-lg">{nextAction.label}</h3>
                     <p className="text-sm text-[#737373]">{nextAction.description}</p>
                   </div>
-                  <ChevronRight className="w-6 h-6 text-[#c9a227] group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="w-6 h-6 text-[#2563EB] group-hover:translate-x-1 transition-transform" />
                 </button>
               ) : (
                 <div className="flex items-center gap-4 p-4 bg-green-50 rounded-2xl border-2 border-green-200">
@@ -548,7 +548,7 @@ export const DashboardAffaire = ({ affaire, onAction, onNavigate }) => {
                   <circle
                     cx="40" cy="40" r="36"
                     fill="none"
-                    stroke="#c9a227"
+                    stroke="#2563EB"
                     strokeWidth="6"
                     strokeLinecap="round"
                     strokeDasharray={`${progression * 2.26} 226`}

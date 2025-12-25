@@ -242,7 +242,7 @@ const SectionEditable = ({ section, contenu, onChange, onGenerate, isGenerating 
     <Card className={`overflow-hidden ${hasContent ? 'border-green-200' : ''}`}>
       {/* En-tête */}
       <div
-        className="p-4 bg-[#faf8f3] cursor-pointer flex items-center justify-between"
+        className="p-4 bg-[#EFF6FF] cursor-pointer flex items-center justify-between"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
@@ -285,7 +285,7 @@ const SectionEditable = ({ section, contenu, onChange, onGenerate, isGenerating 
             value={contenu || ''}
             onChange={(e) => onChange(section.id, e.target.value)}
             rows={10}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] font-mono text-sm"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] font-mono text-sm"
             placeholder={`Rédigez la section "${section.titre}"...`}
           />
 
@@ -418,11 +418,11 @@ export const ModuleCompteRendu = ({ affaire, reunion, expert, onUpdate, onClose 
           <div className="flex items-center gap-3 bg-white/10 rounded-lg px-4 py-2">
             <div className="w-32 h-2 bg-white/20 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#c9a227] transition-all"
+                className="h-full bg-[#2563EB] transition-all"
                 style={{ width: `${progression}%` }}
               />
             </div>
-            <span className="text-lg font-mono text-[#c9a227]">{progression}%</span>
+            <span className="text-lg font-mono text-[#2563EB]">{progression}%</span>
           </div>
 
           <Button
@@ -447,7 +447,7 @@ export const ModuleCompteRendu = ({ affaire, reunion, expert, onUpdate, onClose 
             icon={Save}
             onClick={handleSave}
             loading={saving}
-            className="bg-[#c9a227] hover:bg-[#b8922a]"
+            className="bg-[#2563EB] hover:bg-[#b8922a]"
           >
             Enregistrer
           </Button>
@@ -485,7 +485,7 @@ export const ModuleCompteRendu = ({ affaire, reunion, expert, onUpdate, onClose 
           <div className="grid grid-cols-4 gap-4">
             <Card className="p-3">
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-[#c9a227]" />
+                <Users className="w-4 h-4 text-[#2563EB]" />
                 <div>
                   <p className="text-xs text-[#737373]">Présents</p>
                   <p className="font-medium text-[#1a1a1a]">{reunion?.presents?.length || 0}</p>
@@ -494,7 +494,7 @@ export const ModuleCompteRendu = ({ affaire, reunion, expert, onUpdate, onClose 
             </Card>
             <Card className="p-3">
               <div className="flex items-center gap-2">
-                <Camera className="w-4 h-4 text-[#c9a227]" />
+                <Camera className="w-4 h-4 text-[#2563EB]" />
                 <div>
                   <p className="text-xs text-[#737373]">Photos</p>
                   <p className="font-medium text-[#1a1a1a]">{reunion?.photos?.length || 0}</p>
@@ -503,7 +503,7 @@ export const ModuleCompteRendu = ({ affaire, reunion, expert, onUpdate, onClose 
             </Card>
             <Card className="p-3">
               <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#c9a227]" />
+                <FileText className="w-4 h-4 text-[#2563EB]" />
                 <div>
                   <p className="text-xs text-[#737373]">Notes</p>
                   <p className="font-medium text-[#1a1a1a]">
@@ -514,7 +514,7 @@ export const ModuleCompteRendu = ({ affaire, reunion, expert, onUpdate, onClose 
             </Card>
             <Card className="p-3">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#c9a227]" />
+                <Clock className="w-4 h-4 text-[#2563EB]" />
                 <div>
                   <p className="text-xs text-[#737373]">Durée</p>
                   <p className="font-medium text-[#1a1a1a]">
@@ -529,17 +529,17 @@ export const ModuleCompteRendu = ({ affaire, reunion, expert, onUpdate, onClose 
           {previewMode ? (
             <Card className="p-6">
               <h3 className="text-lg font-medium text-[#1a1a1a] mb-4 flex items-center gap-2">
-                <Eye className="w-5 h-5 text-[#c9a227]" />
+                <Eye className="w-5 h-5 text-[#2563EB]" />
                 Aperçu du compte-rendu
               </h3>
-              <pre className="whitespace-pre-wrap font-mono text-sm text-[#525252] bg-[#faf8f3] p-6 rounded-xl">
+              <pre className="whitespace-pre-wrap font-mono text-sm text-[#525252] bg-[#EFF6FF] p-6 rounded-xl">
                 {generateFullDocument() || '[Aucun contenu - Commencez par générer ou rédiger les sections]'}
               </pre>
             </Card>
           ) : (
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-[#1a1a1a] flex items-center gap-2">
-                <Edit className="w-5 h-5 text-[#c9a227]" />
+                <Edit className="w-5 h-5 text-[#2563EB]" />
                 Sections du compte-rendu ({SECTIONS_COMPTE_RENDU.length})
               </h3>
 
