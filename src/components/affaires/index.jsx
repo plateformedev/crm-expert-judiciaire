@@ -45,6 +45,17 @@ import { AlertesDelais } from './AlertesDelais';
 import { TableauContradictoire } from './TableauContradictoire';
 import { CycleReunion } from './CycleReunion';
 
+// Phase 5 - Intégrations externes
+import {
+  AdresseAutocomplete,
+  FormulaireAdresse,
+  LienGoogleMaps,
+  AR24Widget,
+  OpalexeWidget,
+  AssistantIAWidget,
+  SuiviLaPosteWidget
+} from '../integrations';
+
 // ============================================================================
 // LISTE DES AFFAIRES
 // ============================================================================
@@ -1550,6 +1561,21 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
         {/* Suivi du contradictoire : qui a reçu quoi, dires, documents */}
         {activeTab === 'contradictoire' && (
           <div className="space-y-6">
+            {/* Barre d'outils envois et suivi */}
+            <Card className="p-4 bg-gradient-to-r from-blue-50 to-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-[#1a1a1a]">Outils d'envoi</h4>
+                  <p className="text-sm text-[#737373]">LRAR dématérialisées et suivi postal</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AR24Widget affaire={affaire} />
+                  <SuiviLaPosteWidget affaire={affaire} />
+                  <OpalexeWidget affaire={affaire} />
+                </div>
+              </div>
+            </Card>
+
             {/* Tableau de suivi contradictoire */}
             <TableauContradictoire
               affaire={affaire}
@@ -1912,13 +1938,22 @@ const TabGeneral = ({ affaire }) => (
           <span className="text-[#737373]">Type</span>
           <span className="font-medium">{affaire.bien_type || 'N/C'}</span>
         </div>
-        <div className="flex justify-between">
+        <div className="flex justify-between items-start">
           <span className="text-[#737373]">Adresse</span>
-          <span className="font-medium text-right">{affaire.bien_adresse || 'N/C'}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-[#737373]">Ville</span>
-          <span className="font-medium">{affaire.bien_code_postal} {affaire.bien_ville}</span>
+          <div className="text-right">
+            <span className="font-medium">{affaire.bien_adresse || 'N/C'}</span>
+            <div className="font-medium">{affaire.bien_code_postal} {affaire.bien_ville}</div>
+            {(affaire.bien_adresse || affaire.bien_ville) && (
+              <LienGoogleMaps
+                adresse={`${affaire.bien_adresse || ''}, ${affaire.bien_code_postal || ''} ${affaire.bien_ville || ''}`}
+                variant="button"
+                size="sm"
+                className="mt-2"
+              >
+                Voir sur Maps
+              </LienGoogleMaps>
+            )}
+          </div>
         </div>
       </div>
     </Card>
@@ -2616,9 +2651,30 @@ const TabDocuments = ({ affaire, onDownload }) => (
 
 const TabRapports = ({ affaire, onUpdate }) => {
   const [activeRapport, setActiveRapport] = useState('note-synthese'); // 'note-synthese' | 'rapport-final'
+  const [textToInsert, setTextToInsert] = useState(null);
+
+  // Fonction pour insérer le texte généré par l'IA dans l'éditeur actif
+  const handleInsertText = (text) => {
+    setTextToInsert(text);
+    // Le texte sera récupéré par l'éditeur actif
+  };
 
   return (
     <div className="space-y-6">
+      {/* Barre d'outils intégrations */}
+      <Card className="p-4 bg-gradient-to-r from-[#faf8f3] to-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="font-medium text-[#1a1a1a]">Outils de rédaction</h4>
+            <p className="text-sm text-[#737373]">Assistance IA et échanges avec la juridiction</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <AssistantIAWidget affaire={affaire} onInsertText={handleInsertText} />
+            <OpalexeWidget affaire={affaire} />
+          </div>
+        </div>
+      </Card>
+
       {/* Sélection du type de rapport */}
       <Card className="p-4">
         <div className="flex gap-4">
@@ -3576,28 +3632,20 @@ const ModalAjoutPartie = ({ affaireId, onClose, onSuccess }) => {
           />
         </div>
 
-        {/* Adresse */}
-        <Input
-          label="Adresse"
-          value={data.adresse}
-          onChange={(e) => handleChange('adresse', e.target.value)}
-          placeholder="Numéro et nom de rue"
+        {/* Adresse avec autocomplete Google/API Adresse */}
+        <FormulaireAdresse
+          value={{
+            adresse: data.adresse,
+            codePostal: data.code_postal,
+            ville: data.ville
+          }}
+          onChange={(adresseData) => {
+            handleChange('adresse', adresseData.adresse);
+            handleChange('code_postal', adresseData.codePostal);
+            handleChange('ville', adresseData.ville);
+          }}
+          showMapsLink={true}
         />
-        <div className="grid grid-cols-3 gap-4">
-          <Input
-            label="Code postal"
-            value={data.code_postal}
-            onChange={(e) => handleChange('code_postal', e.target.value)}
-            placeholder="75001"
-          />
-          <Input
-            label="Ville"
-            value={data.ville}
-            onChange={(e) => handleChange('ville', e.target.value)}
-            placeholder="Paris"
-            className="col-span-2"
-          />
-        </div>
 
         {/* Avocat */}
         <div className="border-t border-[#e5e5e5] pt-4">
