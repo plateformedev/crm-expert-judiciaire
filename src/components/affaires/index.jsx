@@ -2,7 +2,7 @@
 // CRM EXPERT JUDICIAIRE - COMPOSANTS AFFAIRES
 // ============================================================================
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Folder, Plus, Search, Filter, ChevronRight, Clock, MapPin,
@@ -12,7 +12,8 @@ import {
   Wand2, Calculator, BookOpen, Shield, Target, ChevronDown, RotateCcw,
   Timer, Play, Square, Banknote, CircleDot, ArrowRight,
   Archive, PauseCircle, MoreHorizontal, Mic, StopCircle,
-  FlaskConical, FileCheck, MessageSquare, Bell
+  FlaskConical, FileCheck, MessageSquare, Bell,
+  ArrowUpDown, ArrowUp, ArrowDown
 } from 'lucide-react';
 import { Card, Badge, Button, Input, Select, Tabs, ProgressBar, EmptyState, ModalBase, useToast } from '../ui';
 import { useAffaires, useAffaireDetail, useParties } from '../../hooks/useSupabase';
@@ -69,18 +70,34 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
   const [actionMenuId, setActionMenuId] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null); // { type: 'delete'|'archive'|'suspend', affaire: {} }
 
-  // État des filtres
-  const [filters, setFilters] = useState({
-    statut: 'all',
-    urgent: 'all', // 'all', 'oui', 'non'
-    tribunal: 'all',
-    ville: 'all',
-    echeance: 'all', // 'all', 'depassee', 'semaine', 'mois', 'trimestre'
-    progression: 'all', // 'all', '0-25', '25-50', '50-75', '75-100'
-    avecParties: 'all', // 'all', 'oui', 'non'
-    avecReunions: 'all',
-    avecDesordres: 'all'
+  // État du tri par colonnes
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+
+  // État des filtres (chargement depuis localStorage)
+  const [filters, setFilters] = useState(() => {
+    try {
+      const saved = localStorage.getItem('affaires_filters');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {
+      statut: 'all',
+      urgent: 'all',
+      tribunal: 'all',
+      ville: 'all',
+      echeance: 'all',
+      progression: 'all',
+      avecParties: 'all',
+      avecReunions: 'all',
+      avecDesordres: 'all'
+    };
   });
+
+  // Sauvegarder les filtres dans localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('affaires_filters', JSON.stringify(filters));
+    } catch {}
+  }, [filters]);
 
   // Extraire les valeurs uniques pour les dropdowns
   const uniqueValues = useMemo(() => ({
@@ -196,6 +213,52 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
     });
   }, [affaires, search, filters]);
 
+  // Tri des affaires filtrées
+  const affairesTriees = useMemo(() => {
+    if (!sortConfig.key) return affairesFiltrees;
+
+    return [...affairesFiltrees].sort((a, b) => {
+      let aVal, bVal;
+
+      switch (sortConfig.key) {
+        case 'reference': aVal = a.reference || ''; bVal = b.reference || ''; break;
+        case 'rg': aVal = a.rg || ''; bVal = b.rg || ''; break;
+        case 'tribunal': aVal = a.tribunal || ''; bVal = b.tribunal || ''; break;
+        case 'ville': aVal = a.bien_ville || ''; bVal = b.bien_ville || ''; break;
+        case 'statut': aVal = a.statut || ''; bVal = b.statut || ''; break;
+        case 'echeance': aVal = a.date_echeance || ''; bVal = b.date_echeance || ''; break;
+        case 'progression': aVal = calculerAvancementTunnel(a); bVal = calculerAvancementTunnel(b); break;
+        case 'parties': aVal = a.parties?.length || 0; bVal = b.parties?.length || 0; break;
+        case 'reunions': aVal = a.reunions?.length || 0; bVal = b.reunions?.length || 0; break;
+        case 'desordres': aVal = a.pathologies?.length || 0; bVal = b.pathologies?.length || 0; break;
+        case 'provision': aVal = a.provision_montant || 0; bVal = b.provision_montant || 0; break;
+        default: return 0;
+      }
+
+      if (typeof aVal === 'string') {
+        const cmp = aVal.localeCompare(bVal, 'fr', { numeric: true });
+        return sortConfig.direction === 'asc' ? cmp : -cmp;
+      }
+      return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+    });
+  }, [affairesFiltrees, sortConfig]);
+
+  // Fonction pour gérer le tri
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
+  // Icône de tri pour les en-têtes
+  const SortIcon = ({ column }) => {
+    if (sortConfig.key !== column) return <ArrowUpDown className="w-3 h-3 text-[#a3a3a3]" />;
+    return sortConfig.direction === 'asc'
+      ? <ArrowUp className="w-3 h-3 text-[#c9a227]" />
+      : <ArrowDown className="w-3 h-3 text-[#c9a227]" />;
+  };
+
   // Statistiques rapides
   const stats = useMemo(() => ({
     total: affaires.length,
@@ -213,6 +276,36 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
     }
     return result;
   };
+
+  // Export CSV des affaires filtrées
+  const handleExportCSV = useCallback(() => {
+    const headers = ['Référence', 'N° RG', 'Tribunal', 'Ville', 'Statut', 'Échéance', 'Parties', 'Réunions', 'Désordres', 'Provision'];
+    const rows = affairesTriees.map(a => [
+      a.reference || '',
+      a.rg || '',
+      a.tribunal || '',
+      a.bien_ville || '',
+      a.statut || '',
+      a.date_echeance || '',
+      a.parties?.length || 0,
+      a.reunions?.length || 0,
+      a.pathologies?.length || 0,
+      a.provision_montant || 0
+    ]);
+
+    const csvContent = [
+      headers.join(';'),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(';'))
+    ].join('\n');
+
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `affaires_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [affairesTriees]);
 
   // Gestionnaire d'actions (archiver, suspendre, supprimer)
   const handleAction = async (type, affaire) => {
@@ -321,6 +414,11 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
               Réinitialiser
             </button>
           )}
+
+          {/* Bouton export CSV */}
+          <Button variant="secondary" icon={Download} onClick={handleExportCSV}>
+            Export CSV
+          </Button>
 
           {/* Bouton nouvelle affaire */}
           <Button variant="primary" icon={Plus} onClick={() => setShowCreateModal(true)}>
@@ -571,22 +669,44 @@ export const ListeAffaires = ({ onSelectAffaire }) => {
             <table className="w-full">
               <thead className="bg-[#f7f7f7] border-b-2 border-[#e0e0e0]">
                 <tr>
-                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Référence</th>
-                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">N° RG</th>
-                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Tribunal</th>
-                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Ville</th>
-                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Statut</th>
-                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Échéance</th>
-                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Progress.</th>
-                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Parties</th>
-                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Réunions</th>
-                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Désordres</th>
-                  <th className="px-4 py-4 text-right text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Provision</th>
+                  <th onClick={() => handleSort('reference')} className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide cursor-pointer hover:bg-[#ebebeb] select-none">
+                    <span className="flex items-center gap-1">Référence <SortIcon column="reference" /></span>
+                  </th>
+                  <th onClick={() => handleSort('rg')} className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide cursor-pointer hover:bg-[#ebebeb] select-none">
+                    <span className="flex items-center gap-1">N° RG <SortIcon column="rg" /></span>
+                  </th>
+                  <th onClick={() => handleSort('tribunal')} className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide cursor-pointer hover:bg-[#ebebeb] select-none">
+                    <span className="flex items-center gap-1">Tribunal <SortIcon column="tribunal" /></span>
+                  </th>
+                  <th onClick={() => handleSort('ville')} className="px-4 py-4 text-left text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide cursor-pointer hover:bg-[#ebebeb] select-none">
+                    <span className="flex items-center gap-1">Ville <SortIcon column="ville" /></span>
+                  </th>
+                  <th onClick={() => handleSort('statut')} className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide cursor-pointer hover:bg-[#ebebeb] select-none">
+                    <span className="flex items-center justify-center gap-1">Statut <SortIcon column="statut" /></span>
+                  </th>
+                  <th onClick={() => handleSort('echeance')} className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide cursor-pointer hover:bg-[#ebebeb] select-none">
+                    <span className="flex items-center justify-center gap-1">Échéance <SortIcon column="echeance" /></span>
+                  </th>
+                  <th onClick={() => handleSort('progression')} className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide cursor-pointer hover:bg-[#ebebeb] select-none">
+                    <span className="flex items-center justify-center gap-1">Progress. <SortIcon column="progression" /></span>
+                  </th>
+                  <th onClick={() => handleSort('parties')} className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide cursor-pointer hover:bg-[#ebebeb] select-none">
+                    <span className="flex items-center justify-center gap-1">Parties <SortIcon column="parties" /></span>
+                  </th>
+                  <th onClick={() => handleSort('reunions')} className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide cursor-pointer hover:bg-[#ebebeb] select-none">
+                    <span className="flex items-center justify-center gap-1">Réunions <SortIcon column="reunions" /></span>
+                  </th>
+                  <th onClick={() => handleSort('desordres')} className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide cursor-pointer hover:bg-[#ebebeb] select-none">
+                    <span className="flex items-center justify-center gap-1">Désordres <SortIcon column="desordres" /></span>
+                  </th>
+                  <th onClick={() => handleSort('provision')} className="px-4 py-4 text-right text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide cursor-pointer hover:bg-[#ebebeb] select-none">
+                    <span className="flex items-center justify-end gap-1">Provision <SortIcon column="provision" /></span>
+                  </th>
                   <th className="px-4 py-4 text-center text-[13px] font-semibold text-[#1f1f1f] uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f0f0f0]">
-                {affairesFiltrees.map(affaire => {
+                {affairesTriees.map(affaire => {
                   const avancement = calculerAvancementTunnel(affaire);
                   const delaiRestant = affaire.date_echeance ? calculerDelaiRestant(affaire.date_echeance) : null;
 

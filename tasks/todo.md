@@ -114,33 +114,33 @@ Le tableau a déjà :
 
 ### Améliorations prévues
 
-- [ ] 9.4.1 Tri par colonnes (clic sur en-tête = tri ASC/DESC)
-- [ ] 9.4.2 Sauvegarde filtres dans localStorage
-- [ ] 9.4.3 Export CSV des affaires filtrées
+- [x] 9.4.1 Tri par colonnes (clic sur en-tête = tri ASC/DESC)
+- [x] 9.4.2 Sauvegarde filtres dans localStorage
+- [x] 9.4.3 Export CSV des affaires filtrées
 
 ### Détails techniques
 
-#### 9.4.1 Tri par colonnes
-- Ajouter état `sortConfig = { key: null, direction: 'asc' }`
-- Ajouter fonction `handleSort(key)` qui toggle ASC/DESC
-- Ajouter icône ↑↓ sur les en-têtes cliquables
-- Trier `affairesFiltrees` selon `sortConfig`
+#### 9.4.1 Tri par colonnes ✅
+- État `sortConfig = { key, direction }` ajouté
+- Fonction `handleSort(key)` toggle ASC/DESC
+- Icônes ↑↓ sur les 11 colonnes triables
+- `affairesTriees` = tri de `affairesFiltrees`
 
-#### 9.4.2 Sauvegarde filtres
-- `useEffect` pour sauver `filters` dans localStorage
-- Charger les filtres au montage depuis localStorage
+#### 9.4.2 Sauvegarde filtres ✅
+- Initialisation depuis `localStorage.getItem('affaires_filters')`
+- `useEffect` sauvegarde à chaque modification
 
-#### 9.4.3 Export CSV
-- Bouton "Exporter CSV" dans la barre d'outils
-- Génère fichier CSV avec les colonnes visibles
-- Téléchargement automatique
+#### 9.4.3 Export CSV ✅
+- Bouton "Export CSV" ajouté dans la barre d'outils
+- Génère CSV avec 10 colonnes (séparateur `;`)
+- Téléchargement automatique `affaires_YYYY-MM-DD.csv`
 
 ---
 
 ### Review Tableau
-| Amélioration | Statut | Impact |
-|--------------|--------|--------|
-| Tri colonnes | ⏳ | Fort |
-| Sauvegarde filtres | ⏳ | Moyen |
-| Export CSV | ⏳ | Fort |
+| Amélioration | Statut | Fichier |
+|--------------|--------|---------|
+| Tri colonnes | ✅ | `affaires/index.jsx` |
+| Sauvegarde filtres | ✅ | `affaires/index.jsx` |
+| Export CSV | ✅ | `affaires/index.jsx` |
 
