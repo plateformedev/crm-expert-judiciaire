@@ -61,3 +61,43 @@ Implémenter les améliorations UX inspirées de Pennylane pour rendre le CRM pl
 - ✅ Pas de régression (build OK)
 - ✅ Style cohérent avec l'existant
 
+---
+
+## CORRECTION BUGS CRITIQUES
+
+### Analyse
+
+#### Bug 1 : Heures décimales dans Statistiques
+- **Symptôme** : Affiche "4.45999999999999" au lieu de "4.46"
+- **Fichier** : `src/components/pages/PageStatistiques.jsx`, ligne 412
+- **Cause** : Somme de flottants sans arrondi → erreur de précision JavaScript
+- **Fix** : Arrondir `totalHeures` à 2 décimales
+
+#### Bug 2 : Modale OPALEXE intempestive
+- **Symptôme** : Modale s'ouvre automatiquement sur certains onglets
+- **Statut** : ⚠️ Non reproductible - besoin étapes exactes
+- **Note** : Aucun useEffect trouvé qui déclenche une modale au changement d'onglet
+
+#### Bug 3 : Carnet d'adresses en chargement infini
+- **Symptôme** : Spinner tourne indéfiniment
+- **Fichier** : `src/components/sapiteurs/index.jsx` + `src/App.jsx`
+- **Cause** : `CarnetSapiteurs` appelé sans `expertId` → le hook ne fetch jamais, `loading=true` pour toujours
+- **Fix** : Gérer le cas sans expertId (terminer loading + liste vide/démo)
+
+---
+
+### Plan de correction
+
+- [ ] Bug 1 : Arrondir totalHeures (1 ligne)
+- [ ] Bug 3 : Gérer expertId manquant dans useSapiteurs
+- [ ] Bug 2 : Investiguer si reproductible
+
+---
+
+### Review Bugs
+| Bug | Statut | Fichier | Commit |
+|-----|--------|---------|--------|
+| Heures décimales | ⏳ | - | - |
+| Carnet chargement | ⏳ | - | - |
+| Modale OPALEXE | 🔍 À investiguer | - | - |
+
