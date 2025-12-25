@@ -15,7 +15,8 @@ export {
   ProgressBar,
   Tooltip,
   EmptyState,
-  LoadingSpinner
+  LoadingSpinner,
+  DropZone
 } from './index.jsx';
 
 // Système de notifications Toast
@@ -29,3 +30,17 @@ export { HelpTooltip, HelpPanel, HelpButton, useHelp } from './HelpTooltip';
 
 // Bannière mode démonstration
 export { DemoBanner, DemoIndicator } from './DemoBanner';
+
+// Illustrations SVG pour états vides
+export {
+  IllustrationDossiers,
+  IllustrationDocuments,
+  IllustrationPhotos,
+  IllustrationRecherche,
+  IllustrationCalendrier,
+  IllustrationContacts,
+  IllustrationNotifications,
+  IllustrationSucces,
+  IllustrationErreur,
+  IllustrationDashboard
+} from './Illustrations';

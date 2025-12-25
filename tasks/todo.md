@@ -37,10 +37,10 @@ Implémenter les améliorations UX inspirées de Pennylane pour rendre le CRM pl
 
 ---
 
-## PRIORITÉ 3 - Refonte (Plus tard)
-- [ ] Zone de dépôt drag & drop visuel
-- [ ] Micro-interactions et transitions fluides
-- [ ] Illustrations personnalisées pour états vides
+## PRIORITÉ 3 - Refonte UX ✅
+- [x] Zone de dépôt drag & drop visuel (DropZone component)
+- [x] Micro-interactions et transitions fluides (animations CSS + Tailwind)
+- [x] Illustrations personnalisées pour états vides (SVG)
 
 ---
 

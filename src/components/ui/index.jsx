@@ -3,8 +3,8 @@
 // Style Samsung One UI - Simple, Contrasté, Lisible
 // ============================================================================
 
-import React from 'react';
-import { X, ChevronRight } from 'lucide-react';
+import React, { useState, useCallback, useRef } from 'react';
+import { X, ChevronRight, Upload, FileUp, CheckCircle, AlertCircle, X as XIcon, File } from 'lucide-react';
 import { DS } from '../../data';
 
 // ============================================================================
@@ -591,17 +591,20 @@ export const Tooltip = ({
 };
 
 // ============================================================================
-// EMPTY STATE - Style Professionnel
+// EMPTY STATE - Style Professionnel avec illustrations
 // ============================================================================
 
 export const EmptyState = ({
   icon: Icon,
+  illustration: Illustration, // Composant illustration SVG optionnel
+  illustrationSize = 100,
   title,
   description,
   action,
   actionLabel,
-  variant = 'default', // default, success, info
-  className = ''
+  variant = 'default', // default, success, info, search, error
+  className = '',
+  animated = true
 }) => {
   const variants = {
     default: {
@@ -615,26 +618,49 @@ export const EmptyState = ({
     info: {
       iconBg: 'bg-[#EFF6FF]',
       iconColor: 'text-[#2563EB]'
+    },
+    search: {
+      iconBg: 'bg-[#EFF6FF]',
+      iconColor: 'text-[#2563EB]'
+    },
+    error: {
+      iconBg: 'bg-[#FEF2F2]',
+      iconColor: 'text-[#DC2626]'
     }
   };
 
   const config = variants[variant] || variants.default;
 
   return (
-    <div className={`text-center py-12 px-6 ${className}`}>
-      {Icon && (
-        <div className={`w-16 h-16 ${config.iconBg} rounded-full flex items-center justify-center mx-auto mb-4`}>
+    <div className={`text-center py-12 px-6 ${animated ? 'animate-fade-in' : ''} ${className}`}>
+      {/* Illustration SVG (priorité) ou icône */}
+      {Illustration ? (
+        <div className="mx-auto mb-6 animate-bounce-soft">
+          <Illustration size={illustrationSize} />
+        </div>
+      ) : Icon && (
+        <div className={`w-16 h-16 ${config.iconBg} rounded-full flex items-center justify-center mx-auto mb-4 ${animated ? 'animate-scale-in' : ''}`}>
           <Icon className={`w-8 h-8 ${config.iconColor}`} />
         </div>
       )}
-      <h3 className="text-lg font-medium text-[#111827] mb-1">{title}</h3>
+
+      {/* Titre */}
+      <h3 className="text-lg font-medium text-[#111827] mb-2">{title}</h3>
+
+      {/* Description */}
       {description && (
-        <p className="text-[15px] text-[#6B7280] mb-4 max-w-sm mx-auto">
+        <p className="text-[15px] text-[#6B7280] mb-5 max-w-sm mx-auto leading-relaxed">
           {description}
         </p>
       )}
+
+      {/* Action */}
       {action && (
-        <Button variant="secondary" onClick={action}>
+        <Button
+          variant="primary"
+          onClick={action}
+          className="hover-lift"
+        >
           {actionLabel}
         </Button>
       )}
@@ -711,6 +737,283 @@ export const SectionHeader = ({
 );
 
 // ============================================================================
+// DROPZONE - Zone de dépôt drag & drop avec animation
+// ============================================================================
+
+export const DropZone = ({
+  onFilesDropped,
+  accept = '*/*',
+  multiple = true,
+  maxSize = 20 * 1024 * 1024, // 20 Mo par défaut
+  maxFiles = 10,
+  label = 'Glissez vos fichiers ici',
+  sublabel = 'ou cliquez pour parcourir',
+  hint = '',
+  className = '',
+  compact = false,
+  showPreview = true,
+  disabled = false
+}) => {
+  const [isDragging, setIsDragging] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [errors, setErrors] = useState([]);
+  const fileInputRef = useRef(null);
+  const dragCounter = useRef(0);
+
+  // Valider un fichier
+  const validateFile = useCallback((file) => {
+    if (maxSize && file.size > maxSize) {
+      return `${file.name} dépasse la taille max (${Math.round(maxSize / 1024 / 1024)} Mo)`;
+    }
+    if (accept !== '*/*') {
+      const acceptedTypes = accept.split(',').map(t => t.trim());
+      const isAccepted = acceptedTypes.some(type => {
+        if (type.startsWith('.')) {
+          return file.name.toLowerCase().endsWith(type.toLowerCase());
+        }
+        if (type.endsWith('/*')) {
+          return file.type.startsWith(type.replace('/*', '/'));
+        }
+        return file.type === type;
+      });
+      if (!isAccepted) {
+        return `${file.name} n'est pas un type de fichier accepté`;
+      }
+    }
+    return null;
+  }, [accept, maxSize]);
+
+  // Traiter les fichiers déposés
+  const processFiles = useCallback((fileList) => {
+    const newFiles = Array.from(fileList);
+    const validFiles = [];
+    const newErrors = [];
+
+    // Limite de fichiers
+    const availableSlots = maxFiles - files.length;
+    if (newFiles.length > availableSlots && multiple) {
+      newErrors.push(`Maximum ${maxFiles} fichiers autorisés`);
+    }
+
+    const filesToProcess = multiple ? newFiles.slice(0, availableSlots) : [newFiles[0]];
+
+    filesToProcess.forEach(file => {
+      const error = validateFile(file);
+      if (error) {
+        newErrors.push(error);
+      } else {
+        // Ajouter preview pour les images
+        if (file.type.startsWith('image/')) {
+          file.preview = URL.createObjectURL(file);
+        }
+        validFiles.push(file);
+      }
+    });
+
+    setErrors(newErrors);
+
+    if (validFiles.length > 0) {
+      const updatedFiles = multiple ? [...files, ...validFiles] : validFiles;
+      setFiles(updatedFiles);
+      onFilesDropped?.(updatedFiles);
+    }
+  }, [files, maxFiles, multiple, validateFile, onFilesDropped]);
+
+  // Gestionnaires drag & drop
+  const handleDragEnter = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current++;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  }, []);
+
+  const handleDragLeave = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current--;
+    if (dragCounter.current === 0) {
+      setIsDragging(false);
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    dragCounter.current = 0;
+
+    if (disabled) return;
+
+    const { files: droppedFiles } = e.dataTransfer;
+    if (droppedFiles?.length > 0) {
+      processFiles(droppedFiles);
+    }
+  }, [disabled, processFiles]);
+
+  // Supprimer un fichier
+  const removeFile = useCallback((index) => {
+    const newFiles = files.filter((_, i) => i !== index);
+    // Révoquer URL preview
+    if (files[index]?.preview) {
+      URL.revokeObjectURL(files[index].preview);
+    }
+    setFiles(newFiles);
+    onFilesDropped?.(newFiles);
+  }, [files, onFilesDropped]);
+
+  // Clic sur la zone
+  const handleClick = () => {
+    if (!disabled) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  // Formatage taille fichier
+  const formatSize = (bytes) => {
+    if (bytes < 1024) return `${bytes} o`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
+    return `${(bytes / 1024 / 1024).toFixed(1)} Mo`;
+  };
+
+  return (
+    <div className={`space-y-3 ${className}`}>
+      {/* Zone de dépôt */}
+      <div
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        onClick={handleClick}
+        className={`
+          relative border-2 border-dashed rounded-2xl transition-all duration-300 cursor-pointer
+          ${compact ? 'p-4' : 'p-8'}
+          ${disabled
+            ? 'border-[#e5e5e5] bg-[#f5f5f5] cursor-not-allowed opacity-60'
+            : isDragging
+              ? 'border-[#2563EB] bg-[#EFF6FF] scale-[1.02] shadow-lg shadow-[#2563EB]/20'
+              : 'border-[#e5e5e5] hover:border-[#2563EB] hover:bg-[#FAFBFF]'
+          }
+        `}
+      >
+        {/* Animation de fond pendant le drag */}
+        {isDragging && (
+          <div className="absolute inset-0 rounded-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#EFF6FF] via-[#DBEAFE] to-[#EFF6FF] animate-pulse" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-16 h-16 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin opacity-30" />
+            </div>
+          </div>
+        )}
+
+        {/* Contenu */}
+        <div className={`relative text-center ${isDragging ? 'opacity-80' : ''}`}>
+          <div className={`
+            mx-auto rounded-2xl flex items-center justify-center transition-all duration-300
+            ${compact ? 'w-12 h-12 mb-2' : 'w-16 h-16 mb-4'}
+            ${isDragging
+              ? 'bg-[#2563EB] text-white scale-110'
+              : 'bg-[#EFF6FF] text-[#2563EB]'
+            }
+          `}>
+            {isDragging ? (
+              <FileUp className={compact ? 'w-6 h-6' : 'w-8 h-8'} />
+            ) : (
+              <Upload className={compact ? 'w-6 h-6' : 'w-8 h-8'} />
+            )}
+          </div>
+
+          <p className={`font-medium text-[#1a1a1a] ${compact ? 'text-sm' : 'text-base'}`}>
+            {isDragging ? 'Déposez vos fichiers ici' : label}
+          </p>
+
+          {!isDragging && (
+            <p className={`text-[#737373] mt-1 ${compact ? 'text-xs' : 'text-sm'}`}>
+              {sublabel}
+            </p>
+          )}
+
+          {hint && !compact && (
+            <p className="text-xs text-[#a3a3a3] mt-2">{hint}</p>
+          )}
+        </div>
+
+        {/* Input caché */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={accept}
+          multiple={multiple}
+          className="hidden"
+          onChange={(e) => processFiles(e.target.files)}
+          disabled={disabled}
+        />
+      </div>
+
+      {/* Erreurs */}
+      {errors.length > 0 && (
+        <div className="space-y-1">
+          {errors.map((error, i) => (
+            <div key={i} className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>{error}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Prévisualisation des fichiers */}
+      {showPreview && files.length > 0 && (
+        <div className="space-y-2">
+          {files.map((file, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 p-3 bg-[#f5f5f5] rounded-xl group animate-in fade-in slide-in-from-bottom-2 duration-300"
+            >
+              {/* Miniature ou icône */}
+              {file.preview ? (
+                <img
+                  src={file.preview}
+                  alt={file.name}
+                  className="w-10 h-10 rounded-lg object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                  <File className="w-5 h-5 text-[#737373]" />
+                </div>
+              )}
+
+              {/* Infos fichier */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-[#1a1a1a] truncate">{file.name}</p>
+                <p className="text-xs text-[#737373]">{formatSize(file.size)}</p>
+              </div>
+
+              {/* Indicateur succès */}
+              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+
+              {/* Bouton supprimer */}
+              <button
+                onClick={(e) => { e.stopPropagation(); removeFile(index); }}
+                className="p-1.5 text-[#737373] hover:text-red-600 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+              >
+                <XIcon className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
 // INDEX EXPORT
 // ============================================================================
 
@@ -731,5 +1034,6 @@ export default {
   EmptyState,
   LoadingSpinner,
   Divider,
-  SectionHeader
+  SectionHeader,
+  DropZone
 };

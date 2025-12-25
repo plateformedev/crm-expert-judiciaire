@@ -9,7 +9,7 @@ import {
   Calendar, User, Tag, MoreVertical, Plus, X, Check,
   AlertTriangle, Clock, ExternalLink, Paperclip
 } from 'lucide-react';
-import { Card, Badge, Button, Input, ModalBase, useConfirmation, useToast } from '../ui';
+import { Card, Badge, Button, Input, ModalBase, useConfirmation, useToast, DropZone } from '../ui';
 import { formatDateFr } from '../../utils/helpers';
 
 // ============================================================================
@@ -70,7 +70,7 @@ const DocumentCard = ({ document, parties, onView, onDelete, onDownload }) => {
   };
 
   return (
-    <div className="p-4 border border-[#e5e5e5] rounded-xl hover:border-[#c9a227] hover:shadow-md transition-all group">
+    <div className="p-4 border border-[#e5e5e5] rounded-xl hover:border-[#2563EB] hover:shadow-md transition-all group">
       <div className="flex items-start gap-3">
         {/* Icône type */}
         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -214,8 +214,8 @@ const ModalAjoutDocument = ({ isOpen, onClose, onSave, parties }) => {
               onClick={() => setFormData(prev => ({ ...prev, direction: dir.id }))}
               className={`p-3 rounded-xl border-2 flex items-center gap-2 transition-colors ${
                 formData.direction === dir.id
-                  ? 'border-[#c9a227] bg-[#faf8f3]'
-                  : 'border-[#e5e5e5] hover:border-[#c9a227]'
+                  ? 'border-[#2563EB] bg-[#EFF6FF]'
+                  : 'border-[#e5e5e5] hover:border-[#2563EB]'
               }`}
             >
               <dir.icon className={`w-5 h-5 ${
@@ -243,7 +243,7 @@ const ModalAjoutDocument = ({ isOpen, onClose, onSave, parties }) => {
           <select
             value={formData.type}
             onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
           >
             <option value="">Sélectionner un type</option>
             {CATEGORIES.map(cat => (
@@ -273,7 +273,7 @@ const ModalAjoutDocument = ({ isOpen, onClose, onSave, parties }) => {
             <select
               value={formData.partie_id}
               onChange={(e) => setFormData(prev => ({ ...prev, partie_id: e.target.value }))}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             >
               <option value="">Non spécifié</option>
               <option value="tribunal">Tribunal</option>
@@ -303,22 +303,21 @@ const ModalAjoutDocument = ({ isOpen, onClose, onSave, parties }) => {
             value={formData.description}
             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
             rows={3}
-            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             placeholder="Description ou remarques..."
           />
         </div>
 
-        {/* Zone upload (simulé) */}
-        <div className="border-2 border-dashed border-[#e5e5e5] rounded-xl p-6 text-center">
-          <Upload className="w-8 h-8 text-[#a3a3a3] mx-auto mb-2" />
-          <p className="text-sm text-[#737373]">
-            Glissez un fichier ici ou cliquez pour sélectionner
-          </p>
-          <p className="text-xs text-[#a3a3a3] mt-1">
-            PDF, DOC, JPG, PNG (max 10 Mo)
-          </p>
-          <input type="file" className="hidden" />
-        </div>
+        {/* Zone upload */}
+        <DropZone
+          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+          multiple={false}
+          maxSize={10 * 1024 * 1024}
+          label="Glissez un fichier ici"
+          sublabel="ou cliquez pour sélectionner"
+          hint="PDF, DOC, JPG, PNG (max 10 Mo)"
+          compact={true}
+        />
 
         {/* Actions */}
         <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
@@ -434,8 +433,8 @@ export const GestionDocuments = ({ affaire, onUpdate }) => {
       <div className="grid grid-cols-3 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#faf8f3] rounded-xl flex items-center justify-center">
-              <FolderOpen className="w-5 h-5 text-[#c9a227]" />
+            <div className="w-10 h-10 bg-[#EFF6FF] rounded-xl flex items-center justify-center">
+              <FolderOpen className="w-5 h-5 text-[#2563EB]" />
             </div>
             <div>
               <p className="text-2xl font-light text-[#1a1a1a]">{stats.total}</p>
@@ -480,7 +479,7 @@ export const GestionDocuments = ({ affaire, onUpdate }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Rechercher un document..."
-              className="w-full pl-10 pr-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+              className="w-full pl-10 pr-4 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
             />
           </div>
 
@@ -490,7 +489,7 @@ export const GestionDocuments = ({ affaire, onUpdate }) => {
             <select
               value={filterDirection}
               onChange={(e) => setFilterDirection(e.target.value)}
-              className="px-3 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] text-sm"
+              className="px-3 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] text-sm"
             >
               <option value="tous">Tous</option>
               <option value="recu">Reçus</option>
@@ -504,7 +503,7 @@ export const GestionDocuments = ({ affaire, onUpdate }) => {
             <select
               value={filterCategorie}
               onChange={(e) => setFilterCategorie(e.target.value)}
-              className="px-3 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227] text-sm"
+              className="px-3 py-2 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB] text-sm"
             >
               <option value="tous">Toutes</option>
               {CATEGORIES.map(cat => (
@@ -570,26 +569,26 @@ export const GestionDocuments = ({ affaire, onUpdate }) => {
           <div className="space-y-6">
             {/* Métadonnées */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-[#faf8f3] rounded-lg">
+              <div className="p-3 bg-[#EFF6FF] rounded-lg">
                 <p className="text-xs text-[#737373] uppercase">Type</p>
                 <p className="font-medium">
                   {TYPES_DOCUMENTS.find(t => t.id === selectedDocument.type)?.label || selectedDocument.type}
                 </p>
               </div>
-              <div className="p-3 bg-[#faf8f3] rounded-lg">
+              <div className="p-3 bg-[#EFF6FF] rounded-lg">
                 <p className="text-xs text-[#737373] uppercase">Direction</p>
                 <p className="font-medium">
                   {selectedDocument.direction === 'recu' ? 'Document reçu' : 'Document envoyé'}
                 </p>
               </div>
-              <div className="p-3 bg-[#faf8f3] rounded-lg">
+              <div className="p-3 bg-[#EFF6FF] rounded-lg">
                 <p className="text-xs text-[#737373] uppercase">Date</p>
                 <p className="font-medium">
                   {selectedDocument.date ? formatDateFr(selectedDocument.date) : 'Non datée'}
                 </p>
               </div>
               {selectedDocument.reference && (
-                <div className="p-3 bg-[#faf8f3] rounded-lg">
+                <div className="p-3 bg-[#EFF6FF] rounded-lg">
                   <p className="text-xs text-[#737373] uppercase">Référence</p>
                   <p className="font-medium">{selectedDocument.reference}</p>
                 </div>

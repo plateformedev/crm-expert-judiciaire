@@ -11,7 +11,7 @@ import {
   Type, Square, Circle, ArrowRight, Pen, Eraser,
   ChevronLeft, ChevronRight, Folder, Link2
 } from 'lucide-react';
-import { Card, Badge, Button, Input, Select, ModalBase, EmptyState } from '../ui';
+import { Card, Badge, Button, Input, Select, ModalBase, EmptyState, DropZone } from '../ui';
 import { formatDateFr } from '../../utils/helpers';
 import { supabase, storage } from '../../lib/supabase';
 
@@ -242,23 +242,18 @@ export const GaleriePhotos = ({
     return acc;
   }, {});
 
-  // Handle file drop
-  const handleDrop = useCallback(async (e) => {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
-    if (files.length > 0) {
-      await uploadMultiple(files);
+  // Handle files from DropZone
+  const handleFilesDropped = useCallback(async (files) => {
+    const imageFiles = files.filter(f => f.type.startsWith('image/'));
+    if (imageFiles.length > 0) {
+      await uploadMultiple(imageFiles);
     }
   }, [uploadMultiple]);
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-[#c9a227] border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -274,14 +269,14 @@ export const GaleriePhotos = ({
             placeholder="Rechercher une photo..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+            className="w-full pl-12 pr-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
           />
         </div>
 
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#c9a227]"
+          className="px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
         >
           <option value="all">Toutes catégories</option>
           {CATEGORIES_PHOTOS.map(cat => (
@@ -327,23 +322,17 @@ export const GaleriePhotos = ({
       </div>
 
       {/* Zone de drop */}
-      <div
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        className="border-2 border-dashed border-[#e5e5e5] rounded-xl p-8 text-center hover:border-[#c9a227] transition-colors"
-      >
-        <Upload className="w-12 h-12 text-[#a3a3a3] mx-auto mb-3" />
-        <p className="text-[#737373]">
-          Glissez vos photos ici ou{' '}
-          <button 
-            onClick={() => fileInputRef.current?.click()}
-            className="text-[#c9a227] hover:underline"
-          >
-            parcourez
-          </button>
-        </p>
-        <p className="text-xs text-[#a3a3a3] mt-1">JPG, PNG, HEIC (max 20 Mo)</p>
-      </div>
+      <DropZone
+        onFilesDropped={handleFilesDropped}
+        accept="image/*"
+        multiple={true}
+        maxSize={20 * 1024 * 1024}
+        label="Glissez vos photos ici"
+        sublabel="ou cliquez pour parcourir"
+        hint="JPG, PNG, HEIC (max 20 Mo)"
+        showPreview={false}
+        disabled={uploading}
+      />
 
       {/* Galerie */}
       {photos.length === 0 ? (
@@ -489,7 +478,7 @@ const PhotoCard = ({ photo, onClick, onEdit, onDelete }) => {
       {/* Badge annotations */}
       {photo.annotations?.length > 0 && (
         <div className="absolute top-2 right-2">
-          <span className="px-2 py-1 bg-[#c9a227] text-white rounded text-xs">
+          <span className="px-2 py-1 bg-[#2563EB] text-white rounded text-xs">
             {photo.annotations.length} annotation(s)
           </span>
         </div>
@@ -605,7 +594,7 @@ const ModalUploadPhoto = ({ isOpen, onClose, onUpload, pathologies, reunions }) 
         {/* Zone de sélection */}
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-[#e5e5e5] rounded-xl p-8 text-center cursor-pointer hover:border-[#c9a227] transition-colors"
+          className="border-2 border-dashed border-[#e5e5e5] rounded-xl p-8 text-center cursor-pointer hover:border-[#2563EB] transition-colors"
         >
           <Camera className="w-12 h-12 text-[#a3a3a3] mx-auto mb-3" />
           <p className="text-[#737373]">Cliquez pour sélectionner des photos</p>
@@ -847,7 +836,7 @@ const ModalAnnotationPhoto = ({ isOpen, photo, onClose, onSave }) => {
                 onClick={() => setOutil(o.id)}
                 className={`w-full p-3 rounded-xl transition-colors ${
                   outil === o.id 
-                    ? 'bg-[#c9a227] text-white' 
+                    ? 'bg-[#2563EB] text-white' 
                     : 'bg-[#f5f5f5] text-[#737373] hover:bg-[#e5e5e5]'
                 }`}
                 title={o.label}
