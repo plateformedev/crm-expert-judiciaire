@@ -46,6 +46,7 @@ import { AlertesDelais } from './AlertesDelais';
 import { TableauContradictoire } from './TableauContradictoire';
 import { CycleReunion } from './CycleReunion';
 import { TimerWidget } from './TimerWidget';
+import { GestionParties } from './GestionParties';
 
 // Phase 5 - Intégrations externes
 import {
@@ -1616,8 +1617,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
 
             {/* Parties (intégré) */}
             <div className="pt-6 border-t border-[#e5e5e5]">
-              <h3 className="text-lg font-medium text-[#1a1a1a] mb-4">Parties au dossier</h3>
-              <TabParties affaire={affaire} onAddPartie={() => setShowAddPartie(true)} onUpdate={(updates) => update(updates)} />
+              <GestionParties affaire={affaire} onUpdate={(updates) => update(updates)} />
             </div>
           </div>
         )}
@@ -1781,7 +1781,7 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
 
         {/* ═══════════════════ ANCIENS ONGLETS (COMPATIBILITÉ) ═══════════════════ */}
         {activeTab === 'general' && <TabGeneral affaire={affaire} />}
-        {activeTab === 'parties' && <TabParties affaire={affaire} onAddPartie={() => setShowAddPartie(true)} onUpdate={(updates) => update(updates)} />}
+        {activeTab === 'parties' && <GestionParties affaire={affaire} onUpdate={(updates) => update(updates)} />}
         {activeTab === 'reunions' && (
           <GestionReunions
             affaire={affaire}
@@ -2098,240 +2098,7 @@ const TabGeneral = ({ affaire }) => (
   </div>
 );
 
-const TabParties = ({ affaire, onAddPartie, onUpdate }) => {
-  const [editingPartie, setEditingPartie] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editFormData, setEditFormData] = useState({});
-  const toast = useToast();
-
-  const parties = affaire.parties || [];
-
-  const partiesByType = {
-    demandeur: parties.filter(p => p.type === 'demandeur'),
-    defenseur: parties.filter(p => p.type === 'defenseur'),
-    intervenant: parties.filter(p => p.type === 'intervenant'),
-    assureur: parties.filter(p => p.type === 'assureur')
-  };
-
-  // Ouvrir modal d'édition
-  const handleEdit = (partie) => {
-    setEditingPartie(partie);
-    setEditFormData({ ...partie });
-    setShowEditModal(true);
-  };
-
-  // Sauvegarder modifications
-  const handleSaveEdit = async () => {
-    try {
-      const updatedParties = parties.map(p =>
-        p.id === editingPartie.id ? { ...p, ...editFormData } : p
-      );
-      await onUpdate({ parties: updatedParties });
-      setShowEditModal(false);
-      setEditingPartie(null);
-      toast.success('Partie modifiée avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de la modification');
-    }
-  };
-
-  // Supprimer une partie
-  const handleDelete = async (partie) => {
-    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer "${partie.raison_sociale || partie.nom}" ?`)) return;
-    try {
-      const updatedParties = parties.filter(p => p.id !== partie.id);
-      await onUpdate({ parties: updatedParties });
-      toast.success('Partie supprimée');
-    } catch (error) {
-      toast.error('Erreur lors de la suppression');
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      {Object.entries(partiesByType).map(([type, list]) => (
-        list.length > 0 && (
-          <div key={type}>
-            <h4 className="text-xs uppercase tracking-wider text-[#a3a3a3] mb-3">
-              {type === 'demandeur' ? 'Demandeurs' :
-               type === 'defenseur' ? 'Défendeurs' :
-               type === 'intervenant' ? 'Intervenants' : 'Assureurs'}
-            </h4>
-            <div className="grid gap-4">
-              {list.map(partie => (
-                <Card key={partie.id} className="p-4 hover:border-[#2563EB] transition-colors">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="font-medium text-[#1a1a1a]">
-                        {partie.raison_sociale || `${partie.prenom || ''} ${partie.nom}`}
-                      </p>
-                      {partie.role && <p className="text-sm text-[#737373]">{partie.role}</p>}
-                      {partie.avocat_nom && (
-                        <p className="text-sm text-[#a3a3a3] mt-1">
-                          Représenté par Me {partie.avocat_nom}
-                        </p>
-                      )}
-                      {partie.adresse && (
-                        <p className="text-xs text-[#a3a3a3] mt-1">
-                          {partie.adresse}, {partie.code_postal} {partie.ville}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex gap-1">
-                      {partie.email && (
-                        <button
-                          className="p-2 text-[#a3a3a3] hover:text-[#2563EB] hover:bg-[#f5f5f5] rounded-lg"
-                          onClick={() => window.location.href = `mailto:${partie.email}`}
-                          title={partie.email}
-                        >
-                          <Mail className="w-4 h-4" />
-                        </button>
-                      )}
-                      {partie.telephone && (
-                        <button
-                          className="p-2 text-[#a3a3a3] hover:text-[#2563EB] hover:bg-[#f5f5f5] rounded-lg"
-                          onClick={() => window.location.href = `tel:${partie.telephone}`}
-                          title={partie.telephone}
-                        >
-                          <Phone className="w-4 h-4" />
-                        </button>
-                      )}
-                      <button
-                        className="p-2 text-[#a3a3a3] hover:text-[#0381fe] hover:bg-blue-50 rounded-lg"
-                        onClick={() => handleEdit(partie)}
-                        title="Modifier"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        className="p-2 text-[#a3a3a3] hover:text-red-500 hover:bg-red-50 rounded-lg"
-                        onClick={() => handleDelete(partie)}
-                        title="Supprimer"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )
-      ))}
-
-      <Button variant="secondary" icon={Plus} className="w-full" onClick={onAddPartie}>
-        Ajouter une partie
-      </Button>
-
-      {/* Modal d'édition */}
-      <ModalBase
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        title="Modifier la partie"
-        size="lg"
-      >
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Nom *</label>
-              <input
-                type="text"
-                value={editFormData.nom || ''}
-                onChange={(e) => setEditFormData({ ...editFormData, nom: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Prénom</label>
-              <input
-                type="text"
-                value={editFormData.prenom || ''}
-                onChange={(e) => setEditFormData({ ...editFormData, prenom: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Raison sociale</label>
-            <input
-              type="text"
-              value={editFormData.raison_sociale || ''}
-              onChange={(e) => setEditFormData({ ...editFormData, raison_sociale: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Email</label>
-              <input
-                type="email"
-                value={editFormData.email || ''}
-                onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Téléphone</label>
-              <input
-                type="tel"
-                value={editFormData.telephone || ''}
-                onChange={(e) => setEditFormData({ ...editFormData, telephone: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Adresse</label>
-            <input
-              type="text"
-              value={editFormData.adresse || ''}
-              onChange={(e) => setEditFormData({ ...editFormData, adresse: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
-            />
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Code postal</label>
-              <input
-                type="text"
-                value={editFormData.code_postal || ''}
-                onChange={(e) => setEditFormData({ ...editFormData, code_postal: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
-              />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Ville</label>
-              <input
-                type="text"
-                value={editFormData.ville || ''}
-                onChange={(e) => setEditFormData({ ...editFormData, ville: e.target.value })}
-                className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-medium uppercase tracking-wider text-[#a3a3a3] mb-2">Avocat</label>
-            <input
-              type="text"
-              value={editFormData.avocat_nom || ''}
-              onChange={(e) => setEditFormData({ ...editFormData, avocat_nom: e.target.value })}
-              className="w-full px-4 py-3 border border-[#e5e5e5] rounded-xl focus:outline-none focus:border-[#2563EB]"
-              placeholder="Me ..."
-            />
-          </div>
-          <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
-            <Button variant="secondary" onClick={() => setShowEditModal(false)} className="flex-1">
-              Annuler
-            </Button>
-            <Button variant="primary" icon={Save} onClick={handleSaveEdit} className="flex-1">
-              Enregistrer
-            </Button>
-          </div>
-        </div>
-      </ModalBase>
-    </div>
-  );
-};
+// Note: L'ancien TabParties a été remplacé par GestionParties (importé depuis ./GestionParties.jsx)
 
 const TabReunions = ({ affaire, onAddReunion, onUpdate }) => {
   const [editingReunion, setEditingReunion] = useState(null);
