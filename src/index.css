@@ -50,12 +50,12 @@
 
   /* Focus visible */
   :focus-visible {
-    @apply outline-none ring-2 ring-gold-500 ring-offset-2;
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
   }
 
   /* Sélection */
   ::selection {
-    @apply bg-gold-200 text-gold-900;
+    @apply bg-primary-200 text-primary-900;
   }
 
   /* Placeholder */
@@ -76,7 +76,7 @@
 
   /* Loader spinner */
   .spinner {
-    @apply w-6 h-6 border-2 border-gold-500 border-t-transparent rounded-full animate-spin;
+    @apply w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin;
   }
 
   /* Badge de statut */
@@ -89,7 +89,7 @@
   }
 
   .status-en-cours {
-    @apply bg-gold-100 text-gold-700;
+    @apply bg-primary-100 text-primary-700;
   }
 
   .status-pre-rapport {
@@ -146,7 +146,7 @@
   }
 
   .nav-item.active {
-    @apply bg-gold-100 text-gold-700 font-medium;
+    @apply bg-primary-100 text-primary-700 font-medium;
   }
 
   /* Form field */
@@ -160,7 +160,7 @@
 
   .form-input {
     @apply w-full px-4 py-3 border border-neutral-200 rounded-xl;
-    @apply focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-100;
+    @apply focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100;
     @apply transition-all duration-200;
   }
 
@@ -196,7 +196,7 @@
   }
 
   .progress-bar-fill {
-    @apply h-full bg-gold-500 rounded-full transition-all duration-500 ease-out;
+    @apply h-full bg-primary-500 rounded-full transition-all duration-500 ease-out;
   }
 
   /* Alertes par criticité */
@@ -222,7 +222,7 @@
   }
 
   .timeline-dot {
-    @apply absolute left-0 -translate-x-1/2 w-4 h-4 rounded-full bg-gold-500 border-4 border-white;
+    @apply absolute left-0 -translate-x-1/2 w-4 h-4 rounded-full bg-primary-500 border-4 border-white;
   }
 }
 
@@ -233,7 +233,7 @@
 @layer utilities {
   /* Text gradient */
   .text-gradient {
-    @apply bg-gradient-to-r from-gold-600 to-gold-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent;
   }
 
   /* Masquer scrollbar mais garder scroll */

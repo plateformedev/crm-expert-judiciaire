@@ -116,16 +116,16 @@ export const DashboardExpert = ({
 
   return (
     <div className="space-y-6">
-      {/* En-tête personnalisé - Style Pennylane */}
-      <div className="bg-gradient-to-r from-[#1a1a1a] to-[#2a2a2a] rounded-2xl p-8 text-white">
+      {/* En-tête personnalisé - Style Professionnel Juridique */}
+      <div className="bg-gradient-to-r from-[#1E3A5F] to-[#2563EB] rounded-2xl p-8 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-2 text-white/60 mb-2">
+            <div className="flex items-center gap-2 text-white/70 mb-2">
               <SalutIcon className="w-5 h-5" />
               <span className="text-sm">{formatDateFr(new Date(), true)}</span>
             </div>
             <h1 className="text-3xl font-semibold mb-2">
-              {salutation.text}, {expert?.prenom || 'Expert'} 👋
+              {salutation.text}, {expert?.prenom || 'Expert'}
             </h1>
             {/* Message contextuel avec nombre d'actions */}
             <p className="text-white/80 text-lg">
@@ -267,32 +267,32 @@ export const DashboardExpert = ({
 // COMPOSANTS WIDGETS
 // ============================================================================
 
-// KPI Card - Style Pennylane avec grands chiffres et tendances
+// KPI Card - Style Professionnel avec grands chiffres et tendances
 const KPICard = ({ icon: Icon, label, value, subValue, trend, onClick }) => {
   const trendConfig = {
     success: {
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
+      color: 'text-[#059669]',
+      bgColor: 'bg-[#ECFDF5]',
       arrow: '↗',
-      iconBg: 'bg-green-100'
+      iconBg: 'bg-[#D1FAE5]'
     },
     warning: {
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-50',
+      color: 'text-[#D97706]',
+      bgColor: 'bg-[#FFFBEB]',
       arrow: '→',
-      iconBg: 'bg-amber-100'
+      iconBg: 'bg-[#FEF3C7]'
     },
     danger: {
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
+      color: 'text-[#DC2626]',
+      bgColor: 'bg-[#FEF2F2]',
       arrow: '↘',
-      iconBg: 'bg-red-100'
+      iconBg: 'bg-[#FEE2E2]'
     },
     neutral: {
-      color: 'text-[#737373]',
-      bgColor: 'bg-[#fafafa]',
+      color: 'text-[#6B7280]',
+      bgColor: 'bg-[#F9FAFB]',
       arrow: '',
-      iconBg: 'bg-[#f5e6c8]'
+      iconBg: 'bg-[#EFF6FF]'
     }
   };
 
@@ -300,23 +300,23 @@ const KPICard = ({ icon: Icon, label, value, subValue, trend, onClick }) => {
 
   return (
     <Card
-      className={`p-6 ${onClick ? 'cursor-pointer hover:border-[#c9a227] hover:shadow-md transition-all' : ''}`}
+      className={`p-6 ${onClick ? 'cursor-pointer hover:border-[#3B82F6] hover:shadow-md transition-all' : ''}`}
       onClick={onClick}
     >
       <div className="flex items-start justify-between mb-3">
-        <p className="text-xs text-[#a3a3a3] uppercase tracking-wider font-medium">{label}</p>
-        <div className={`w-10 h-10 ${config.iconBg} rounded-xl flex items-center justify-center`}>
-          <Icon className={`w-5 h-5 ${trend === 'neutral' ? 'text-[#c9a227]' : config.color}`} />
+        <p className="text-sm text-[#6B7280] uppercase tracking-wide font-medium">{label}</p>
+        <div className={`w-12 h-12 ${config.iconBg} rounded-full flex items-center justify-center`}>
+          <Icon className={`w-6 h-6 ${trend === 'neutral' ? 'text-[#2563EB]' : config.color}`} />
         </div>
       </div>
 
-      {/* Valeur principale - 48px comme Pennylane */}
-      <p className="text-5xl font-bold text-[#1a1a1a] leading-none mb-2">{value}</p>
+      {/* Valeur principale - Grand et lisible */}
+      <p className="text-4xl font-bold text-[#111827] leading-none mb-2">{value}</p>
 
       {/* Sous-valeur avec flèche tendance */}
-      <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg ${config.bgColor}`}>
+      <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg ${config.bgColor}`}>
         {config.arrow && <span className={`${config.color} font-medium`}>{config.arrow}</span>}
-        <span className={`text-sm ${config.color}`}>{subValue}</span>
+        <span className={`text-sm font-medium ${config.color}`}>{subValue}</span>
       </div>
     </Card>
   );

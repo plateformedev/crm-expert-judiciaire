@@ -88,21 +88,21 @@ const Sidebar = ({
             className="flex items-center gap-3 cursor-pointer"
             onClick={() => navigate('/')}
           >
-            <div className="w-11 h-11 bg-[#fdf8e8] rounded-2xl flex items-center justify-center border-2 border-[#c9a227]">
-              <Scale className="w-6 h-6 text-[#c9a227]" />
+            <div className="w-11 h-11 bg-[#EFF6FF] rounded-2xl flex items-center justify-center border-2 border-[#2563EB]">
+              <Scale className="w-6 h-6 text-[#2563EB]" />
             </div>
             <div>
               <span className="font-bold text-lg text-[#1f1f1f]">Expert</span>
-              <span className="text-[#c9a227] text-lg font-bold">.CRM</span>
+              <span className="text-[#2563EB] text-lg font-bold">.CRM</span>
             </div>
           </div>
         )}
         {collapsed && (
           <div
-            className="w-11 h-11 bg-[#fdf8e8] rounded-2xl flex items-center justify-center mx-auto cursor-pointer border-2 border-[#c9a227]"
+            className="w-11 h-11 bg-[#EFF6FF] rounded-2xl flex items-center justify-center mx-auto cursor-pointer border-2 border-[#2563EB]"
             onClick={() => navigate('/')}
           >
-            <Scale className="w-6 h-6 text-[#c9a227]" />
+            <Scale className="w-6 h-6 text-[#2563EB]" />
           </div>
         )}
         <button
@@ -130,7 +130,7 @@ const Sidebar = ({
                 className={`
                   w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-200
                   ${isActive
-                    ? 'bg-[#fdf8e8] border-2 border-[#c9a227]'
+                    ? 'bg-[#EFF6FF] border-2 border-[#2563EB]'
                     : 'border-2 border-transparent hover:bg-[#f7f7f7] active:bg-[#f0f0f0]'
                   }
                 `}
@@ -138,14 +138,14 @@ const Sidebar = ({
                 <div className="flex items-center gap-3">
                   <div className={`
                     w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0
-                    ${isActive ? 'bg-[#c9a227]' : 'bg-[#f0f0f0]'}
+                    ${isActive ? 'bg-[#2563EB]' : 'bg-[#f0f0f0]'}
                   `}>
                     <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-[#555555]'}`} />
                   </div>
                   {!collapsed && (
                     <>
                       <span className={`text-[15px] font-semibold ${
-                        isActive ? 'text-[#9a7b1c]' : 'text-[#1f1f1f]'
+                        isActive ? 'text-[#1D4ED8]' : 'text-[#1f1f1f]'
                       }`}>
                         {module.label}
                       </span>
@@ -178,12 +178,12 @@ const Sidebar = ({
                         className={`
                           w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors
                           ${isSubActive
-                            ? 'bg-[#fdf8e8] text-[#9a7b1c]'
+                            ? 'bg-[#EFF6FF] text-[#1D4ED8]'
                             : 'text-[#555555] hover:bg-[#f7f7f7] active:bg-[#f0f0f0]'
                           }
                         `}
                       >
-                        <SubIcon className={`w-4 h-4 ${isSubActive ? 'text-[#c9a227]' : 'text-[#757575]'}`} />
+                        <SubIcon className={`w-4 h-4 ${isSubActive ? 'text-[#2563EB]' : 'text-[#757575]'}`} />
                         <span className={`text-[14px] ${isSubActive ? 'font-semibold' : 'font-medium'}`}>
                           {sub.label}
                         </span>
@@ -205,19 +205,19 @@ const Sidebar = ({
             className={`
               w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-colors
               ${location.pathname === '/parametres'
-                ? 'bg-[#fdf8e8] border-2 border-[#c9a227]'
+                ? 'bg-[#EFF6FF] border-2 border-[#2563EB]'
                 : 'border-2 border-transparent hover:bg-[#f7f7f7] active:bg-[#f0f0f0]'
               }
             `}
           >
             <div className={`
               w-9 h-9 rounded-xl flex items-center justify-center
-              ${location.pathname === '/parametres' ? 'bg-[#c9a227]' : 'bg-[#f0f0f0]'}
+              ${location.pathname === '/parametres' ? 'bg-[#2563EB]' : 'bg-[#f0f0f0]'}
             `}>
               <Settings className={`w-5 h-5 ${location.pathname === '/parametres' ? 'text-white' : 'text-[#555555]'}`} />
             </div>
             <span className={`text-[15px] font-semibold ${
-              location.pathname === '/parametres' ? 'text-[#9a7b1c]' : 'text-[#1f1f1f]'
+              location.pathname === '/parametres' ? 'text-[#1D4ED8]' : 'text-[#1f1f1f]'
             }`}>
               Paramètres
             </span>

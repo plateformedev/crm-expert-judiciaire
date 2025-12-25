@@ -167,7 +167,7 @@ const FormSection = ({ title, icon: Icon, children, description }) => (
   <Card className="p-6">
     <div className="flex items-center gap-3 mb-4 pb-4 border-b border-[#e5e5e5]">
       <div className="w-10 h-10 bg-[#f5e6c8] rounded-xl flex items-center justify-center">
-        <Icon className="w-5 h-5 text-[#c9a227]" />
+        <Icon className="w-5 h-5 text-[#2563EB]" />
       </div>
       <div>
         <h3 className="font-medium text-[#1a1a1a]">{title}</h3>
@@ -504,7 +504,7 @@ export const PageParametres = () => {
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === tab.id
-                ? 'border-[#c9a227] text-[#c9a227]'
+                ? 'border-[#2563EB] text-[#2563EB]'
                 : 'border-transparent text-[#737373] hover:text-[#1a1a1a]'
             }`}
           >
@@ -524,7 +524,7 @@ export const PageParametres = () => {
                 <select
                   value={profile.civilite}
                   onChange={(e) => setProfile({...profile, civilite: e.target.value})}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#2563EB]"
                 >
                   <option value="M.">M.</option>
                   <option value="Mme">Mme</option>
@@ -621,7 +621,7 @@ export const PageParametres = () => {
                   <select
                     value={profile.coursAppel}
                     onChange={(e) => setProfile({...profile, coursAppel: e.target.value})}
-                    className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#c9a227]"
+                    className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#2563EB]"
                   >
                     <option value="">Sélectionner...</option>
                     {COURS_APPEL_OPTIONS.map(ca => (
@@ -647,8 +647,8 @@ export const PageParametres = () => {
                       }}
                       className={`px-3 py-1 text-xs rounded-full transition-colors ${
                         (profile.specialites || []).includes(spec)
-                          ? 'bg-[#c9a227] text-white'
-                          : 'bg-white border border-[#e5e5e5] text-[#737373] hover:border-[#c9a227]'
+                          ? 'bg-[#2563EB] text-white'
+                          : 'bg-white border border-[#e5e5e5] text-[#737373] hover:border-[#2563EB]'
                       }`}
                     >
                       {spec}
@@ -790,7 +790,7 @@ export const PageParametres = () => {
                 <select
                   value={tarifs.tva}
                   onChange={(e) => setTarifs({...tarifs, tva: parseFloat(e.target.value)})}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#2563EB]"
                 >
                   <option value="0">Non assujetti (0%)</option>
                   <option value="10">Taux réduit (10%)</option>
@@ -851,8 +851,8 @@ export const PageParametres = () => {
                         })}
                         className={`flex-1 p-3 rounded-xl border-2 transition-colors capitalize ${
                           modeles.enTete?.format === format
-                            ? 'border-[#c9a227] bg-[#fdf8e8]'
-                            : 'border-[#e0e0e0] hover:border-[#c9a227]'
+                            ? 'border-[#2563EB] bg-[#EFF6FF]'
+                            : 'border-[#e0e0e0] hover:border-[#2563EB]'
                         }`}
                       >
                         {format}
@@ -872,7 +872,7 @@ export const PageParametres = () => {
                       enTete: { ...modeles.enTete, afficherLogo: !modeles.enTete?.afficherLogo }
                     })}
                     className={`w-12 h-6 rounded-full transition-colors ${
-                      modeles.enTete?.afficherLogo ? 'bg-[#c9a227]' : 'bg-[#e0e0e0]'
+                      modeles.enTete?.afficherLogo ? 'bg-[#2563EB]' : 'bg-[#e0e0e0]'
                     }`}
                   >
                     <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
@@ -909,7 +909,7 @@ export const PageParametres = () => {
                       piedPage: { ...modeles.piedPage, afficherCoordonnees: !modeles.piedPage?.afficherCoordonnees }
                     })}
                     className={`w-12 h-6 rounded-full transition-colors ${
-                      modeles.piedPage?.afficherCoordonnees ? 'bg-[#c9a227]' : 'bg-[#e0e0e0]'
+                      modeles.piedPage?.afficherCoordonnees ? 'bg-[#2563EB]' : 'bg-[#e0e0e0]'
                     }`}
                   >
                     <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
@@ -925,8 +925,8 @@ export const PageParametres = () => {
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4 pb-4 border-b border-[#e0e0e0]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#fdf8e8] rounded-xl flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-[#c9a227]" />
+                <div className="w-10 h-10 bg-[#EFF6FF] rounded-xl flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-[#2563EB]" />
                 </div>
                 <div>
                   <h3 className="font-medium text-[#1f1f1f]">Paragraphes types</h3>
@@ -975,7 +975,7 @@ export const PageParametres = () => {
                       </button>
                       <button
                         onClick={() => setEditingParagraphe(para)}
-                        className="p-2 hover:bg-white rounded-lg text-[#757575] hover:text-[#c9a227]"
+                        className="p-2 hover:bg-white rounded-lg text-[#757575] hover:text-[#2563EB]"
                         title="Modifier"
                       >
                         <Edit className="w-4 h-4" />
@@ -1015,7 +1015,7 @@ export const PageParametres = () => {
               {(modeles.clausesStandards || []).map((clause) => (
                 <div
                   key={clause.id}
-                  className="p-4 border border-[#e0e0e0] rounded-xl hover:border-[#c9a227] transition-colors"
+                  className="p-4 border border-[#e0e0e0] rounded-xl hover:border-[#2563EB] transition-colors"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -1032,7 +1032,7 @@ export const PageParametres = () => {
                       </button>
                       <button
                         onClick={() => setEditingClause(clause)}
-                        className="p-2 hover:bg-[#f7f7f7] rounded-lg text-[#757575] hover:text-[#c9a227]"
+                        className="p-2 hover:bg-[#f7f7f7] rounded-lg text-[#757575] hover:text-[#2563EB]"
                         title="Modifier"
                       >
                         <Edit className="w-4 h-4" />
@@ -1113,9 +1113,42 @@ export const PageParametres = () => {
             </p>
           </FormSection>
 
-          {/* Densité d'affichage */}
-          <FormSection title="Apparence" icon={Palette} description="Personnalisez l'affichage">
+          {/* Accessibilité et Apparence */}
+          <FormSection title="Apparence & Accessibilité" icon={Palette} description="Personnalisez l'affichage et l'accessibilité">
             <div className="space-y-4">
+              {/* Taille de police - Accessibilité seniors */}
+              <FormField label="Taille du texte">
+                <div className="flex gap-3">
+                  {[
+                    { id: 'normal', label: 'Normal', desc: '14px', icon: 'Aa' },
+                    { id: 'large', label: 'Grand', desc: '16px', icon: 'Aa' },
+                    { id: 'x-large', label: 'Très grand', desc: '18px', icon: 'Aa' }
+                  ].map(option => (
+                    <button
+                      key={option.id}
+                      onClick={() => {
+                        setInterfaceConfig({ ...interfaceConfig, fontSize: option.id });
+                        // Appliquer la classe sur le html
+                        document.documentElement.classList.remove('text-base', 'text-lg', 'text-xl');
+                        if (option.id === 'large') document.documentElement.classList.add('text-lg');
+                        if (option.id === 'x-large') document.documentElement.classList.add('text-xl');
+                      }}
+                      className={`flex-1 p-4 rounded-xl border-2 transition-colors text-center ${
+                        (interfaceConfig.fontSize || 'normal') === option.id
+                          ? 'border-[#2563EB] bg-[#EFF6FF]'
+                          : 'border-[#e0e0e0] hover:border-[#2563EB]'
+                      }`}
+                    >
+                      <div className={`font-bold mb-1 ${option.id === 'large' ? 'text-lg' : option.id === 'x-large' ? 'text-xl' : 'text-base'}`}>
+                        {option.icon}
+                      </div>
+                      <p className="font-medium text-[#1f1f1f]">{option.label}</p>
+                      <p className="text-xs text-[#757575] mt-0.5">{option.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </FormField>
+
               <FormField label="Densité d'affichage">
                 <div className="flex gap-3">
                   {[
@@ -1128,8 +1161,8 @@ export const PageParametres = () => {
                       onClick={() => setInterfaceConfig({ ...interfaceConfig, densite: option.id })}
                       className={`flex-1 p-4 rounded-xl border-2 transition-colors text-center ${
                         interfaceConfig.densite === option.id
-                          ? 'border-[#c9a227] bg-[#fdf8e8]'
-                          : 'border-[#e0e0e0] hover:border-[#c9a227]'
+                          ? 'border-[#2563EB] bg-[#EFF6FF]'
+                          : 'border-[#e0e0e0] hover:border-[#2563EB]'
                       }`}
                     >
                       <p className="font-medium text-[#1f1f1f]">{option.label}</p>
@@ -1155,8 +1188,8 @@ export const PageParametres = () => {
                       }}
                       className={`px-3 py-1.5 text-xs rounded-lg transition-colors capitalize ${
                         interfaceConfig.listeAffaires.colonnes.includes(col)
-                          ? 'bg-[#c9a227] text-white'
-                          : 'bg-white border border-[#e0e0e0] text-[#757575] hover:border-[#c9a227]'
+                          ? 'bg-[#2563EB] text-white'
+                          : 'bg-white border border-[#e0e0e0] text-[#757575] hover:border-[#2563EB]'
                       }`}
                     >
                       {col.replace('_', ' ')}
@@ -1213,7 +1246,7 @@ export const PageParametres = () => {
                       });
                     }}
                     className={`w-12 h-6 rounded-full transition-colors ${
-                      widget.visible ? 'bg-[#c9a227]' : 'bg-[#e0e0e0]'
+                      widget.visible ? 'bg-[#2563EB]' : 'bg-[#e0e0e0]'
                     }`}
                   >
                     <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
@@ -1263,7 +1296,7 @@ export const PageParametres = () => {
                 <button
                   onClick={() => setPreferences({...preferences, notificationsEmail: !preferences.notificationsEmail})}
                   className={`w-12 h-6 rounded-full transition-colors ${
-                    preferences.notificationsEmail ? 'bg-[#c9a227]' : 'bg-[#e5e5e5]'
+                    preferences.notificationsEmail ? 'bg-[#2563EB]' : 'bg-[#e5e5e5]'
                   }`}
                 >
                   <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
@@ -1280,7 +1313,7 @@ export const PageParametres = () => {
                 <button
                   onClick={() => setPreferences({...preferences, notificationsPush: !preferences.notificationsPush})}
                   className={`w-12 h-6 rounded-full transition-colors ${
-                    preferences.notificationsPush ? 'bg-[#c9a227]' : 'bg-[#e5e5e5]'
+                    preferences.notificationsPush ? 'bg-[#2563EB]' : 'bg-[#e5e5e5]'
                   }`}
                 >
                   <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
@@ -1293,7 +1326,7 @@ export const PageParametres = () => {
                 <select
                   value={preferences.rappelEcheance}
                   onChange={(e) => setPreferences({...preferences, rappelEcheance: parseInt(e.target.value)})}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#2563EB]"
                 >
                   <option value="3">3 jours avant</option>
                   <option value="5">5 jours avant</option>
@@ -1318,8 +1351,8 @@ export const PageParametres = () => {
                       onClick={() => setPreferences({...preferences, theme: theme.id})}
                       className={`flex-1 p-3 rounded-lg border-2 transition-colors ${
                         preferences.theme === theme.id
-                          ? 'border-[#c9a227] bg-[#faf8f3]'
-                          : 'border-[#e5e5e5] hover:border-[#c9a227]'
+                          ? 'border-[#2563EB] bg-[#faf8f3]'
+                          : 'border-[#e5e5e5] hover:border-[#2563EB]'
                       }`}
                     >
                       <div className="text-2xl mb-1">{theme.icon}</div>
@@ -1333,7 +1366,7 @@ export const PageParametres = () => {
                 <select
                   value={preferences.formatDate}
                   onChange={(e) => setPreferences({...preferences, formatDate: e.target.value})}
-                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#c9a227]"
+                  className="w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm focus:outline-none focus:border-[#2563EB]"
                 >
                   <option value="DD/MM/YYYY">DD/MM/YYYY (31/12/2024)</option>
                   <option value="DD-MM-YYYY">DD-MM-YYYY (31-12-2024)</option>
@@ -1349,7 +1382,7 @@ export const PageParametres = () => {
                 <button
                   onClick={() => setPreferences({...preferences, sauvegardeAuto: !preferences.sauvegardeAuto})}
                   className={`w-12 h-6 rounded-full transition-colors ${
-                    preferences.sauvegardeAuto ? 'bg-[#c9a227]' : 'bg-[#e5e5e5]'
+                    preferences.sauvegardeAuto ? 'bg-[#2563EB]' : 'bg-[#e5e5e5]'
                   }`}
                 >
                   <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${

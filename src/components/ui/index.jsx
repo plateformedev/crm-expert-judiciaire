@@ -28,7 +28,7 @@ export const Card = ({
   };
 
   const premiumStyle = premium
-    ? 'border-[#c9a227] border-2 bg-[#fdf8e8]'
+    ? 'border-[#2563EB] border-2 bg-[#EFF6FF]'
     : '';
 
   const clickableClasses = onClick ? 'cursor-pointer transition-all duration-200' : '';
@@ -132,12 +132,14 @@ export const Badge = ({
 }) => {
   const variants = {
     default: 'bg-[#f0f0f0] text-[#555555]',
-    gold: 'bg-[#fdf8e8] text-[#9a7b1c] border border-[#c9a227]',
-    success: 'bg-[#e5f7ed] text-[#007a3d] border border-[#00a65a]',
-    warning: 'bg-[#fff5e5] text-[#cc7700] border border-[#ff9500]',
-    error: 'bg-[#ffebea] text-[#cc2f26] border border-[#ff3b30]',
-    info: 'bg-[#e5f3ff] text-[#0066cc] border border-[#0381fe]',
-    purple: 'bg-[#f3e8ff] text-[#7c3aed] border border-[#a855f7]'
+    primary: 'bg-[#EFF6FF] text-[#1D4ED8] border border-[#3B82F6]',
+    gold: 'bg-[#EFF6FF] text-[#1D4ED8] border border-[#3B82F6]',
+    success: 'bg-[#ECFDF5] text-[#047857] border border-[#059669]',
+    warning: 'bg-[#FFFBEB] text-[#B45309] border border-[#D97706]',
+    error: 'bg-[#FEF2F2] text-[#B91C1C] border border-[#DC2626]',
+    info: 'bg-[#ECFEFF] text-[#0E7490] border border-[#0891B2]',
+    purple: 'bg-[#f3e8ff] text-[#7c3aed] border border-[#a855f7]',
+    accent: 'bg-[#FDF8E8] text-[#7A5A07] border border-[#B8860B]'
   };
 
   const sizes = {
@@ -175,8 +177,8 @@ export const Button = ({
   ...props
 }) => {
   const variants = {
-    primary: `bg-[#c9a227] text-white font-semibold
-              hover:bg-[#b8921f] active:bg-[#9a7b1c]
+    primary: `bg-[#2563EB] text-white font-semibold
+              hover:bg-[#1D4ED8] active:bg-[#1E40AF]
               disabled:bg-[#e4e4e4] disabled:text-[#ababab]`,
     secondary: `bg-white border-2 border-[#e0e0e0] text-[#1f1f1f] font-medium
                 hover:bg-[#f7f7f7] active:bg-[#f0f0f0]
@@ -186,10 +188,12 @@ export const Button = ({
               disabled:bg-[#e4e4e4] disabled:text-[#ababab]`,
     ghost: `bg-transparent text-[#555555] font-medium
             hover:bg-[#f0f0f0] active:bg-[#e4e4e4]`,
-    danger: `bg-[#ff3b30] text-white font-semibold
-             hover:bg-[#e6342b] active:bg-[#cc2f26]`,
-    text: `bg-transparent text-[#c9a227] font-semibold
-           hover:bg-[#fdf8e8] active:bg-[#f5e6b3]`
+    danger: `bg-[#DC2626] text-white font-semibold
+             hover:bg-[#B91C1C] active:bg-[#991B1B]`,
+    text: `bg-transparent text-[#2563EB] font-semibold
+           hover:bg-[#EFF6FF] active:bg-[#DBEAFE]`,
+    accent: `bg-[#B8860B] text-white font-semibold
+             hover:bg-[#9A7209] active:bg-[#7A5A07]`
   };
 
   const sizes = {
@@ -375,7 +379,7 @@ export const Switch = ({
         />
         <div className={`
           w-[52px] h-[32px] rounded-full transition-colors duration-200
-          ${checked ? 'bg-[#c9a227]' : 'bg-[#e0e0e0]'}
+          ${checked ? 'bg-[#2563EB]' : 'bg-[#e0e0e0]'}
         `}>
           <div className={`
             absolute top-1 w-[24px] h-[24px] bg-white rounded-full shadow-md
@@ -483,14 +487,14 @@ export const Tabs = ({
           className={`
             px-5 py-4 text-[14px] font-semibold transition-all relative
             ${activeTab === tab.id
-              ? 'text-[#c9a227]'
+              ? 'text-[#2563EB]'
               : 'text-[#757575] hover:text-[#1f1f1f]'
             }
           `}
         >
           {tab.label}
           {activeTab === tab.id && (
-            <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#c9a227] rounded-t-full" />
+            <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#2563EB] rounded-t-full" />
           )}
         </button>
       ))}
@@ -513,19 +517,23 @@ export const ProgressBar = ({
   const percentage = Math.min(100, Math.max(0, (value / max) * 100));
 
   const colors = {
-    gold: 'bg-[#c9a227]',
-    green: 'bg-[#00a65a]',
-    red: 'bg-[#ff3b30]',
-    blue: 'bg-[#0381fe]',
-    orange: 'bg-[#ff9500]'
+    primary: 'bg-[#2563EB]',
+    gold: 'bg-[#2563EB]',
+    green: 'bg-[#059669]',
+    red: 'bg-[#DC2626]',
+    blue: 'bg-[#3B82F6]',
+    orange: 'bg-[#D97706]',
+    accent: 'bg-[#B8860B]'
   };
 
   const trackColors = {
-    gold: 'bg-[#f5e6b3]',
-    green: 'bg-[#b3e6c9]',
-    red: 'bg-[#ffb3b0]',
-    blue: 'bg-[#b3d9ff]',
-    orange: 'bg-[#ffd9a3]'
+    primary: 'bg-[#DBEAFE]',
+    gold: 'bg-[#DBEAFE]',
+    green: 'bg-[#D1FAE5]',
+    red: 'bg-[#FEE2E2]',
+    blue: 'bg-[#DBEAFE]',
+    orange: 'bg-[#FEF3C7]',
+    accent: 'bg-[#F5E6B3]'
   };
 
   const heights = {
@@ -583,7 +591,7 @@ export const Tooltip = ({
 };
 
 // ============================================================================
-// EMPTY STATE - Style Samsung
+// EMPTY STATE - Style Professionnel
 // ============================================================================
 
 export const EmptyState = ({
@@ -592,19 +600,41 @@ export const EmptyState = ({
   description,
   action,
   actionLabel,
+  variant = 'default', // default, success, info
   className = ''
 }) => {
+  const variants = {
+    default: {
+      iconBg: 'bg-[#F3F4F6]',
+      iconColor: 'text-[#9CA3AF]'
+    },
+    success: {
+      iconBg: 'bg-[#ECFDF5]',
+      iconColor: 'text-[#059669]'
+    },
+    info: {
+      iconBg: 'bg-[#EFF6FF]',
+      iconColor: 'text-[#2563EB]'
+    }
+  };
+
+  const config = variants[variant] || variants.default;
+
   return (
-    <div className={`text-center py-16 px-6 ${className}`}>
+    <div className={`text-center py-12 px-6 ${className}`}>
       {Icon && (
-        <div className="w-20 h-20 bg-[#f7f7f7] border-2 border-[#e0e0e0] rounded-full flex items-center justify-center mx-auto mb-6">
-          <Icon className="w-10 h-10 text-[#ababab]" />
+        <div className={`w-16 h-16 ${config.iconBg} rounded-full flex items-center justify-center mx-auto mb-4`}>
+          <Icon className={`w-8 h-8 ${config.iconColor}`} />
         </div>
       )}
-      <h3 className="text-[17px] font-semibold text-[#1f1f1f] mb-2">{title}</h3>
-      {description && <p className="text-[14px] text-[#757575] mb-6 max-w-md mx-auto leading-relaxed">{description}</p>}
+      <h3 className="text-lg font-medium text-[#111827] mb-1">{title}</h3>
+      {description && (
+        <p className="text-[15px] text-[#6B7280] mb-4 max-w-sm mx-auto">
+          {description}
+        </p>
+      )}
       {action && (
-        <Button variant="primary" onClick={action}>
+        <Button variant="secondary" onClick={action}>
           {actionLabel}
         </Button>
       )}
@@ -639,7 +669,7 @@ export const LoadingSpinner = ({ size = 'md', className = '' }) => {
         <path
           className="opacity-90"
           fill="none"
-          stroke="#c9a227"
+          stroke="#2563EB"
           strokeWidth="3"
           strokeLinecap="round"
           d="M12 2a10 10 0 0 1 10 10"

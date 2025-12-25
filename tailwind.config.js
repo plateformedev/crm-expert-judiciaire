@@ -6,48 +6,104 @@ export default {
   ],
   theme: {
     extend: {
-      // Couleurs du design system CRM Expert
+      // Couleurs du design system CRM Expert - Charte graphique professionnelle juridique
       colors: {
-        // Couleurs principales
-        gold: {
-          50: '#fefce8',
-          100: '#fef9c3',
-          200: '#fef08a',
-          300: '#fde047',
-          400: '#facc15',
-          500: '#c9a227', // Couleur principale
-          600: '#b8922c',
-          700: '#a16207',
-          800: '#854d0e',
-          900: '#713f12',
+        // Couleur primaire - Bleu professionnel/juridique
+        primary: {
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          200: '#BFDBFE',
+          300: '#93C5FD',
+          400: '#60A5FA',
+          500: '#3B82F6',  // Bleu principal
+          600: '#2563EB',
+          700: '#1D4ED8',
+          800: '#1E40AF',
+          900: '#1E3A5F',  // Bleu nuit (header)
+          950: '#172554',
         },
-        // Neutres personnalisés
+        // Accent - Or discret pour highlights financiers
+        accent: {
+          50: '#FDF8E8',
+          100: '#F5E6B3',
+          200: '#E8D48A',
+          300: '#D4B85C',
+          400: '#C9A227',
+          500: '#B8860B',  // DarkGoldenrod - sophistiqué
+          600: '#9A7209',
+          700: '#7A5A07',
+          800: '#5C4305',
+          900: '#3D2D03',
+        },
+        // Alias gold pour compatibilité ascendante
+        gold: {
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          200: '#BFDBFE',
+          300: '#93C5FD',
+          400: '#60A5FA',
+          500: '#3B82F6',
+          600: '#2563EB',
+          700: '#1D4ED8',
+          800: '#1E40AF',
+          900: '#1E3A5F',
+        },
+        // Neutres - Gris élégants
         neutral: {
-          50: '#fafafa',
-          100: '#f5f5f5',
-          200: '#e5e5e5',
-          300: '#d4d4d4',
-          400: '#a3a3a3',
-          500: '#737373',
-          600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#1a1a1a', // Noir principal
-          950: '#0a0a0a',
+          50: '#F9FAFB',
+          100: '#F3F4F6',
+          200: '#E5E7EB',
+          300: '#D1D5DB',
+          400: '#9CA3AF',
+          500: '#6B7280',
+          600: '#4B5563',
+          700: '#374151',
+          800: '#1F2937',
+          900: '#111827',
+          950: '#030712',
+        },
+        // Sémantiques
+        success: {
+          50: '#ECFDF5',
+          100: '#D1FAE5',
+          500: '#059669',  // Vert émeraude
+          600: '#047857',
+          700: '#065F46',
+        },
+        warning: {
+          50: '#FFFBEB',
+          100: '#FEF3C7',
+          500: '#D97706',  // Orange ambré
+          600: '#B45309',
+          700: '#92400E',
+        },
+        danger: {
+          50: '#FEF2F2',
+          100: '#FEE2E2',
+          500: '#DC2626',
+          600: '#B91C1C',
+          700: '#991B1B',
+        },
+        info: {
+          50: '#ECFEFF',
+          100: '#CFFAFE',
+          500: '#0891B2',
+          600: '#0E7490',
+          700: '#155E75',
         },
         // Statuts expertise
         expertise: {
-          nouveau: '#3b82f6',      // blue-500
-          'en-cours': '#c9a227',   // gold-500
-          'pre-rapport': '#f59e0b', // amber-500
-          termine: '#22c55e',       // green-500
-          archive: '#6b7280',       // gray-500
+          nouveau: '#3B82F6',      // primary-500
+          'en-cours': '#2563EB',   // primary-600
+          'pre-rapport': '#D97706', // warning-500
+          termine: '#059669',       // success-500
+          archive: '#6B7280',       // neutral-500
         },
         // Garanties construction
         garantie: {
-          gpa: '#22c55e',          // vert
-          biennale: '#f59e0b',     // orange
-          decennale: '#ef4444',    // rouge
+          gpa: '#059669',          // success-500
+          biennale: '#D97706',     // warning-500
+          decennale: '#DC2626',    // danger-500
         }
       },
       // Typographie
@@ -74,7 +130,9 @@ export default {
       // Ombres personnalisées
       boxShadow: {
         'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'gold': '0 4px 14px 0 rgba(201, 162, 39, 0.25)',
+        'primary': '0 4px 14px 0 rgba(59, 130, 246, 0.25)',  // Ombre bleu
+        'gold': '0 4px 14px 0 rgba(59, 130, 246, 0.25)',     // Alias pour compatibilité
+        'accent': '0 4px 14px 0 rgba(184, 134, 11, 0.25)',   // Ombre or discret
         'card': '0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)',
         'card-hover': '0 10px 40px rgba(0, 0, 0, 0.1)',
       },
@@ -209,9 +267,13 @@ export default {
           backgroundColor: theme('colors.neutral.100'),
           color: theme('colors.neutral.700'),
         },
+        '.badge-primary': {
+          backgroundColor: theme('colors.primary.100'),
+          color: theme('colors.primary.700'),
+        },
         '.badge-gold': {
-          backgroundColor: theme('colors.gold.100'),
-          color: theme('colors.gold.700'),
+          backgroundColor: theme('colors.primary.100'),
+          color: theme('colors.primary.700'),
         },
         '.badge-success': {
           backgroundColor: theme('colors.green.100'),
@@ -231,14 +293,14 @@ export default {
           alignItems: 'center',
           justifyContent: 'center',
           padding: `${theme('spacing.3')} ${theme('spacing.6')}`,
-          backgroundColor: theme('colors.gold.500'),
+          backgroundColor: theme('colors.primary.600'),
           color: 'white',
           fontWeight: theme('fontWeight.medium'),
           borderRadius: theme('borderRadius.xl'),
           transition: 'all 0.2s ease',
           '&:hover': {
-            backgroundColor: theme('colors.gold.600'),
-            boxShadow: theme('boxShadow.gold'),
+            backgroundColor: theme('colors.primary.700'),
+            boxShadow: theme('boxShadow.primary'),
           },
           '&:disabled': {
             opacity: '0.5',
@@ -255,8 +317,8 @@ export default {
           transition: 'all 0.2s ease',
           '&:focus': {
             outline: 'none',
-            borderColor: theme('colors.gold.500'),
-            boxShadow: `0 0 0 3px ${theme('colors.gold.100')}`,
+            borderColor: theme('colors.primary.500'),
+            boxShadow: `0 0 0 3px ${theme('colors.primary.100')}`,
           },
         },
       });

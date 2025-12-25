@@ -76,6 +76,7 @@ import { ETAPES_TUNNEL, DS } from './data';
 
 // Navigation simplifiée - Modules essentiels uniquement
 // Excellence et Outils sont intégrés dans la fiche affaire
+// Note: Paramètres est dans le footer de la Sidebar (pas de doublon)
 const MODULES = [
   { id: 'dashboard', path: '/dashboard', label: 'Tableau de bord', icon: Home },
   { id: 'affaires', path: '/affaires', label: 'Affaires', icon: Folder },
@@ -83,8 +84,7 @@ const MODULES = [
   { id: 'calendrier', path: '/calendrier', label: 'Calendrier', icon: Calendar },
   { id: 'carnet', path: '/carnet', label: 'Carnet d\'adresses', icon: Users },
   { id: 'facturation', path: '/facturation', label: 'Facturation', icon: Euro },
-  { id: 'statistiques', path: '/statistiques', label: 'Statistiques', icon: BarChart3 },
-  { id: 'parametres', path: '/parametres', label: 'Paramètres', icon: Settings }
+  { id: 'statistiques', path: '/statistiques', label: 'Statistiques', icon: BarChart3 }
 ];
 
 // ============================================================================
