@@ -116,7 +116,8 @@ export default defineConfig(({ mode }) => ({
   server: {
     port: 3000,
     host: true,
-    open: true
+    open: true,
+    allowedHosts: 'all'
   },
   build: {
     outDir: 'dist',
