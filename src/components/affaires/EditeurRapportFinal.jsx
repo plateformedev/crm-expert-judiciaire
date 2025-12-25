@@ -16,6 +16,48 @@ import { formatDateFr } from '../../utils/helpers';
 // STRUCTURE DU RAPPORT FINAL
 // ============================================================================
 
+// ============================================================================
+// VARIABLES DYNAMIQUES DISPONIBLES
+// ============================================================================
+
+const VARIABLES_DYNAMIQUES = [
+  { category: 'Affaire', variables: [
+    { code: '{{affaire.reference}}', label: 'Référence dossier' },
+    { code: '{{affaire.rg}}', label: 'N° RG' },
+    { code: '{{affaire.tribunal}}', label: 'Tribunal' },
+    { code: '{{affaire.date_ordonnance}}', label: 'Date ordonnance' },
+    { code: '{{affaire.date_echeance}}', label: 'Date échéance' }
+  ]},
+  { category: 'Bien expertisé', variables: [
+    { code: '{{bien.adresse}}', label: 'Adresse du bien' },
+    { code: '{{bien.code_postal}}', label: 'Code postal' },
+    { code: '{{bien.ville}}', label: 'Ville' },
+    { code: '{{bien.type}}', label: 'Type de bien' }
+  ]},
+  { category: 'Financier', variables: [
+    { code: '{{provision.montant}}', label: 'Provision initiale' },
+    { code: '{{provision.versee}}', label: 'Provision versée' },
+    { code: '{{desordres.total_ht}}', label: 'Total préjudices HT' },
+    { code: '{{desordres.total_ttc}}', label: 'Total préjudices TTC' }
+  ]},
+  { category: 'Dates', variables: [
+    { code: '{{date.jour}}', label: 'Date du jour' },
+    { code: '{{date.annee}}', label: 'Année en cours' },
+    { code: '{{expertise.premiere_reunion}}', label: 'Date 1ère réunion' },
+    { code: '{{expertise.derniere_reunion}}', label: 'Date dernière réunion' }
+  ]},
+  { category: 'Compteurs', variables: [
+    { code: '{{parties.count}}', label: 'Nombre de parties' },
+    { code: '{{reunions.count}}', label: 'Nombre de réunions' },
+    { code: '{{desordres.count}}', label: 'Nombre de désordres' },
+    { code: '{{dires.count}}', label: 'Nombre de dires' }
+  ]}
+];
+
+// ============================================================================
+// STRUCTURE DU RAPPORT FINAL
+// ============================================================================
+
 const SECTIONS_RAPPORT = [
   {
     id: 'preambule',
@@ -90,6 +132,129 @@ const SECTIONS_RAPPORT = [
     obligatoire: false
   }
 ];
+
+// ============================================================================
+// COMPOSANT: Table des matières
+// ============================================================================
+
+const TableDesMatieres = ({ sections, contentStatus, onJumpTo }) => {
+  return (
+    <Card className="p-4 sticky top-4">
+      <h4 className="text-sm font-medium text-[#1a1a1a] mb-3 flex items-center gap-2">
+        <BookOpen className="w-4 h-4 text-[#2563EB]" />
+        Sommaire
+      </h4>
+      <div className="space-y-1">
+        {SECTIONS_RAPPORT.map((section, index) => {
+          const hasContent = contentStatus[section.id]?.trim();
+          return (
+            <button
+              key={section.id}
+              onClick={() => onJumpTo(section.id)}
+              className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-[#EFF6FF] transition-colors flex items-center gap-2"
+            >
+              <span className="w-5 text-[#a3a3a3]">{index + 1}.</span>
+              <span className={`flex-1 ${hasContent ? 'text-[#1a1a1a]' : 'text-[#a3a3a3]'}`}>
+                {section.titre}
+              </span>
+              {hasContent ? (
+                <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+              ) : section.obligatoire ? (
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+    </Card>
+  );
+};
+
+// ============================================================================
+// COMPOSANT: Panneau de variables
+// ============================================================================
+
+const PanneauVariables = ({ onInsert, affaire }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  // Remplacer les variables par leurs valeurs réelles
+  const resolveVariable = (code) => {
+    const desordresTotal = (affaire.pathologies || []).reduce((sum, d) => sum + (Number(d.cout_estimation) || 0), 0);
+    const reunions = affaire.reunions || [];
+
+    const mappings = {
+      '{{affaire.reference}}': affaire.reference || 'N/C',
+      '{{affaire.rg}}': affaire.rg || 'N/C',
+      '{{affaire.tribunal}}': affaire.tribunal || 'N/C',
+      '{{affaire.date_ordonnance}}': affaire.date_ordonnance ? formatDateFr(affaire.date_ordonnance) : 'N/C',
+      '{{affaire.date_echeance}}': affaire.date_echeance ? formatDateFr(affaire.date_echeance) : 'N/C',
+      '{{bien.adresse}}': affaire.bien_adresse || 'N/C',
+      '{{bien.code_postal}}': affaire.bien_code_postal || '',
+      '{{bien.ville}}': affaire.bien_ville || 'N/C',
+      '{{bien.type}}': affaire.bien_type || 'N/C',
+      '{{provision.montant}}': affaire.provision_montant ? `${Number(affaire.provision_montant).toLocaleString('fr-FR')} €` : 'N/C',
+      '{{provision.versee}}': affaire.provision_versee ? `${Number(affaire.provision_versee).toLocaleString('fr-FR')} €` : 'N/C',
+      '{{desordres.total_ht}}': `${desordresTotal.toLocaleString('fr-FR')} €`,
+      '{{desordres.total_ttc}}': `${(desordresTotal * 1.20).toLocaleString('fr-FR')} €`,
+      '{{date.jour}}': formatDateFr(new Date()),
+      '{{date.annee}}': new Date().getFullYear().toString(),
+      '{{expertise.premiere_reunion}}': reunions[0]?.date_reunion ? formatDateFr(reunions[0].date_reunion) : 'N/C',
+      '{{expertise.derniere_reunion}}': reunions[reunions.length - 1]?.date_reunion ? formatDateFr(reunions[reunions.length - 1].date_reunion) : 'N/C',
+      '{{parties.count}}': (affaire.parties || []).length.toString(),
+      '{{reunions.count}}': reunions.length.toString(),
+      '{{desordres.count}}': (affaire.pathologies || []).length.toString(),
+      '{{dires.count}}': (affaire.dires || []).length.toString()
+    };
+
+    return mappings[code] || code;
+  };
+
+  return (
+    <Card className="p-4">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between text-sm font-medium text-[#1a1a1a]"
+      >
+        <span className="flex items-center gap-2">
+          <Wand2 className="w-4 h-4 text-[#2563EB]" />
+          Variables dynamiques
+        </span>
+        {expanded ? (
+          <ChevronDown className="w-4 h-4 text-[#a3a3a3]" />
+        ) : (
+          <ChevronRight className="w-4 h-4 text-[#a3a3a3]" />
+        )}
+      </button>
+
+      {expanded && (
+        <div className="mt-4 space-y-4">
+          <p className="text-xs text-[#737373]">
+            Cliquez sur une variable pour la copier. Les variables seront remplacées lors de l'export.
+          </p>
+          {VARIABLES_DYNAMIQUES.map(cat => (
+            <div key={cat.category}>
+              <p className="text-xs font-medium text-[#a3a3a3] uppercase tracking-wider mb-2">
+                {cat.category}
+              </p>
+              <div className="flex flex-wrap gap-1">
+                {cat.variables.map(v => (
+                  <button
+                    key={v.code}
+                    onClick={() => onInsert(v.code)}
+                    className="px-2 py-1 bg-[#f5f5f5] hover:bg-[#EFF6FF] border border-[#e5e5e5] hover:border-[#2563EB] rounded text-xs text-[#525252] hover:text-[#2563EB] transition-colors group relative"
+                    title={`${v.label}: ${resolveVariable(v.code)}`}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+};
 
 // ============================================================================
 // COMPOSANT: Section éditable du rapport
@@ -646,49 +811,73 @@ ${'═'.repeat(80)}
           </pre>
         </Card>
       ) : (
-        <div className="space-y-4">
-          {/* Actions rapides */}
-          {!locked && (
-            <Card className="p-4 bg-gradient-to-r from-[#EFF6FF] to-white">
-              <div className="flex items-center gap-4">
-                <Lightbulb className="w-5 h-5 text-[#2563EB]" />
-                <p className="text-sm text-[#525252] flex-1">
-                  Utilisez le bouton <Wand2 className="w-4 h-4 inline text-[#2563EB]" /> pour générer automatiquement le contenu depuis les données du dossier ou importer depuis la note de synthèse.
-                </p>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  icon={RefreshCw}
-                  onClick={() => {
-                    SECTIONS_RAPPORT.forEach(s => {
-                      if (!sections[s.id]?.trim()) {
-                        if (affaire.note_synthese?.[s.id]) {
-                          importFromSynthese(s.id);
-                        } else {
-                          generateFromData(s.id);
-                        }
-                      }
-                    });
-                  }}
-                >
-                  Tout générer
-                </Button>
-              </div>
-            </Card>
-          )}
-
-          {/* Sections */}
-          {SECTIONS_RAPPORT.map(section => (
-            <SectionRapport
-              key={section.id}
-              section={section}
-              content={sections[section.id]}
-              onChange={updateSection}
-              affaire={affaire}
-              onInsertTemplate={insertTemplate}
-              locked={locked}
+        <div className="flex gap-6">
+          {/* Sidebar gauche */}
+          <div className="w-64 flex-shrink-0 space-y-4">
+            <TableDesMatieres
+              sections={SECTIONS_RAPPORT}
+              contentStatus={sections}
+              onJumpTo={(sectionId) => {
+                const element = document.getElementById(`section-${sectionId}`);
+                element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
             />
-          ))}
+            {!locked && (
+              <PanneauVariables
+                affaire={affaire}
+                onInsert={(code) => {
+                  navigator.clipboard.writeText(code);
+                }}
+              />
+            )}
+          </div>
+
+          {/* Contenu principal */}
+          <div className="flex-1 space-y-4">
+            {/* Actions rapides */}
+            {!locked && (
+              <Card className="p-4 bg-gradient-to-r from-[#EFF6FF] to-white">
+                <div className="flex items-center gap-4">
+                  <Lightbulb className="w-5 h-5 text-[#2563EB]" />
+                  <p className="text-sm text-[#525252] flex-1">
+                    Utilisez le bouton <Wand2 className="w-4 h-4 inline text-[#2563EB]" /> pour générer automatiquement le contenu depuis les données du dossier ou importer depuis la note de synthèse.
+                  </p>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={RefreshCw}
+                    onClick={() => {
+                      SECTIONS_RAPPORT.forEach(s => {
+                        if (!sections[s.id]?.trim()) {
+                          if (affaire.note_synthese?.[s.id]) {
+                            importFromSynthese(s.id);
+                          } else {
+                            generateFromData(s.id);
+                          }
+                        }
+                      });
+                    }}
+                  >
+                    Tout générer
+                  </Button>
+                </div>
+              </Card>
+            )}
+
+            {/* Sections */}
+            {SECTIONS_RAPPORT.map(section => (
+              <div key={section.id} id={`section-${section.id}`}>
+                <SectionRapport
+                  section={section}
+                  content={sections[section.id]}
+                  onChange={updateSection}
+                  affaire={affaire}
+                  onInsertTemplate={insertTemplate}
+                  locked={locked}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
