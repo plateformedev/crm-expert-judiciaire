@@ -273,11 +273,11 @@ export const PageStatistiques = () => {
       .filter(a => !a.provision_recue && a.provision_montant)
       .reduce((sum, a) => sum + (a.provision_montant || 0), 0);
 
-    // Heures travaillées
-    const totalHeures = affaires.reduce((sum, a) => {
+    // Heures travaillées (arrondi à 2 décimales pour éviter 4.45999999)
+    const totalHeures = Math.round(affaires.reduce((sum, a) => {
       const vacations = a.vacations || [];
       return sum + vacations.reduce((s, v) => s + (v.duree_heures || 0), 0);
-    }, 0);
+    }, 0) * 100) / 100;
 
     // Réunions
     const totalReunions = affaires.reduce((sum, a) => sum + (a.reunions?.length || 0), 0);

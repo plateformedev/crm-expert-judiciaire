@@ -115,7 +115,12 @@ export const useSapiteurs = (expertId) => {
   };
 
   React.useEffect(() => {
-    if (expertId) fetchSapiteurs();
+    if (expertId) {
+      fetchSapiteurs();
+    } else {
+      // Sans expertId (mode démo), terminer le loading avec liste vide
+      setLoading(false);
+    }
   }, [expertId]);
 
   return {

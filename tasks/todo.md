@@ -88,16 +88,16 @@ Implémenter les améliorations UX inspirées de Pennylane pour rendre le CRM pl
 
 ### Plan de correction
 
-- [ ] Bug 1 : Arrondir totalHeures (1 ligne)
-- [ ] Bug 3 : Gérer expertId manquant dans useSapiteurs
-- [ ] Bug 2 : Investiguer si reproductible
+- [x] Bug 1 : Arrondir totalHeures (1 ligne)
+- [x] Bug 3 : Gérer expertId manquant dans useSapiteurs
+- [ ] Bug 2 : Investiguer si reproductible (besoin étapes)
 
 ---
 
 ### Review Bugs
-| Bug | Statut | Fichier | Commit |
-|-----|--------|---------|--------|
-| Heures décimales | ⏳ | - | - |
-| Carnet chargement | ⏳ | - | - |
-| Modale OPALEXE | 🔍 À investiguer | - | - |
+| Bug | Statut | Fichier | Fix |
+|-----|--------|---------|-----|
+| Heures décimales | ✅ | `PageStatistiques.jsx` | `Math.round(x * 100) / 100` |
+| Carnet chargement | ✅ | `sapiteurs/index.jsx` | `setLoading(false)` si pas d'expertId |
+| Modale OPALEXE | 🔍 | - | Besoin reproduction |
 
