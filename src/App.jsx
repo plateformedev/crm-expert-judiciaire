@@ -356,8 +356,18 @@ const DashboardWrapper = () => {
 const AppLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // Sidebar avec préférence sauvegardée
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('sidebar_collapsed') === 'true';
+    } catch { return false; }
+  });
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Sauvegarder préférence sidebar
+  useEffect(() => {
+    try { localStorage.setItem('sidebar_collapsed', sidebarCollapsed); } catch {}
+  }, [sidebarCollapsed]);
   const { notifications } = useNotifications();
   const { affaires } = useAffaires();
   const { goBack, canGoBack, tabs, openTab } = useTabs();

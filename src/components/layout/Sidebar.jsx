@@ -126,6 +126,7 @@ const Sidebar = ({
             <div key={module.id} className="mb-1">
               <button
                 onClick={() => handleModuleClick(module)}
+                title={collapsed ? module.label : undefined}
                 className={`
                   w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-200
                   ${isActive

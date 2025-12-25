@@ -15,10 +15,10 @@ Implémenter les améliorations UX inspirées de Pennylane pour rendre le CRM pl
 
 ## PRIORITÉ 2 - Impact Moyen
 
-### 2.1 Menu latéral repliable
-- [ ] Modifier Sidebar.jsx pour ajouter un état collapsed/expanded
-- [ ] Afficher icônes seules quand replié, texte au survol
-- [ ] Sauvegarder la préférence dans localStorage
+### 2.1 Menu latéral repliable ✅
+- [x] ~~Modifier Sidebar.jsx pour ajouter un état collapsed/expanded~~ (déjà existant)
+- [x] Afficher icônes seules quand replié, texte au survol (ajout title)
+- [x] Sauvegarder la préférence dans localStorage
 
 ### 2.2 Panneau notifications latéral droit
 - [ ] Créer composant NotificationsPanel.jsx
