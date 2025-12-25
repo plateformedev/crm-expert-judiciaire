@@ -20,10 +20,10 @@ Implémenter les améliorations UX inspirées de Pennylane pour rendre le CRM pl
 - [x] Afficher icônes seules quand replié, texte au survol (ajout title)
 - [x] Sauvegarder la préférence dans localStorage
 
-### 2.2 Panneau notifications latéral droit
-- [ ] Créer composant NotificationsPanel.jsx
-- [ ] 3 onglets : À faire | Alertes | Historique
-- [ ] Message positif quand tout est fait
+### 2.2 Panneau notifications latéral droit ✅
+- [x] Créer composant NotificationsPanel.jsx
+- [x] 3 onglets : À faire | Alertes | Historique
+- [x] Message positif quand tout est fait ("🎉 Vous êtes à jour !")
 
 ### 2.3 Améliorer la recherche globale
 - [ ] Rendre la barre de recherche plus visible

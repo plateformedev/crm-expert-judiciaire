@@ -426,6 +426,7 @@ const AppLayout = ({ children }) => {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             notifications={notifications}
+            affaires={affaires}
           />
 
           {/* Barre d'onglets (style navigateur) */}

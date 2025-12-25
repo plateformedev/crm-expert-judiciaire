@@ -9,6 +9,7 @@ import {
   Download, Upload, Settings, LogOut, HelpCircle, X
 } from 'lucide-react';
 import { Button, useToast } from '../ui';
+import NotificationsPanel from './NotificationsPanel';
 
 const Header = ({
   searchQuery = '',
@@ -16,6 +17,8 @@ const Header = ({
   setShowModal = null,
   onNewAffaire = null,
   notifications = [],
+  alertes = [],
+  affaires = [],
   user = { nom: 'Expert', email: 'expert@example.com' }
 }) => {
   const navigate = useNavigate();
@@ -267,6 +270,14 @@ const Header = ({
           )}
         </div>
       </div>
+
+      {/* Panneau notifications latéral style Pennylane */}
+      <NotificationsPanel
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        alertes={alertes}
+        affaires={affaires}
+      />
     </header>
   );
 };
