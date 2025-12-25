@@ -50,6 +50,7 @@ import { GestionParties } from './GestionParties';
 import { EditeurMission } from './EditeurMission';
 import { GestionDesordres } from './GestionDesordres';
 import { GenerateurCourriers } from './GenerateurCourriers';
+import { ExportDocuments } from './ExportDocuments';
 
 // Phase 5 - Intégrations externes
 import {
@@ -1757,6 +1758,11 @@ export const FicheAffaire = ({ affaireId, onBack }) => {
               onOpenNoteSynthese={() => setShowNoteSynthese(true)}
               onOpenRapportFinal={() => setShowRapportFinal(true)}
             />
+
+            {/* Export multi-format */}
+            <div className="pt-6 border-t border-[#e5e5e5]">
+              <ExportDocuments affaire={affaire} />
+            </div>
 
             {/* Outils d'expertise */}
             <div className="pt-6 border-t border-[#e5e5e5]">
