@@ -646,4 +646,5 @@ export const TempsAujourdhui = ({ vacationsJour = [] }) => {
 // EXPORT
 // ============================================================================
 
+export { StatistiquesGlobal } from './StatistiquesGlobal';
 export default DashboardExpert;
