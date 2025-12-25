@@ -101,3 +101,46 @@ Implémenter les améliorations UX inspirées de Pennylane pour rendre le CRM pl
 | Carnet chargement | ✅ | `sapiteurs/index.jsx` | `setLoading(false)` si pas d'expertId |
 | Modale OPALEXE | 🔍 | - | Besoin reproduction |
 
+---
+
+## AMÉLIORATION TABLEAU DES AFFAIRES (9.4)
+
+### État actuel
+Le tableau a déjà :
+- ✅ Filtres complets (9 critères)
+- ✅ Recherche texte
+- ✅ Stats rapides
+- ✅ 12 colonnes (Référence, RG, Tribunal, Ville, Statut, Échéance, Progress., Parties, Réunions, Désordres, Provision, Actions)
+
+### Améliorations prévues
+
+- [ ] 9.4.1 Tri par colonnes (clic sur en-tête = tri ASC/DESC)
+- [ ] 9.4.2 Sauvegarde filtres dans localStorage
+- [ ] 9.4.3 Export CSV des affaires filtrées
+
+### Détails techniques
+
+#### 9.4.1 Tri par colonnes
+- Ajouter état `sortConfig = { key: null, direction: 'asc' }`
+- Ajouter fonction `handleSort(key)` qui toggle ASC/DESC
+- Ajouter icône ↑↓ sur les en-têtes cliquables
+- Trier `affairesFiltrees` selon `sortConfig`
+
+#### 9.4.2 Sauvegarde filtres
+- `useEffect` pour sauver `filters` dans localStorage
+- Charger les filtres au montage depuis localStorage
+
+#### 9.4.3 Export CSV
+- Bouton "Exporter CSV" dans la barre d'outils
+- Génère fichier CSV avec les colonnes visibles
+- Téléchargement automatique
+
+---
+
+### Review Tableau
+| Amélioration | Statut | Impact |
+|--------------|--------|--------|
+| Tri colonnes | ⏳ | Fort |
+| Sauvegarde filtres | ⏳ | Moyen |
+| Export CSV | ⏳ | Fort |
+
